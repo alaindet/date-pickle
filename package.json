@@ -5,7 +5,8 @@
   "main": "src/index.ts",
   "scripts": {
     "start": "npx nodemon",
-    "exec": "npx ts-node ./src/index.ts",
+    "once": "npx ts-node ./src/index.ts",
+    "demo": "npx nodemon --config nodemon.demo.json",
     "build": "rimraf ./dist && tsc -p tsconfig.build.json",
     "test": "cross-env NODE_ICU_DATA=node_modules/full-icu jest",
     "test:watch": "cross-env NODE_ICU_DATA=node_modules/full-icu jest --watch"
