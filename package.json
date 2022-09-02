@@ -2,7 +2,8 @@
   "name": "date-pickle",
   "version": "0.0.1",
   "description": "A framework-agnostic library to manage calendars",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "start": "npx nodemon",
     "once": "npx ts-node ./src/index.ts",
@@ -28,5 +29,8 @@
     "ts-jest": "^28.0.8",
     "ts-node": "^10.9.1",
     "typescript": "^4.8.2"
-  }
+  },
+  "files": [
+    "/dist"
+  ]
 }
