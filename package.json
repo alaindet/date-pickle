@@ -1,6 +1,6 @@
 {
   "name": "date-pickle",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A framework-agnostic library to manage calendars",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
