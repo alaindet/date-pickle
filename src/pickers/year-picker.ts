@@ -3,71 +3,80 @@ import { ItemsChangeHandler, YearItem } from '../types';
 
 export class YearPicker {
 
-  private ref!: Date;
-  private items!: YearItem[];
-  private itemsCount = 12;
-  private min?: Date;
-  private max?: Date;
-  private itemsChangeHandler?: ItemsChangeHandler<YearItem>;
+  private _ref!: Date;
+  private _items!: YearItem[];
+  private _itemsCount = 12;
+  private _min?: Date;
+  private _max?: Date;
+  private _itemsChangeHandler?: ItemsChangeHandler<YearItem>;
+  private _shouldUpdate: boolean = true;
 
   constructor(current?: Date, shouldUpdate = true) {
-    this.ref = current ?? new Date();
+    this._ref = current ?? new Date();
+    this._shouldUpdate = shouldUpdate;
+    this.updateItems();
+  }
+
+  get min(): Date | undefined { return this._min }
+  get max(): Date | undefined { return this._max }
+  get shouldUpdate(): boolean { return this._shouldUpdate }
+  get items(): YearItem[] | undefined { return this._items }
+
+  set shouldUpdate(shouldUpdate: boolean) {
+    this._shouldUpdate = shouldUpdate;
     shouldUpdate && this.updateItems();
   }
 
-  getMin(): Date | undefined { return this.min }
-  getMax(): Date | undefined { return this.max }
-  getItems(): YearItem[] { return this.items }
-
-  setNow(shouldUpdate = true): void {
-    this.ref = new Date();
-    shouldUpdate && this.updateItems();
+  set year(year: number) {
+    this._ref.setFullYear(year);
+    this.updateItems();
   }
 
-  setYear(year: number, shouldUpdate = true): void {
-    this.ref.setFullYear(year);
-    shouldUpdate && this.updateItems();
+  set min(min: Date | undefined) {
+    this._min = min;
+    this.updateItems();
   }
 
-  setMin(min: Date, shouldUpdate = true): void {
-    this.min = min;
-    shouldUpdate && this.updateItems();
+  set max(max: Date | undefined) {
+    this._max = max;
+    this.updateItems();
   }
 
-  setMax(max: Date, shouldUpdate = true): void {
-    this.max = max;
-    shouldUpdate && this.updateItems();
+  now(): void {
+    this._ref = new Date();
+    this.updateItems();
   }
 
   onItemsChange(handler: ItemsChangeHandler<YearItem>): void {
-    this.itemsChangeHandler = handler;
-    if (this.items) handler(this.items);
+    this._itemsChangeHandler = handler;
+    if (this.items && this._shouldUpdate) handler(this.items);
   }
 
-  next(shouldUpdate = true): void {
-    this.ref.setFullYear(this.ref.getFullYear() + this.itemsCount);
-    shouldUpdate && this.updateItems();
+  next(): void {
+    this._ref.setFullYear(this._ref.getFullYear() + this._itemsCount);
+    this.updateItems();
   }
 
   prev(shouldUpdate = true): void {
-    this.ref.setFullYear(this.ref.getFullYear() - this.itemsCount);
-    shouldUpdate && this.updateItems();
+    this._ref.setFullYear(this._ref.getFullYear() - this._itemsCount);
+    this.updateItems();
   }
 
   updateItems(): void {
-    this.items = this.buildItems();
-    this.itemsChangeHandler && this.itemsChangeHandler(this.items);
+    if (!this._shouldUpdate) return;
+    this._items = this.buildItems();
+    this._itemsChangeHandler && this._itemsChangeHandler(this._items);
   }
 
   private buildItems(): YearItem[] {
 
     const d = new Date();
     const thisYearComp = d.getFullYear();
-    const minComp = this.min ? comparableDate(this.min, 'year') : null;
-    const maxComp = this.max ? comparableDate(this.max, 'year') : null;
+    const minComp = this?.min ? comparableDate(this._min!, 'year') : null;
+    const maxComp = this?.max ? comparableDate(this._max!, 'year') : null;
 
-    const half = Math.floor(this.itemsCount / 2);
-    const year = this.ref.getFullYear();
+    const half = Math.floor(this._itemsCount / 2);
+    const year = this._ref.getFullYear();
     const inf = year - half + 1;
     const sup = year + half;
 

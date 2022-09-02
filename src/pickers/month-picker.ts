@@ -6,53 +6,62 @@ const LAST_MONTH_INDEX = 11;
 
 export class MonthPicker {
 
-  private items!: MonthItem[];
-  private locale!: Locale;
-  private min?: Date;
-  private max?: Date;
-  private itemsChangeHandler?: ItemsChangeHandler<MonthItem>;
+  private _items!: MonthItem[];
+  private _locale!: Locale;
+  private _min?: Date;
+  private _max?: Date;
+  private _itemsChangeHandler?: ItemsChangeHandler<MonthItem>;
+  private _shouldUpdate: boolean = true;
 
   constructor(locale = 'default', shouldUpdate = true) {
-    this.locale = locale;
+    this._locale = locale;
+    this._shouldUpdate = shouldUpdate;
+    this.updateItems();
+  }
+
+  get locale(): Locale { return this._locale }
+  get min(): Date | undefined { return this._min }
+  get max(): Date | undefined { return this._max }
+  get shouldUpdate(): boolean { return this._shouldUpdate }
+  get items(): MonthItem[] | undefined { return this._items }
+
+  set shouldUpdate(shouldUpdate: boolean) {
+    this._shouldUpdate = shouldUpdate;
     shouldUpdate && this.updateItems();
   }
 
-  getMin(): Date | undefined { return this.min }
-  getMax(): Date | undefined { return this.max }
-  getLocale(): Locale { return this.locale }
-  getItems(): MonthItem[] { return this.items }
-
-  setLocale(locale: string, shouldUpdate = true): void {
-    this.locale = locale;
-    shouldUpdate && this.updateItems();
+  set locale(locale: Locale) {
+    this._locale = locale;
+    this.updateItems();
   }
 
-  setMin(min: Date, shouldUpdate = true): void {
-    this.min = min;
-    shouldUpdate && this.updateItems();
+  set min(min: Date | undefined) {
+    this._min = min;
+    this.updateItems();
   }
 
-  setMax(max: Date, shouldUpdate = true): void {
-    this.max = max;
-    shouldUpdate && this.updateItems();
+  set max(max: Date | undefined) {
+    this._max = max;
+    this.updateItems();
   }
 
   onItemsChange(handler: ItemsChangeHandler<MonthItem>): void {
-    this.itemsChangeHandler = handler;
-    if (this.items) handler(this.items);
+    this._itemsChangeHandler = handler;
+    if (this._items) handler(this._items);
   }
 
   updateItems(): void {
-    this.items = this.buildItems();
-    this.itemsChangeHandler && this.itemsChangeHandler(this.items);
+    if (!this._shouldUpdate) return;
+    this._items = this.buildItems();
+    this._itemsChangeHandler && this._itemsChangeHandler(this._items);
   }
 
   private buildItems(): MonthItem[] {
 
     const d = new Date();
     const thisMonthComp = comparableDate(d, 'month');
-    const minComp = this.min ? comparableDate(this.min, 'month') : null;
-    const maxComp = this.max ? comparableDate(this.max, 'month') : null;
+    const minComp = this._min ? comparableDate(this._min!, 'month') : null;
+    const maxComp = this._max ? comparableDate(this._max!, 'month') : null;
 
     const inf = FIRST_MONTH_INDEX;
     const sup = LAST_MONTH_INDEX;
@@ -62,7 +71,7 @@ export class MonthPicker {
       d.setMonth(monthIndex);
       const monthComp = comparableDate(d, 'month');
 
-      const name = d.toLocaleString(this.locale, { month: 'long'} ).toLocaleLowerCase();
+      const name = d.toLocaleString(this._locale, { month: 'long'} ).toLocaleLowerCase();
 
       const isCurrent = monthComp === thisMonthComp;
 

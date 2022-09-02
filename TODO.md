@@ -1,5 +1,6 @@
-- [ ] Add README.md
 - [ ] Remove this TODO
 - [ ] npm pack and npm link
-- [ ] Add "shouldUpdate" flag to all pickers and DateSnaker
-- [ ] Replace all as getters/setters
+- [ ] Create base class for pickers
+- [ ] Update code examples
+- [ ] Add examples
+- [ ] Add updateAfter(callback)
