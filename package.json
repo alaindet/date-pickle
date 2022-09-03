@@ -5,15 +5,16 @@
   "main": "src/index.ts",
   "scripts": {
     "start": "npx nodemon",
-    "once": "npx ts-node ./src/index.ts",
-    "demo": "npx nodemon --config nodemon.demo.json",
     "build": "rimraf ./dist && tsc -p tsconfig.build.json",
     "test": "cross-env NODE_ICU_DATA=node_modules/full-icu jest",
     "test:watch": "cross-env NODE_ICU_DATA=node_modules/full-icu jest --watch"
   },
   "keywords": [
+    "date-pickle",
     "typescript",
-    "calendar"
+    "javascript",
+    "calendar",
+    "time"
   ],
   "author": "Alain D'Ettorre <alain.det@gmail.com>",
   "license": "MIT",
