@@ -1,4 +1,4 @@
-export type ItemsChangeHandler<T = any> = (items: T[]) => void;
+export type ItemsChangeHandler<T = unknown> = (items: T[]) => void;
 
 export interface DayItem {
   date: Date;

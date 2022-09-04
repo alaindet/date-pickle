@@ -5,10 +5,9 @@
 1. Clone and build the package
 ```
 git clone https://github.com/alaindet/date-pickle
-cd date-pickle
+cd ./date-pickle
 npm install
-npm run build
-npm pack # Generates date-pickle-<VERSION>.tgz
+npm run release # Generates date-pickle-<VERSION>.tgz
 ```
 
 2. Move to your project
