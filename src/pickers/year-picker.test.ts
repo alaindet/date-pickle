@@ -19,7 +19,7 @@ describe('YearPicker', () => {
     const picker = new YearPicker(now);
     const items = picker.items!;
     const thisYear = now.getFullYear();
-    const index = items.findIndex(i => i.year === thisYear);
+    const index = items!.findIndex(i => i.year === thisYear);
     expect(items[index].isCurrent).toBeTruthy();
   });
 

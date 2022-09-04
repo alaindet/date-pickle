@@ -2,13 +2,15 @@ import { range, comparableDate } from '../utils';
 import { YearItem } from '../types';
 import { Picker } from './picker';
 
+const YEARS_COUNT = 12;
+
 export class YearPicker extends Picker<YearItem> {
-
-  private _itemsCount = 12;
-
   constructor(current?: Date, shouldUpdate = true) {
     super(current, shouldUpdate);
-    this._ref = current ?? new Date();
+  }
+
+  get year(): number {
+    return this._ref.getFullYear();
   }
 
   set year(year: number) {
@@ -17,29 +19,27 @@ export class YearPicker extends Picker<YearItem> {
   }
 
   next(): void {
-    this._ref.setFullYear(this._ref.getFullYear() + this._itemsCount);
+    this._ref.setFullYear(this._ref.getFullYear() + YEARS_COUNT);
     this.updateItems();
   }
 
   prev(): void {
-    this._ref.setFullYear(this._ref.getFullYear() - this._itemsCount);
+    this._ref.setFullYear(this._ref.getFullYear() - YEARS_COUNT);
     this.updateItems();
   }
 
-  protected override buildItems(): YearItem[] {
-
+  protected buildItems(): YearItem[] {
     const d = new Date();
     const thisYearComp = d.getFullYear();
     const minComp = this?.min ? comparableDate(this._min!, 'year') : null;
     const maxComp = this?.max ? comparableDate(this._max!, 'year') : null;
 
-    const half = Math.floor(this._itemsCount / 2);
+    const half = Math.floor(YEARS_COUNT / 2);
     const year = this._ref.getFullYear();
     const inf = year - half + 1;
     const sup = year + half;
 
     return range(inf, sup).map(year => {
-
       d.setFullYear(year);
       const yearComp = comparableDate(d, 'year');
 

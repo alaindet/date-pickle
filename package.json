@@ -1,14 +1,22 @@
 {
   "name": "date-pickle",
-  "version": "0.0.1",
+  "version": "0.0.4",
   "description": "A framework-agnostic library to manage calendars",
   "main": "src/index.ts",
+  "types": "src/types/index.ts",
   "scripts": {
     "start": "npx nodemon",
     "build": "rimraf ./dist && tsc -p tsconfig.build.json",
     "test": "cross-env NODE_ICU_DATA=node_modules/full-icu jest",
     "test:watch": "cross-env NODE_ICU_DATA=node_modules/full-icu jest --watch",
-    "lint": "eslint --ext .js,.ts ."
+    "lint": "eslint --ext .js,.ts .",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+
+    "release": "npm run build && npm run pack",
+    "prepare": "npm run build",
+    "preversion": "npm run lint",
+    "version": "npm run format && git add -A src",
+    "postversion": "git push && git push --tags"
   },
   "keywords": [
     "date-pickle",

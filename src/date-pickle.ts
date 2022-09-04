@@ -5,7 +5,7 @@ import { Locale } from './types';
 import { cloneDate } from './utils';
 
 export class DatePickle {
-
+  // Pickers
   private _yearPicker?: YearPicker;
   private _monthPicker?: MonthPicker;
   private _datePicker?: DatePicker;
@@ -14,7 +14,7 @@ export class DatePickle {
   private _locale!: Locale;
   private _min?: Date;
   private _max?: Date;
-  private _shouldUpdate: boolean = true;
+  private _shouldUpdate = true;
 
   constructor(current?: Date, locale = 'default', shouldUpdate = true) {
     this._ref = current ?? new Date();
@@ -22,10 +22,47 @@ export class DatePickle {
     this._shouldUpdate = shouldUpdate;
   }
 
-  get locale(): Locale { return this._locale }
-  get min(): Date | undefined { return this._min }
-  get max(): Date | undefined { return this._max }
-  get shouldUpdate(): boolean { return this._shouldUpdate }
+  get locale(): Locale {
+    return this._locale;
+  }
+
+  set locale(locale: Locale) {
+    this._locale = locale;
+    if (this?._monthPicker) this._monthPicker.locale = locale;
+  }
+
+  get min(): Date | undefined {
+    return this._min;
+  }
+
+  set min(min: Date | undefined) {
+    this._min = min;
+    if (this?._yearPicker) this._yearPicker.min = min;
+    if (this?._monthPicker) this._monthPicker.min = min;
+    if (this?._datePicker) this._datePicker.min = min;
+  }
+
+  get max(): Date | undefined {
+    return this._max;
+  }
+
+  set max(max: Date | undefined) {
+    this._max = max;
+    if (this?._yearPicker) this._yearPicker.max = max;
+    if (this?._monthPicker) this._monthPicker.max = max;
+    if (this?._datePicker) this._datePicker.max = max;
+  }
+
+  get shouldUpdate(): boolean {
+    return this._shouldUpdate;
+  }
+
+  set shouldUpdate(update: boolean) {
+    this._shouldUpdate = update;
+    if (this?._yearPicker) this._yearPicker.shouldUpdate = update;
+    if (this?._monthPicker) this._monthPicker.shouldUpdate = update;
+    if (this?._datePicker) this._datePicker.shouldUpdate = update;
+  }
 
   get yearPicker(): YearPicker {
     if (!this._yearPicker) this.createYearPicker();
@@ -42,44 +79,22 @@ export class DatePickle {
     return this._datePicker!;
   }
 
-  set shouldUpdate(update: boolean) {
-    this._shouldUpdate = update;
-    if (this?._yearPicker) this._yearPicker.shouldUpdate = update;
-    if (this?._monthPicker) this._monthPicker.shouldUpdate = update;
-    if (this?._datePicker) this._datePicker.shouldUpdate = update;
-  }
-
-  set locale(locale: Locale) {
-    this._locale = locale;
-    if (this?._monthPicker) this._monthPicker.locale = locale;
-  }
-
-  set min(min: Date | undefined) {
-    this._min = min;
-    if (this?._yearPicker) this._yearPicker.min = min;
-    if (this?._monthPicker) this._monthPicker.min = min;
-    if (this?._datePicker) this._datePicker.min = min;
-  }
-
-  set max(max: Date | undefined) {
-    this._max = max;
-    if (this?._yearPicker) this._yearPicker.max = max;
-    if (this?._monthPicker) this._monthPicker.max = max;
-    if (this?._datePicker) this._datePicker.max = max;
-  }
-
   set current(current: Date) {
     this._ref = current;
     if (this?._yearPicker) this._yearPicker.year = current.getFullYear();
     if (this?._datePicker) this._datePicker.current = current;
   }
 
-  exists(picker: 'year-picker' | 'month-picker' | 'date-picker'): boolean {
-    switch (picker) {
-      case 'year-picker': return !!this?._yearPicker;
-      case 'month-picker': return !!this?._monthPicker;
-      case 'date-picker': return !!this?._datePicker;
-    }
+  existsYearPicker(): boolean {
+    return !!this?._yearPicker;
+  }
+
+  existsMonthPicker(): boolean {
+    return !!this?._monthPicker;
+  }
+
+  existsDatePicker(): boolean {
+    return !!this?._datePicker;
   }
 
   private createYearPicker(): void {

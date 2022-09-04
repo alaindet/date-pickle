@@ -1,14 +1,8 @@
 import { cloneDate, comparableDate } from '../utils';
-import { ItemsChangeHandler, DayItem } from '../types';
+import { DayItem } from '../types';
+import { Picker } from './picker';
 
-export class DatePicker {
-
-  private _ref!: Date;
-  private _items!: DayItem[];
-  private _min?: Date;
-  private _max?: Date;
-  private _itemsChangeHandler?: ItemsChangeHandler<DayItem>;
-  private _shouldUpdate: boolean = true;
+export class DatePicker extends Picker<DayItem> {
 
   /**
    * Shows some days of prev and next month to fill the week (starts on monday)
@@ -17,54 +11,19 @@ export class DatePicker {
    * - If first day of current month is wednesday, show prev month's last 2 days
    * - If last day of current month is thursday, show next months' first 3 days
    */
-  private _peek: boolean = true;
+  private _peek = true;
 
   constructor(current?: Date, shouldUpdate = true) {
-    const d = current ?? new Date();
-    this._ref = d;
-    this._shouldUpdate = shouldUpdate;
-    this.updateItems();
+    super(current, shouldUpdate);
   }
 
-  get min(): Date | undefined { return this._min }
-  get max(): Date | undefined { return this._max }
-  get peek(): boolean { return this._peek }
-  get shouldUpdate(): boolean { return this._shouldUpdate }
-  get items(): DayItem[] | undefined { return this._items }
-
-  set shouldUpdate(shouldUpdate: boolean) {
-    this._shouldUpdate = shouldUpdate;
-    shouldUpdate && this.updateItems();
-  }
-
-  set current(current: Date) {
-    this._ref = current;
-    this.updateItems();
-  }
-
-  set min(min: Date | undefined) {
-    this._min = min;
-    this.updateItems();
-  }
-
-  set max(max: Date | undefined) {
-    this._max = max;
-    this.updateItems();
+  get peek(): boolean {
+    return this._peek;
   }
 
   set peek(peek: boolean) {
     this._peek = peek;
     this.updateItems();
-  }
-
-  now(): void {
-    this._ref = new Date();
-    this.updateItems();
-  }
-
-  onItemsChange(handler: ItemsChangeHandler<DayItem>): void {
-    this._itemsChangeHandler = handler;
-    if (this._items) handler(this._items);
   }
 
   next(): void {
@@ -79,13 +38,7 @@ export class DatePicker {
     this.updateItems();
   }
 
-  updateItems(): void {
-    if (!this._shouldUpdate) return;
-    this._items = this.buildItems();
-    this._itemsChangeHandler && this._itemsChangeHandler(this._items);
-  }
-
-  private buildItems(): DayItem[] {
+  protected buildItems(): DayItem[] {
 
     const days = this.getDaysInCurrentMonth();
 

@@ -17,17 +17,17 @@ describe('DatePickle', () => {
   it('should instantiate pickers lazily', () => {
     const dpk = new DatePickle(new Date('2022-09-02'), 'en');
 
-    expect(dpk.exists('year-picker')).toBeFalsy();
+    expect(dpk.existsYearPicker()).toBeFalsy();
     dpk.yearPicker;
-    expect(dpk.exists('year-picker')).toBeTruthy();
+    expect(dpk.existsYearPicker()).toBeTruthy();
 
-    expect(dpk.exists('month-picker')).toBeFalsy();
+    expect(dpk.existsMonthPicker()).toBeFalsy();
     dpk.monthPicker;
-    expect(dpk.exists('month-picker')).toBeTruthy();
+    expect(dpk.existsMonthPicker()).toBeTruthy();
 
-    expect(dpk.exists('date-picker')).toBeFalsy();
+    expect(dpk.existsDatePicker()).toBeFalsy();
     dpk.datePicker;
-    expect(dpk.exists('date-picker')).toBeTruthy();
+    expect(dpk.existsDatePicker()).toBeTruthy();
   });
 
   it('should propagate min value to pickers', () => {

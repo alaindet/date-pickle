@@ -1,13 +1,13 @@
-import { ItemsChangeHandler } from '../types';
+import { ItemsChangeHandler, Locale } from '../types';
 
-export abstract class Picker<T = any> {
-
+export abstract class Picker<ItemType = unknown> {
   protected _ref!: Date;
-  protected _items!: T[];
+  protected _items: ItemType[] = [];
   protected _min?: Date;
   protected _max?: Date;
-  protected _itemsChangeHandler?: ItemsChangeHandler<T>;
-  protected _shouldUpdate: boolean = true;
+  protected _locale?: Locale;
+  protected _itemsChangeHandler?: ItemsChangeHandler<ItemType>;
+  protected _shouldUpdate = true;
 
   constructor(current?: Date, shouldUpdate = true) {
     this._ref = current ?? new Date();
@@ -15,14 +15,26 @@ export abstract class Picker<T = any> {
     this.updateItems();
   }
 
-  get min(): Date | undefined { return this._min }
-  get max(): Date | undefined { return this._max }
-  get shouldUpdate(): boolean { return this._shouldUpdate }
-  get items(): T[] | undefined { return this._items }
+  get current(): Date {
+    return this._ref;
+  }
+
+  set current(current: Date) {
+    this._ref = current;
+    this.updateItems();
+  }
+
+  get shouldUpdate(): boolean {
+    return this._shouldUpdate;
+  }
 
   set shouldUpdate(shouldUpdate: boolean) {
     this._shouldUpdate = shouldUpdate;
     shouldUpdate && this.updateItems();
+  }
+
+  get min(): Date | undefined {
+    return this._min;
   }
 
   set min(min: Date | undefined) {
@@ -30,9 +42,26 @@ export abstract class Picker<T = any> {
     this.updateItems();
   }
 
+  get max(): Date | undefined {
+    return this._max;
+  }
+
   set max(max: Date | undefined) {
     this._max = max;
     this.updateItems();
+  }
+
+  get locale(): Locale | undefined {
+    return this._locale;
+  }
+
+  set locale(locale: Locale | undefined) {
+    this._locale = locale;
+    this.updateItems();
+  }
+
+  get items(): ItemType[] | undefined {
+    return this._items;
   }
 
   now(): void {
@@ -40,7 +69,7 @@ export abstract class Picker<T = any> {
     this.updateItems();
   }
 
-  onItemsChange(handler: ItemsChangeHandler<T>): void {
+  onItemsChange(handler: ItemsChangeHandler<ItemType>): void {
     this._itemsChangeHandler = handler;
     if (this.items && this._shouldUpdate) handler(this.items);
   }
@@ -52,7 +81,7 @@ export abstract class Picker<T = any> {
   }
 
   // Overridden by child class
-  protected buildItems(): T[] {
+  protected buildItems(): ItemType[] {
     return [];
   }
 }
