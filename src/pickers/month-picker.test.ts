@@ -10,13 +10,13 @@ describe('MonthPicker', () => {
     expect(result).toEqual(expected);
   });
 
-  it('should mark this month as current month', () => {
+  it('should mark this month with isNow = true', () => {
     const now = new Date();
     const picker = new MonthPicker();
     const items = picker.items!;
     const thisMonth = now.getMonth() + 1;
     const index = items.findIndex(i => i.number === thisMonth);
-    expect(items[index].isCurrent).toBeTruthy();
+    expect(items[index].isNow).toBeTruthy();
   });
 
   it('should translate month names for english locale', () => {

@@ -17,7 +17,7 @@ describe('DatePicker', () => {
     expect(items.length).toEqual(31);
   });
 
-  it('should mark today as current date', () => {
+  it('should mark today with isNow = true flag', () => {
     const now = new Date();
     const picker = new DatePicker(now);
     const todayIndex = now.getUTCDate() - 1;
@@ -27,7 +27,7 @@ describe('DatePicker', () => {
       return d.date.getUTCMonth() === now.getUTCMonth();
     });
 
-    expect(items![todayIndex].isCurrent).toBeTruthy();
+    expect(items![todayIndex].isNow).toBeTruthy();
   });
 
   it('should show saturdays and sundays as weekend days', () => {

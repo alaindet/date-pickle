@@ -1,23 +1,32 @@
 export type ItemsChangeHandler<T = unknown> = (items: T[]) => void;
 
-export interface DayItem {
+export interface DatePickleItem {
+  isNow: boolean;
+  isDisabled: boolean;
+  isSelected: boolean;
+  isFocused: boolean;
+}
+
+export interface DayItem extends DatePickleItem {
   date: Date;
   isWeekend: boolean;
-  isCurrent: boolean;
-  isDisabled: boolean;
 }
 
-export interface MonthItem {
+export interface MonthItem extends DatePickleItem {
   number: number;
   name: string;
-  isCurrent: boolean;
-  isDisabled: boolean;
 }
 
-export interface YearItem {
+export interface YearItem extends DatePickleItem {
   year: number;
-  isCurrent: boolean;
-  isDisabled: boolean;
 }
 
 export type Locale = string; // TODO: Better typing?
+
+export interface PickerOptions {
+  min?: Date;
+  max?: Date;
+  locale?: Locale;
+  selected?: Date;
+  focused?: Date;
+}

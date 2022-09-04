@@ -1,7 +1,7 @@
 import { YearPicker } from './pickers/year-picker';
 import { MonthPicker } from './pickers/month-picker';
 import { DatePicker } from './pickers/date-picker';
-import { Locale } from './types';
+import { Locale, PickerOptions } from './types';
 import { cloneDate } from './utils';
 
 export class DatePickle {
@@ -14,6 +14,8 @@ export class DatePickle {
   private _locale!: Locale;
   private _min?: Date;
   private _max?: Date;
+  private _selected?: Date;
+  private _focused?: Date;
   private _shouldUpdate = true;
 
   constructor(current?: Date, locale = 'default', shouldUpdate = true) {
@@ -28,7 +30,9 @@ export class DatePickle {
 
   set locale(locale: Locale) {
     this._locale = locale;
+    if (this?._yearPicker) this._yearPicker.locale = locale;
     if (this?._monthPicker) this._monthPicker.locale = locale;
+    if (this?._datePicker) this._datePicker.locale = locale;
   }
 
   get min(): Date | undefined {
@@ -64,8 +68,22 @@ export class DatePickle {
     if (this?._datePicker) this._datePicker.shouldUpdate = update;
   }
 
+  get selected(): Date {
+    return this._selected;
+  }
+
+  set shouldUpdate(update: boolean) {
+    this._shouldUpdate = update;
+    if (this?._yearPicker) this._yearPicker.shouldUpdate = update;
+    if (this?._monthPicker) this._monthPicker.shouldUpdate = update;
+    if (this?._datePicker) this._datePicker.shouldUpdate = update;
+  }
+
   get yearPicker(): YearPicker {
-    if (!this._yearPicker) this.createYearPicker();
+    if (!this._yearPicker) {
+      const options = this.getInitialOptions();
+      this._yearPicker = new YearPicker(cloneDate(this._ref), options);
+    }
     return this._yearPicker!;
   }
 
@@ -97,24 +115,13 @@ export class DatePickle {
     return !!this?._datePicker;
   }
 
-  private createYearPicker(): void {
-    this._yearPicker = new YearPicker(cloneDate(this._ref), false);
-    this._yearPicker.min = this._min;
-    this._yearPicker.max = this._max;
-    this._yearPicker.shouldUpdate = true;
-  }
-
-  private createMonthPicker(): void {
-    this._monthPicker = new MonthPicker(this._locale, false);
-    this._monthPicker.min = this._min;
-    this._monthPicker.max = this._max;
-    this._monthPicker.shouldUpdate = true;
-  }
-
-  private createDatePicker(): void {
-    this._datePicker = new DatePicker(cloneDate(this._ref), false);
-    this._datePicker.min = this._min;
-    this._datePicker.max = this._max;
-    this._datePicker.shouldUpdate = true;
+  private getInitialOptions(): PickerOptions {
+    return {
+      min: this._min,
+      max: this._max,
+      locale: this._locale,
+      selected: this._selected,
+      focused: this._selected,
+    };
   }
 }

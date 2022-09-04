@@ -14,13 +14,13 @@ describe('YearPicker', () => {
     expect(result).toEqual(expected);
   });
 
-  it('should mark this year as current year', () => {
+  it('should mark this year with isNow = true', () => {
     const now = new Date();
     const picker = new YearPicker(now);
     const items = picker.items!;
     const thisYear = now.getFullYear();
     const index = items!.findIndex(i => i.year === thisYear);
-    expect(items[index].isCurrent).toBeTruthy();
+    expect(items[index].isNow).toBeTruthy();
   });
 
   it('should disable items lower than min', () => {
