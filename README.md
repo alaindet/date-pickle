@@ -37,7 +37,7 @@ npm install PATH_TO_TGZ_FILE
 ## Usage
 
 ```ts
-import { DatePickle } from './date-pickle';
+import { DatePickle } from 'date-pickle';
 
 const pickle = new DatePickle(new Date('2022-09-02'), 'en');
 
@@ -89,4 +89,7 @@ console.log(datePicker.items);
 //   { date: 2001-01-20T23:00:00.000Z, isDisabled: true, ... },
 //   ...
 // ]
+
+// Standalone picker (doesn't share state with other pickers)
+const datePickerStandalone = new DatePicker(new Date());
 ```
