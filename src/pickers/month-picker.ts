@@ -20,7 +20,7 @@ export class MonthPicker extends Picker<MonthItem> {
     const maxComp = this._max ? comparableDate(this._max!, 'month') : null;
 
     return range(FIRST_MONTH_INDEX, LAST_MONTH_INDEX).map(monthIndex => {
-      d.setMonth(monthIndex);
+      d.setUTCMonth(monthIndex);
       const monthComp = comparableDate(d, 'month');
 
       const name = d

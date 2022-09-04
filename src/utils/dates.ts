@@ -1,10 +1,10 @@
 import { padStart } from './pad-start';
 
-const y = (d: Date) => String(d.getFullYear());
-const m = (d: Date) => padStart(d.getMonth() + 1, '0', 2);
-const d = (d: Date) => padStart(d.getDate(), '0', 2);
-const h = (d: Date) => padStart(d.getHours(), '0', 2);
-const i = (d: Date) => padStart(d.getMinutes(), '0', 2);
+const y = (d: Date) => String(d.getUTCFullYear());
+const m = (d: Date) => padStart(d.getUTCMonth() + 1, '0', 2);
+const d = (d: Date) => padStart(d.getUTCDate(), '0', 2);
+const h = (d: Date) => padStart(d.getUTCHours(), '0', 2);
+const i = (d: Date) => padStart(d.getUTCMinutes(), '0', 2);
 
 export function comparableDate(
   date: Date,

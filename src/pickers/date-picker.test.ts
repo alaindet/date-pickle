@@ -5,21 +5,29 @@ import { DatePicker } from './date-picker';
 describe('DatePicker', () => {
 
   it('should display 31 days for august', () => {
-    const shouldUpdate = false;
-    const picker = new DatePicker(new Date('2022-08-15'), shouldUpdate);
-    picker.peek = false;
-    picker.shouldUpdate = true;
-    expect(picker.items!.length).toEqual(31);
+    const AUGUST = 7; // Month index
+    const d = new Date(Date.UTC(2022, AUGUST, 15));
+    const picker = new DatePicker(d);
+
+    // Discard days from adjacent months
+    const items = picker.items!.filter(d => {
+      return d.date.getUTCMonth() === AUGUST; 
+    });
+
+    expect(items.length).toEqual(31);
   });
 
   it('should mark today as current date', () => {
     const now = new Date();
-    const shouldUpdate = false;
-    const picker = new DatePicker(now, shouldUpdate);
-    picker.peek = false;
-    picker.shouldUpdate = true;
-    const index = now.getDate() - 1;
-    expect(picker.items![index].isCurrent).toBeTruthy();
+    const picker = new DatePicker(now);
+    const todayIndex = now.getUTCDate() - 1;
+
+    // Discard days from adjacent months
+    const items = picker.items!.filter(d => {
+      return d.date.getUTCMonth() === now.getUTCMonth();
+    });
+
+    expect(items![todayIndex].isCurrent).toBeTruthy();
   });
 
   it('should show saturdays and sundays as weekend days', () => {

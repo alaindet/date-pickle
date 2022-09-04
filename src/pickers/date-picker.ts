@@ -4,37 +4,19 @@ import { Picker } from './picker';
 
 export class DatePicker extends Picker<DayItem> {
 
-  /**
-   * Shows some days of prev and next month to fill the week (starts on monday)
-   *
-   * Ex.:
-   * - If first day of current month is wednesday, show prev month's last 2 days
-   * - If last day of current month is thursday, show next months' first 3 days
-   */
-  private _peek = true;
-
   constructor(current?: Date, shouldUpdate = true) {
     super(current, shouldUpdate);
   }
 
-  get peek(): boolean {
-    return this._peek;
-  }
-
-  set peek(peek: boolean) {
-    this._peek = peek;
-    this.updateItems();
-  }
-
   next(): void {
-    this._ref.setDate(15);
-    this._ref.setMonth(this._ref.getMonth() + 1);
+    this._ref.setUTCDate(15);
+    this._ref.setUTCMonth(this._ref.getUTCMonth() + 1);
     this.updateItems();
   }
 
   prev(): void {
-    this._ref.setDate(15);
-    this._ref.setMonth(this._ref.getMonth() - 1);
+    this._ref.setUTCDate(15);
+    this._ref.setUTCMonth(this._ref.getUTCMonth() - 1);
     this.updateItems();
   }
 
@@ -42,7 +24,8 @@ export class DatePicker extends Picker<DayItem> {
 
     const days = this.getDaysInCurrentMonth();
 
-    if (this._peek) {
+    // TODO: Peek?
+    if (true) {
       days.unshift(...this.getDaysInPreviousMonth());
       days.push(...this.getDaysInNextMonth());
     }
@@ -51,16 +34,19 @@ export class DatePicker extends Picker<DayItem> {
   }
 
   private getDaysInCurrentMonth(): Date[] {
-    return this.getDaysInMonth(this._ref.getFullYear(), this._ref.getMonth());
+    return this.getDaysInMonth(
+      this._ref.getUTCFullYear(),
+      this._ref.getUTCMonth(),
+    );
   }
 
   private getDaysInPreviousMonth(): Date[] {
     const d = cloneDate(this._ref);
-    d.setDate(15);
-    d.setMonth(d.getMonth() - 1);
-    const days = this.getDaysInMonth(d.getFullYear(), d.getMonth());
+    d.setUTCDate(15);
+    d.setUTCMonth(d.getUTCMonth() - 1);
+    const days = this.getDaysInMonth(d.getUTCFullYear(), d.getUTCMonth());
     const lastDayOfPrevMonth = days[days.length - 1];
-    const lastWeekday = lastDayOfPrevMonth.getDay();
+    const lastWeekday = lastDayOfPrevMonth.getUTCDay();
     const offset = -lastWeekday;
     if (offset === 0) {
       return [];
@@ -70,11 +56,11 @@ export class DatePicker extends Picker<DayItem> {
 
   private getDaysInNextMonth(): Date[] {
     const d = cloneDate(this._ref);
-    d.setDate(15);
-    d.setMonth(d.getMonth() + 1);
-    const days = this.getDaysInMonth(d.getFullYear(), d.getMonth());
+    d.setUTCDate(15);
+    d.setUTCMonth(d.getUTCMonth() + 1);
+    const days = this.getDaysInMonth(d.getUTCFullYear(), d.getUTCMonth());
     const firstDayOfNextMonth = days[0];
-    const firstWeekday = firstDayOfNextMonth.getDay();
+    const firstWeekday = firstDayOfNextMonth.getUTCDay();
     let offset = 8 - firstWeekday;
     if (offset === 7) {
       return [];
@@ -86,13 +72,13 @@ export class DatePicker extends Picker<DayItem> {
 
   // Thanks to https://bobbyhadz.com/blog/javascript-get-all-dates-in-month
   private getDaysInMonth(year: number, month: number): Date[] {
-    const d = new Date(year, month, 1);
-    const currentMonth = d.getMonth();
+    const d = new Date(Date.UTC(year, month, 1));
+    const currentMonth = d.getUTCMonth();
     const days: Date[] = [];
 
-    while(d.getMonth() === currentMonth) {
-      days.push(new Date(d));
-      d.setDate(d.getDate() + 1);
+    while(d.getUTCMonth() === currentMonth) {
+      days.push(new Date(d.getTime()));
+      d.setUTCDate(d.getUTCDate() + 1);
     }
 
     return days;
@@ -109,7 +95,7 @@ export class DatePicker extends Picker<DayItem> {
 
     return dates.map(d => {
       const dateComp = comparableDate(d, 'day');
-      const weekday = d.getDay();
+      const weekday = d.getUTCDay();
 
       return {
         date: d,
@@ -122,15 +108,15 @@ export class DatePicker extends Picker<DayItem> {
 
   private getFirstDayOfCurrentMonth(): Date {
     const d = cloneDate(this._ref);
-    d.setDate(1);
+    d.setUTCDate(1);
     return d;
   }
 
   private getLastDayOfCurrentMonth(): Date {
     const d = cloneDate(this._ref);
-    d.setDate(1);
-    d.setMonth(d.getMonth() + 1);
-    d.setDate(d.getDate() - 1);
+    d.setUTCDate(1);
+    d.setUTCMonth(d.getUTCMonth() + 1);
+    d.setUTCDate(d.getUTCDate() - 1);
     return d;
   }
 
