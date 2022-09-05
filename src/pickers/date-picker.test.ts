@@ -75,10 +75,10 @@ describe('DatePicker', () => {
   });
 
   it('should trigger onItemsChange', async () => {
-    const picker = new DatePicker(new Date(), { shouldUpdate: false });
+    const picker = new DatePicker(new Date(), { sync: false });
     const items = await new Promise<DayItem[]>((resolve, _) => {
       picker.onItemsChange(items => resolve(items));
-      picker.shouldUpdate = true;
+      picker.sync = true;
     });
     expect(items.length).not.toEqual(0);
   });
@@ -197,7 +197,7 @@ describe('DatePicker', () => {
 
   it('should treat null values on optional properties as undefined', () => {
     const picker = new DatePicker(new Date('2022-09-05'), {
-      shouldUpdate: false, // Avoid re-calculating items
+      sync: false, // Avoid re-calculating items
       min: new Date('2019-09-05'),
       max: new Date('2022-09-06'),
       selected: new Date('2022-09-03'),
@@ -213,6 +213,19 @@ describe('DatePicker', () => {
     expect(picker.max).toBeUndefined();
     expect(picker.selected).toBeUndefined();
     expect(picker.focused).toBeUndefined();
+  });
+
+  it('should disable adjacent months days disabled', () => {
+    const picker = new DatePicker(new Date('2022-09-05'), {
+      min: new Date('2022-08-31'),
+      max: new Date('2022-10-02'),
+    });
+
+    const items = picker.items!;
+    const firstItem = items[0];
+    const lastItem = items[items.length - 1];
+    expect(firstItem.isDisabled).toBeTruthy();
+    expect(lastItem.isDisabled).toBeTruthy();
   });
 });
 

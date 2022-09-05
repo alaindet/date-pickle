@@ -37,7 +37,7 @@ describe('YearPicker', () => {
     const d = new Date('2001-06-07');
     const max = new Date('2003-06-07');
     const picker = new YearPicker(d, { max });
-    picker.shouldUpdate = true;
+    picker.sync = true;
     const items = picker.items!;
     const year2003 = items[7];
     const year2004 = items[8];
@@ -46,10 +46,10 @@ describe('YearPicker', () => {
   });
 
   it('should trigger onItemsChange', async () => {
-    const picker = new YearPicker(new Date('2001-06-07'), { shouldUpdate: false });
+    const picker = new YearPicker(new Date('2001-06-07'), { sync: false });
     const items = await new Promise<YearItem[]>((resolve, _) => {
       picker.onItemsChange(items => resolve(items));
-      picker.shouldUpdate = true;
+      picker.sync = true;
     });
     expect(items.length).not.toEqual(0);
   });

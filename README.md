@@ -75,12 +75,12 @@ firstMonthName = pickle.monthPicker.items![0].name;
 console.log(firstMonthName); // 'gennaio'
 
 // Perform some manipulation then update items
-pickle.shouldUpdate = false;
+pickle.sync = false;
 datePicker.max = new Date('2001-01-20');
 datePicker.current = new Date('2001-03-03'); // Set to march
 datePicker.prev(); // Go to february
 datePicker.prev(); // Go to january
-pickle.shouldUpdate = true;
+pickle.sync = true;
 
 console.log(datePicker.items);
 // [

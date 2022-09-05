@@ -16,13 +16,13 @@ export class DatePickle {
   private _max?: Date;
   private _selected?: Date;
   private _focused?: Date;
-  private _shouldUpdate = true;
+  private _sync = true;
 
   constructor(current?: Date, options?: PickerOptions) {
     this._ref = current ?? new Date();
     if (options?.min) this._min = options.min;
     if (options?.max) this._max = options.max;
-    if (options?.shouldUpdate) this._shouldUpdate = options.shouldUpdate;
+    if (options?.sync) this._sync = options.sync;
     if (options?.locale) this._locale = options.locale;
     if (options?.selected) this._selected = options.selected;
     if (options?.focused) this._focused = options.focused;
@@ -61,15 +61,15 @@ export class DatePickle {
     if (this?._datePicker) this._datePicker.max = max;
   }
 
-  get shouldUpdate(): boolean {
-    return this._shouldUpdate;
+  get sync(): boolean {
+    return this._sync;
   }
 
-  set shouldUpdate(update: boolean) {
-    this._shouldUpdate = update;
-    if (this?._yearPicker) this._yearPicker.shouldUpdate = update;
-    if (this?._monthPicker) this._monthPicker.shouldUpdate = update;
-    if (this?._datePicker) this._datePicker.shouldUpdate = update;
+  set sync(update: boolean) {
+    this._sync = update;
+    if (this?._yearPicker) this._yearPicker.sync = update;
+    if (this?._monthPicker) this._monthPicker.sync = update;
+    if (this?._datePicker) this._datePicker.sync = update;
   }
 
   get selected(): Date | undefined {

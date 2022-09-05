@@ -58,10 +58,10 @@ describe('MonthPicker', () => {
 
   it('should trigger onItemsChange', async () => {
     const now = new Date();
-    const picker = new MonthPicker(now, { locale: 'en', shouldUpdate: false });
+    const picker = new MonthPicker(now, { locale: 'en', sync: false });
     const items = await new Promise<MonthItem[]>((resolve, _) => {
       picker.onItemsChange(items => resolve(items));
-      picker.shouldUpdate = true;
+      picker.sync = true;
     });
     expect(items.length).not.toEqual(0);
   });

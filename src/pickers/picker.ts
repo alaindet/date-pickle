@@ -1,4 +1,4 @@
-import { EventHandler, ItemsChangeHandler, Locale, PickerOptions } from '../types';
+import { DatePickleEventHandler, Locale, PickerOptions } from '../types';
 
 export abstract class Picker<ItemType = unknown> {
   protected _ref!: Date;
@@ -8,16 +8,16 @@ export abstract class Picker<ItemType = unknown> {
   protected _locale = 'default';
   protected _selected?: Date;
   protected _focused?: Date;
-  protected _itemsChangeHandler?: ItemsChangeHandler<ItemType>;
-  protected _selectedHandler?: EventHandler<Date | undefined>;
-  protected _focusedHandler?: EventHandler<Date | undefined>;
-  protected _shouldUpdate = true;
+  protected _itemsChangeHandler?: DatePickleEventHandler<ItemType[]>;
+  protected _selectedHandler?: DatePickleEventHandler<Date | undefined>;
+  protected _focusedHandler?: DatePickleEventHandler<Date | undefined>;
+  protected _sync = true;
 
   constructor(current?: Date, options?: PickerOptions) {
     this._ref = current ?? new Date();
     if (options?.min) this._min = options.min;
     if (options?.max) this._max = options.max;
-    if (options?.shouldUpdate) this._shouldUpdate = options.shouldUpdate;
+    if (options?.sync) this._sync = options.sync;
     if (options?.locale) this._locale = options.locale;
     if (options?.selected) this._selected = options.selected;
     if (options?.focused) this._focused = options.focused;
@@ -33,13 +33,13 @@ export abstract class Picker<ItemType = unknown> {
     this.updateItems();
   }
 
-  get shouldUpdate(): boolean {
-    return this._shouldUpdate;
+  get sync(): boolean {
+    return this._sync;
   }
 
-  set shouldUpdate(shouldUpdate: boolean | null) {
-    this._shouldUpdate = !!shouldUpdate;
-    shouldUpdate && this.updateItems();
+  set sync(sync: boolean | null) {
+    this._sync = !!sync;
+    sync && this.updateItems();
   }
 
   get min(): Date | undefined {
@@ -102,23 +102,23 @@ export abstract class Picker<ItemType = unknown> {
     this.updateItems();
   }
 
-  onItemsChange(handler: ItemsChangeHandler<ItemType>): void {
+  onItemsChange(handler: DatePickleEventHandler<ItemType[]>): void {
     this._itemsChangeHandler = handler;
-    if (this.items && this._shouldUpdate) handler(this.items);
+    if (this.items && this._sync) handler(this.items);
   }
 
-  onSelected(handler: EventHandler<Date | undefined>): void {
+  onSelected(handler: DatePickleEventHandler<Date | undefined>): void {
     this._selectedHandler = handler;
-    if (this._selected && this._shouldUpdate) handler(this._selected);
+    if (this._selected && this._sync) handler(this._selected);
   }
 
-  onFocused(handler: EventHandler<Date | undefined>): void {
+  onFocused(handler: DatePickleEventHandler<Date | undefined>): void {
     this._focusedHandler = handler;
-    if (this._focused && this._shouldUpdate) handler(this._focused);
+    if (this._focused && this._sync) handler(this._focused);
   }
 
   updateItems(): void {
-    if (!this._shouldUpdate) return;
+    if (!this._sync) return;
     this._items = this.buildItems();
     this._itemsChangeHandler && this._itemsChangeHandler(this._items);
   }

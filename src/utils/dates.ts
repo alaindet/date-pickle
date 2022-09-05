@@ -15,10 +15,10 @@ export function comparableDate(
   };
 
   switch (precision) {
-    case 'minute': return toComparable(y, m, d, h, i);
-    case 'day': return toComparable(y, m, d);
-    case 'month': return toComparable(y, m);
-    case 'year': return toComparable(y);
+  case 'minute': return toComparable(y, m, d, h, i);
+  case 'day': return toComparable(y, m, d);
+  case 'month': return toComparable(y, m);
+  case 'year': return toComparable(y);
   }
 }
 

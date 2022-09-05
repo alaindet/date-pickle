@@ -1,6 +1,4 @@
-export type ItemsChangeHandler<T = unknown> = (items: T[]) => void;
-
-export type EventHandler<T = unknown> = (data: T) => void;
+export type DatePickleEventHandler<T = unknown> = (data: T) => void;
 
 export interface DatePickleItem {
   isNow: boolean;
@@ -31,5 +29,5 @@ export interface PickerOptions {
   locale?: Locale | null;
   selected?: Date | null;
   focused?: Date | null;
-  shouldUpdate?: boolean | null;
+  sync?: boolean | null;
 }
