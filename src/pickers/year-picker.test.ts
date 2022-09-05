@@ -1,16 +1,13 @@
 import { YearItem } from '../types';
+import { range } from '../utils';
 import { YearPicker } from './year-picker';
 
 describe('YearPicker', () => {
 
   it('should return items around given year', () => {
-    const d = new Date('2001-06-07');
-    const picker = new YearPicker(d);
+    const picker = new YearPicker(new Date('2001-06-07'));
     const result = picker.items!.map(i => i.year);
-    const expected = [
-      1996, 1997, 1998, 1999, 2000, 2001,
-      2002, 2003, 2004, 2005, 2006, 2007,
-    ];
+    const expected = range(1996, 2007);
     expect(result).toEqual(expected);
   });
 
@@ -18,17 +15,15 @@ describe('YearPicker', () => {
     const now = new Date();
     const picker = new YearPicker(now);
     const items = picker.items!;
-    const thisYear = now.getFullYear();
+    const thisYear = now.getUTCFullYear();
     const index = items!.findIndex(i => i.year === thisYear);
     expect(items[index].isNow).toBeTruthy();
   });
 
   it('should disable items lower than min', () => {
     const d = new Date('2001-06-07');
-    const shouldUpdate = false;
-    const picker = new YearPicker(d, shouldUpdate);
-    picker.min = new Date('1999-06-07');
-    picker.shouldUpdate = true;
+    const min = new Date('1999-06-07');
+    const picker = new YearPicker(d, { min });
     const items = picker.items!;
     const year1998 = items[2];
     const year1999 = items[3];
@@ -38,9 +33,8 @@ describe('YearPicker', () => {
 
   it('should disable items greater than max', () => {
     const d = new Date('2001-06-07');
-    const shouldUpdate = false;
-    const picker = new YearPicker(d, shouldUpdate);
-    picker.max = new Date('2003-06-07');
+    const max = new Date('2003-06-07');
+    const picker = new YearPicker(d, { max });
     picker.shouldUpdate = true;
     const items = picker.items!;
     const year2003 = items[7];
@@ -50,8 +44,7 @@ describe('YearPicker', () => {
   });
 
   it('should trigger itemsChange event', async () => {
-    const shouldUpdate = false;
-    const picker = new YearPicker(new Date('2001-06-07'), shouldUpdate);
+    const picker = new YearPicker(new Date('2001-06-07'), { shouldUpdate: false });
     const items = await new Promise<YearItem[]>((resolve, _) => {
       picker.onItemsChange(items => resolve(items));
       picker.shouldUpdate = true;
@@ -84,6 +77,50 @@ describe('YearPicker', () => {
     picker.now();
     const items = picker.items!.map(i => i.year);
     expect(items).toContainEqual(thisYear);
+  });
+
+  it('should select given year via options', () => {
+    const d = new Date('2022-02-02');
+    const selected = new Date('2020-02-02');
+    const picker = new YearPicker(d, { selected });
+    const items = picker.items!;
+    const year2020 = items.find(y => y.year === 2020);
+    const year2022 = items.find(y => y.year === 2022);
+    expect(year2020?.isSelected).toBeTruthy();
+    expect(year2022?.isSelected).toBeFalsy();
+  });
+
+  it('should select given year via setter', () => {
+    const d = new Date('2022-02-02');
+    const picker = new YearPicker(d);
+    picker.selected = new Date('2020-02-02');
+    const items = picker.items!;
+    const year2020 = items.find(y => y.year === 2020);
+    const year2022 = items.find(y => y.year === 2022);
+    expect(year2020?.isSelected).toBeTruthy();
+    expect(year2022?.isSelected).toBeFalsy();
+  });
+
+  it('should focus given year via options', () => {
+    const d = new Date('2022-02-02');
+    const focused = new Date('2020-02-02');
+    const picker = new YearPicker(d, { focused });
+    const items = picker.items!;
+    const year2020 = items.find(y => y.year === 2020);
+    const year2022 = items.find(y => y.year === 2022);
+    expect(year2020?.isFocused).toBeTruthy();
+    expect(year2022?.isFocused).toBeFalsy();
+  });
+
+  it('should focus given year via setter', () => {
+    const d = new Date('2022-02-02');
+    const picker = new YearPicker(d);
+    picker.focused = new Date('2020-02-02');
+    const items = picker.items!;
+    const year2020 = items.find(y => y.year === 2020);
+    const year2022 = items.find(y => y.year === 2022);
+    expect(year2020?.isFocused).toBeTruthy();
+    expect(year2022?.isFocused).toBeFalsy();
   });
 });
 

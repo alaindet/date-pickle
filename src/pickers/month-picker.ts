@@ -11,8 +11,6 @@ export class MonthPicker extends Picker<MonthItem> {
     super(current, options);
   }
 
-  comparable = (d?: Date) => d ? comparableDate(d, 'month') : null;
-
   protected buildItems(): MonthItem[] {
     const d = new Date();
 
@@ -42,8 +40,12 @@ export class MonthPicker extends Picker<MonthItem> {
         isNow: itemComp === nowComp,
         isDisabled,
         isSelected: itemComp === selectedComp,
-        isFocused: itemComp === focusedComp;
+        isFocused: itemComp === focusedComp,
       };
     });
+  }
+
+  private comparable(d?: Date): number | null {
+    return d ? comparableDate(d, 'month') : null;
   }
 }

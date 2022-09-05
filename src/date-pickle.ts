@@ -18,10 +18,14 @@ export class DatePickle {
   private _focused?: Date;
   private _shouldUpdate = true;
 
-  constructor(current?: Date, locale = 'default', shouldUpdate = true) {
+  constructor(current?: Date, options?: PickerOptions) {
     this._ref = current ?? new Date();
-    this._locale = locale;
-    this._shouldUpdate = shouldUpdate;
+    if (options?.min) this._min = options.min;
+    if (options?.max) this._max = options.max;
+    if (options?.shouldUpdate) this._shouldUpdate = options.shouldUpdate;
+    if (options?.locale) this._locale = options.locale;
+    if (options?.selected) this._selected = options.selected;
+    if (options?.focused) this._focused = options.focused;
   }
 
   get locale(): Locale {
@@ -68,15 +72,26 @@ export class DatePickle {
     if (this?._datePicker) this._datePicker.shouldUpdate = update;
   }
 
-  get selected(): Date {
+  get selected(): Date | undefined {
     return this._selected;
   }
 
-  set shouldUpdate(update: boolean) {
-    this._shouldUpdate = update;
-    if (this?._yearPicker) this._yearPicker.shouldUpdate = update;
-    if (this?._monthPicker) this._monthPicker.shouldUpdate = update;
-    if (this?._datePicker) this._datePicker.shouldUpdate = update;
+  set selected(selected: Date | undefined) {
+    this._selected = selected;
+    if (this?._yearPicker) this._yearPicker.selected = selected;
+    if (this?._monthPicker) this._monthPicker.selected = selected;
+    if (this?._datePicker) this._datePicker.selected = selected;
+  }
+
+  get focused(): Date | undefined {
+    return this._focused;
+  }
+
+  set focused(focused: Date | undefined) {
+    this._focused = focused;
+    if (this?._yearPicker) this._yearPicker.focused = focused;
+    if (this?._monthPicker) this._monthPicker.focused = focused;
+    if (this?._datePicker) this._datePicker.focused = focused;
   }
 
   get yearPicker(): YearPicker {
@@ -88,12 +103,18 @@ export class DatePickle {
   }
 
   get monthPicker(): MonthPicker {
-    if (!this._monthPicker) this.createMonthPicker();
+    if (!this._monthPicker) {
+      const options = this.getInitialOptions();
+      this._monthPicker = new MonthPicker(cloneDate(this._ref), options);
+    }
     return this._monthPicker!;
   }
 
   get datePicker(): DatePicker {
-    if (!this._datePicker) this.createDatePicker();
+    if (!this._datePicker) {
+      const options = this.getInitialOptions();
+      this._datePicker = new DatePicker(cloneDate(this._ref), options);
+    }
     return this._datePicker!;
   }
 

@@ -11,7 +11,7 @@ describe('DatePicker', () => {
 
     // Discard days from adjacent months
     const items = picker.items!.filter(d => {
-      return d.date.getUTCMonth() === AUGUST; 
+      return d.date.getUTCMonth() === AUGUST;
     });
 
     expect(items.length).toEqual(31);
@@ -48,12 +48,10 @@ describe('DatePicker', () => {
 
   it('should disable items lower than min', () => {
     const d = new Date();
-    const shouldUpdate = false;
-    const picker = new DatePicker(cloneDate(d), shouldUpdate);
     const MIN_DATE = 5; // 5th of this month
-    d.setDate(MIN_DATE);
-    picker.min = cloneDate(d);
-    picker.shouldUpdate = true;
+    const min = cloneDate(d);
+    min.setUTCDate(MIN_DATE);
+    const picker = new DatePicker(d, { min });
     const items = picker.items!;
     const index = items.findIndex(i => i.date.getDate() === MIN_DATE);
     expect(items[index - 1].isDisabled).toBeTruthy(); // below min
@@ -63,12 +61,10 @@ describe('DatePicker', () => {
 
   it('should disable items greater than max', () => {
     const d = new Date();
-    const shouldUpdate = false;
-    const picker = new DatePicker(cloneDate(d), shouldUpdate);
+    const max = cloneDate(d);
     const MAX_DATE = 6; // 6th of this month
-    d.setDate(MAX_DATE);
-    picker.max = cloneDate(d);
-    picker.shouldUpdate = true;
+    max.setUTCDate(MAX_DATE);
+    const picker = new DatePicker(d, { max });
     const items = picker.items!;
     const index = items.findIndex(i => i.date.getDate() === MAX_DATE);
     expect(items[index - 1].isDisabled).toBeFalsy(); // below max
@@ -77,8 +73,7 @@ describe('DatePicker', () => {
   });
 
   it('should trigger itemsChange event', async () => {
-    const shouldUpdate = false;
-    const picker = new DatePicker(new Date(), shouldUpdate);
+    const picker = new DatePicker(new Date(), { shouldUpdate: false });
     const items = await new Promise<DayItem[]>((resolve, _) => {
       picker.onItemsChange(items => resolve(items));
       picker.shouldUpdate = true;
@@ -112,6 +107,62 @@ describe('DatePicker', () => {
     picker.now();
     const items = picker.items!.map(i => comparableDate(i.date, 'day'));
     expect(items).toContainEqual(todayComparable);
+  });
+
+  const comp = (d: Date) => comparableDate(d, 'day');
+
+  it('should select given date via options', () => {
+    const d = new Date('2022-08-08');
+    const dummyComp = comp(d);
+    const selected = new Date('2022-08-15.');
+    const selectedComp = comp(selected);
+    const picker = new DatePicker(d, { selected });
+    const items = picker.items!;
+    const shouldBeSelected = items.find(i => comp(i.date) === selectedComp);
+    const shouldNoBeSelected = items.find(i => comp(i.date) === dummyComp);
+    expect(shouldBeSelected?.isSelected).toBeTruthy();
+    expect(shouldNoBeSelected?.isSelected).toBeFalsy();
+  });
+
+  it('should select given date via setter', () => {
+    const d = new Date('2022-08-08');
+    const dummyComp = comp(d);
+    const selected = new Date('2022-08-15.');
+    const selectedComp = comp(selected);
+    const picker = new DatePicker(d);
+    picker.selected = selected;
+    const items = picker.items!;
+    const shouldBeSelected = items.find(i => comp(i.date) === selectedComp);
+    const shouldNoBeSelected = items.find(i => comp(i.date) === dummyComp);
+    expect(shouldBeSelected?.isSelected).toBeTruthy();
+    expect(shouldNoBeSelected?.isSelected).toBeFalsy();
+  });
+
+  it('should focus given date via options', () => {
+    const d = new Date('2022-08-08');
+    const dummyComp = comp(d);
+    const focused = new Date('2022-08-15.');
+    const focusedComp = comp(focused);
+    const picker = new DatePicker(d, { focused });
+    const items = picker.items!;
+    const shouldBeFocused = items.find(i => comp(i.date) === focusedComp);
+    const shouldNoBeFocused = items.find(i => comp(i.date) === dummyComp);
+    expect(shouldBeFocused?.isFocused).toBeTruthy();
+    expect(shouldNoBeFocused?.isFocused).toBeFalsy();
+  });
+
+  it('should focus given date via setter', () => {
+    const d = new Date('2022-08-08');
+    const dummyComp = comp(d);
+    const focused = new Date('2022-08-15.');
+    const focusedComp = comp(focused);
+    const picker = new DatePicker(d);
+    picker.focused = focused;
+    const items = picker.items!;
+    const shouldBeFocused = items.find(i => comp(i.date) === focusedComp);
+    const shouldNoBeFocused = items.find(i => comp(i.date) === dummyComp);
+    expect(shouldBeFocused?.isFocused).toBeTruthy();
+    expect(shouldNoBeFocused?.isFocused).toBeFalsy();
   });
 });
 

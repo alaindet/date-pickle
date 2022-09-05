@@ -9,8 +9,6 @@ export class YearPicker extends Picker<YearItem> {
     super(current, options);
   }
 
-  comparable = (d?: Date) => d ? comparableDate(d, 'year') : null;
-
   get year(): number {
     return this._ref.getUTCFullYear();
   }
@@ -61,5 +59,9 @@ export class YearPicker extends Picker<YearItem> {
         isFocused: itemComp === focusedComp,
       };
     });
+  }
+
+  private comparable(d?: Date): number | null {
+    return d ? comparableDate(d, 'year') : null;
   }
 }

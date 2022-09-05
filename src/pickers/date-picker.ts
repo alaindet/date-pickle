@@ -8,8 +8,6 @@ export class DatePicker extends Picker<DayItem> {
     super(current, options);
   }
 
-  comparable = (d?: Date) => d ? comparableDate(d, 'day') : null;
-
   next(): void {
     this._ref.setUTCDate(15);
     this._ref.setUTCMonth(this._ref.getUTCMonth() + 1);
@@ -143,5 +141,9 @@ export class DatePicker extends Picker<DayItem> {
     }
 
     return [inf, sup];
+  }
+
+  private comparable(d?: Date): number | null {
+    return d ? comparableDate(d, 'day') : null;
   }
 }

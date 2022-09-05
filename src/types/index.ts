@@ -29,4 +29,5 @@ export interface PickerOptions {
   locale?: Locale;
   selected?: Date;
   focused?: Date;
+  shouldUpdate?: boolean;
 }
