@@ -24,8 +24,10 @@ export class DatePicker extends Picker<DayItem> {
 
     const days = this.getDaysInCurrentMonth();
 
-    // TODO: Peek?
-    if (true) {
+    // TODO: Manage peek property?
+    const peek = true;
+
+    if (peek) {
       days.unshift(...this.getDaysInPreviousMonth());
       days.push(...this.getDaysInNextMonth());
     }

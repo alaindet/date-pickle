@@ -1,7 +1,6 @@
-import { ItemsChangeHandler, Locale, PickerOptions } from '../types';
+import { EventHandler, ItemsChangeHandler, Locale, PickerOptions } from '../types';
 
 export abstract class Picker<ItemType = unknown> {
-
   protected _ref!: Date;
   protected _items: ItemType[] = [];
   protected _min?: Date;
@@ -10,6 +9,8 @@ export abstract class Picker<ItemType = unknown> {
   protected _selected?: Date;
   protected _focused?: Date;
   protected _itemsChangeHandler?: ItemsChangeHandler<ItemType>;
+  protected _selectedHandler?: EventHandler<Date | undefined>;
+  protected _focusedHandler?: EventHandler<Date | undefined>;
   protected _shouldUpdate = true;
 
   constructor(current?: Date, options?: PickerOptions) {
@@ -27,8 +28,8 @@ export abstract class Picker<ItemType = unknown> {
     return this._ref;
   }
 
-  set current(current: Date) {
-    this._ref = current;
+  set current(current: Date | null) {
+    this._ref = current ?? new Date();
     this.updateItems();
   }
 
@@ -36,8 +37,8 @@ export abstract class Picker<ItemType = unknown> {
     return this._shouldUpdate;
   }
 
-  set shouldUpdate(shouldUpdate: boolean) {
-    this._shouldUpdate = shouldUpdate;
+  set shouldUpdate(shouldUpdate: boolean | null) {
+    this._shouldUpdate = !!shouldUpdate;
     shouldUpdate && this.updateItems();
   }
 
@@ -45,7 +46,8 @@ export abstract class Picker<ItemType = unknown> {
     return this._min;
   }
 
-  set min(min: Date | undefined) {
+  set min(min: Date | undefined | null) {
+    if (min === null) min = undefined;
     this._min = min;
     this.updateItems();
   }
@@ -54,7 +56,8 @@ export abstract class Picker<ItemType = unknown> {
     return this._max;
   }
 
-  set max(max: Date | undefined) {
+  set max(max: Date | undefined | null) {
+    if (max === null) max = undefined;
     this._max = max;
     this.updateItems();
   }
@@ -72,18 +75,22 @@ export abstract class Picker<ItemType = unknown> {
     return this._selected;
   }
 
-  set selected(selected: Date | undefined) {
+  set selected(selected: Date | undefined | null) {
+    if (selected === null) selected = undefined;
     this._selected = selected;
     this.updateItems();
+    this._selectedHandler && this._selectedHandler(selected);
   }
 
   get focused(): Date | undefined {
     return this._focused;
   }
 
-  set focused(focused: Date | undefined) {
+  set focused(focused: Date | undefined | null) {
+    if (focused === null) focused = undefined;
     this._focused = focused;
     this.updateItems();
+    this._focusedHandler && this._focusedHandler(focused);
   }
 
   get items(): ItemType[] | undefined {
@@ -98,6 +105,16 @@ export abstract class Picker<ItemType = unknown> {
   onItemsChange(handler: ItemsChangeHandler<ItemType>): void {
     this._itemsChangeHandler = handler;
     if (this.items && this._shouldUpdate) handler(this.items);
+  }
+
+  onSelected(handler: EventHandler<Date | undefined>): void {
+    this._selectedHandler = handler;
+    if (this._selected && this._shouldUpdate) handler(this._selected);
+  }
+
+  onFocused(handler: EventHandler<Date | undefined>): void {
+    this._focusedHandler = handler;
+    if (this._focused && this._shouldUpdate) handler(this._focused);
   }
 
   updateItems(): void {

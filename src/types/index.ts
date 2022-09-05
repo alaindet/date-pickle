@@ -1,5 +1,7 @@
 export type ItemsChangeHandler<T = unknown> = (items: T[]) => void;
 
+export type EventHandler<T = unknown> = (data: T) => void;
+
 export interface DatePickleItem {
   isNow: boolean;
   isDisabled: boolean;
@@ -24,10 +26,10 @@ export interface YearItem extends DatePickleItem {
 export type Locale = string; // TODO: Better typing?
 
 export interface PickerOptions {
-  min?: Date;
-  max?: Date;
-  locale?: Locale;
-  selected?: Date;
-  focused?: Date;
-  shouldUpdate?: boolean;
+  min?: Date | null;
+  max?: Date | null;
+  locale?: Locale | null;
+  selected?: Date | null;
+  focused?: Date | null;
+  shouldUpdate?: boolean | null;
 }

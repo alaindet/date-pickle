@@ -1,6 +1,8 @@
 import { MonthItem } from '../types';
-import { cloneDate } from '../utils';
+import { cloneDate, comparableDate } from '../utils';
 import { MonthPicker } from './month-picker';
+
+const comparable = (d: Date) => comparableDate(d, 'month');
 
 describe('MonthPicker', () => {
 
@@ -54,7 +56,7 @@ describe('MonthPicker', () => {
     expect(may.isDisabled).toBeTruthy();
   });
 
-  it('should trigger itemsChange event', async () => {
+  it('should trigger onItemsChange', async () => {
     const now = new Date();
     const picker = new MonthPicker(now, { locale: 'en', shouldUpdate: false });
     const items = await new Promise<MonthItem[]>((resolve, _) => {
@@ -62,6 +64,28 @@ describe('MonthPicker', () => {
       picker.shouldUpdate = true;
     });
     expect(items.length).not.toEqual(0);
+  });
+
+  it('should trigger onSelected', async () => {
+    const d = new Date('2022-09-05');
+    const picker = new MonthPicker();
+    const selected = await new Promise<Date | undefined>((resolve, _) => {
+      picker.onSelected(selected => resolve(selected));
+      picker.selected = d;
+    });
+    expect(selected).toBeTruthy();
+    expect(comparable(selected!)).toEqual(comparable(d));
+  });
+
+  it('should trigger onFocused', async () => {
+    const d = new Date('2022-09-05');
+    const picker = new MonthPicker();
+    const focused = await new Promise<Date | undefined>((resolve, _) => {
+      picker.onFocused(focused => resolve(focused));
+      picker.focused = d;
+    });
+    expect(focused).toBeTruthy();
+    expect(comparable(focused!)).toEqual(comparable(d));
   });
 
   it('should select given month via options', () => {
