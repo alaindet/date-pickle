@@ -1,4 +1,5 @@
 import { MonthItem } from '../types';
+import { cloneDate } from '../utils';
 import { MonthPicker } from './month-picker';
 
 describe('MonthPicker', () => {
@@ -10,32 +11,30 @@ describe('MonthPicker', () => {
     expect(result).toEqual(expected);
   });
 
-  it('should mark this month as current month', () => {
+  it('should mark this month with isNow = true', () => {
     const now = new Date();
-    const picker = new MonthPicker();
+    const picker = new MonthPicker(now);
     const items = picker.items!;
     const thisMonth = now.getMonth() + 1;
     const index = items.findIndex(i => i.number === thisMonth);
-    expect(items[index].isCurrent).toBeTruthy();
+    expect(items[index].isNow).toBeTruthy();
   });
 
   it('should translate month names for english locale', () => {
-    const picker = new MonthPicker('en');
+    const picker = new MonthPicker(new Date(), { locale: 'en' });
     expect(picker.items![0].name).toEqual('january');
   });
 
   it('should translate month names for italian locale', () => {
-    const picker = new MonthPicker('it');
+    const picker = new MonthPicker(new Date(), { locale: 'it' });
     expect(picker.items![7].name).toEqual('agosto');
   });
 
   it('should disable items lower than min', () => {
-    const shouldUpdate = false;
-    const picker = new MonthPicker('en', shouldUpdate);
-    const min = new Date();
-    min.setMonth(7); // august
-    picker.min = min;
-    picker.shouldUpdate = true;
+    const now = new Date();
+    const min = cloneDate(now);
+    min.setUTCMonth(7); // august
+    const picker = new MonthPicker(new Date(), { locale: 'en', min });
     const items = picker.items!;
     const july = items[6];
     const august = items[7];
@@ -44,12 +43,10 @@ describe('MonthPicker', () => {
   });
 
   it('should disable items greater than max', () => {
-    const shouldUpdate = false;
-    const picker = new MonthPicker('en', shouldUpdate);
-    const max = new Date();
-    max.setMonth(3); // april
-    picker.max = max;
-    picker.shouldUpdate = true;
+    const now = new Date();
+    const max = cloneDate(now);
+    max.setUTCMonth(3); // april
+    const picker = new MonthPicker(now, { locale: 'en', max });
     const items = picker.items!;
     const april = items[3];
     const may = items[4];
@@ -58,13 +55,57 @@ describe('MonthPicker', () => {
   });
 
   it('should trigger itemsChange event', async () => {
-    const shouldUpdate = false;
-    const picker = new MonthPicker('en', shouldUpdate);
+    const now = new Date();
+    const picker = new MonthPicker(now, { locale: 'en', shouldUpdate: false });
     const items = await new Promise<MonthItem[]>((resolve, _) => {
       picker.onItemsChange(items => resolve(items));
       picker.shouldUpdate = true;
     });
     expect(items.length).not.toEqual(0);
+  });
+
+  it('should select given month via options', () => {
+    const d = new Date('2022-02-02');
+    const selected = new Date('2022-03-03');
+    const picker = new MonthPicker(d, { selected });
+    const items = picker.items!;
+    const februrary2022 = items[1];
+    const march2022 = items[2];
+    expect(march2022?.isSelected).toBeTruthy();
+    expect(februrary2022?.isSelected).toBeFalsy();
+  });
+
+  it('should select given month via setter', () => {
+    const d = new Date('2022-02-02');
+    const picker = new MonthPicker(d);
+    picker.selected = new Date('2022-03-03');
+    const items = picker.items!;
+    const februrary2022 = items[1];
+    const march2022 = items[2];
+    expect(march2022?.isSelected).toBeTruthy();
+    expect(februrary2022?.isSelected).toBeFalsy();
+  });
+
+  it('should focus given month via options', () => {
+    const d = new Date('2022-02-02');
+    const focused = new Date('2022-03-03');
+    const picker = new MonthPicker(d, { focused });
+    const items = picker.items!;
+    const februrary2022 = items[1];
+    const march2022 = items[2];
+    expect(march2022?.isFocused).toBeTruthy();
+    expect(februrary2022?.isFocused).toBeFalsy();
+  });
+
+  it('should focus given month via setter', () => {
+    const d = new Date('2022-02-02');
+    const picker = new MonthPicker(d);
+    picker.focused = new Date('2022-03-03');
+    const items = picker.items!;
+    const februrary2022 = items[1];
+    const march2022 = items[2];
+    expect(march2022?.isFocused).toBeTruthy();
+    expect(februrary2022?.isFocused).toBeFalsy();
   });
 });
 

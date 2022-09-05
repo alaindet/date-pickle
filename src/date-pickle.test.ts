@@ -1,9 +1,16 @@
 import { DatePickle } from './date-pickle';
+import { comparableDate } from './utils';
+
+const locale = 'en';
+const year = (d: Date) => comparableDate(d, 'year');
+const month = (d: Date) => comparableDate(d, 'month');
+const day = (d: Date) => comparableDate(d, 'day');
 
 describe('DatePickle', () => {
 
   it('should update properties with corresponding methods', () => {
-    const dpk = new DatePickle(new Date('2022-09-02'), 'en');
+    const d = new Date('2022-09-02');
+    const dpk = new DatePickle(d, { locale });
 
     expect(dpk.min).toBeFalsy();
     dpk.min = new Date('2022-08-01');
@@ -15,7 +22,8 @@ describe('DatePickle', () => {
   });
 
   it('should instantiate pickers lazily', () => {
-    const dpk = new DatePickle(new Date('2022-09-02'), 'en');
+    const d = new Date('2022-09-02');
+    const dpk = new DatePickle(d, { locale });
 
     expect(dpk.existsYearPicker()).toBeFalsy();
     dpk.yearPicker;
@@ -31,7 +39,8 @@ describe('DatePickle', () => {
   });
 
   it('should propagate min value to pickers', () => {
-    const dpk = new DatePickle(new Date('2022-09-02'), 'en');
+    const d = new Date('2022-09-02');
+    const dpk = new DatePickle(d, { locale });
 
     const assertMinPropagated = (min: Date) => {
       const minTimestamp = min.getTime();
@@ -51,7 +60,8 @@ describe('DatePickle', () => {
   });
 
   it('should propagate max value to pickers', () => {
-    const dpk = new DatePickle(new Date('2022-09-02'), 'en');
+    const d = new Date('2022-09-02');
+    const dpk = new DatePickle(d, { locale });
 
     const assertMaxPropagated = (max: Date) => {
       const maxTimestamp = max.getTime();
@@ -71,12 +81,39 @@ describe('DatePickle', () => {
   });
 
   it('should propagate locale value to pickers', () => {
+    const d = new Date();
     const oldLocale = 'en';
     const newLocale = 'it';
-    const dpk = new DatePickle(new Date(), oldLocale);
+    const dpk = new DatePickle(d, { locale: oldLocale });
     expect(dpk.monthPicker.locale).toEqual(oldLocale);
     dpk.locale = newLocale;
     expect(dpk.monthPicker.locale).toEqual(newLocale);
+  });
+
+  it('should propagate selected value to pickers', () => {
+    const d = new Date('2022-04-04');
+    const selected = new Date('2022-05-05');
+    const dpk = new DatePickle(d);
+    const yearPicker = dpk.yearPicker;
+    const monthPicker = dpk.monthPicker;
+    const datePicker = dpk.datePicker;
+    dpk.selected = selected;
+    expect(year(yearPicker.selected!)).toEqual(year(selected));
+    expect(month(monthPicker.selected!)).toEqual(month(selected));
+    expect(day(datePicker.selected!)).toEqual(day(selected));
+  });
+
+  it('should propagate focused value to pickers', () => {
+    const d = new Date('2022-04-04');
+    const focused = new Date('2022-05-05');
+    const dpk = new DatePickle(d);
+    const yearPicker = dpk.yearPicker;
+    const monthPicker = dpk.monthPicker;
+    const datePicker = dpk.datePicker;
+    dpk.focused = focused;
+    expect(year(yearPicker.focused!)).toEqual(year(focused));
+    expect(month(monthPicker.focused!)).toEqual(month(focused));
+    expect(day(datePicker.focused!)).toEqual(day(focused));
   });
 });
 

@@ -1,7 +1,7 @@
 import { YearPicker } from './pickers/year-picker';
 import { MonthPicker } from './pickers/month-picker';
 import { DatePicker } from './pickers/date-picker';
-import { Locale } from './types';
+import { Locale, PickerOptions } from './types';
 import { cloneDate } from './utils';
 
 export class DatePickle {
@@ -14,12 +14,18 @@ export class DatePickle {
   private _locale!: Locale;
   private _min?: Date;
   private _max?: Date;
+  private _selected?: Date;
+  private _focused?: Date;
   private _shouldUpdate = true;
 
-  constructor(current?: Date, locale = 'default', shouldUpdate = true) {
+  constructor(current?: Date, options?: PickerOptions) {
     this._ref = current ?? new Date();
-    this._locale = locale;
-    this._shouldUpdate = shouldUpdate;
+    if (options?.min) this._min = options.min;
+    if (options?.max) this._max = options.max;
+    if (options?.shouldUpdate) this._shouldUpdate = options.shouldUpdate;
+    if (options?.locale) this._locale = options.locale;
+    if (options?.selected) this._selected = options.selected;
+    if (options?.focused) this._focused = options.focused;
   }
 
   get locale(): Locale {
@@ -28,7 +34,9 @@ export class DatePickle {
 
   set locale(locale: Locale) {
     this._locale = locale;
+    if (this?._yearPicker) this._yearPicker.locale = locale;
     if (this?._monthPicker) this._monthPicker.locale = locale;
+    if (this?._datePicker) this._datePicker.locale = locale;
   }
 
   get min(): Date | undefined {
@@ -64,18 +72,49 @@ export class DatePickle {
     if (this?._datePicker) this._datePicker.shouldUpdate = update;
   }
 
+  get selected(): Date | undefined {
+    return this._selected;
+  }
+
+  set selected(selected: Date | undefined) {
+    this._selected = selected;
+    if (this?._yearPicker) this._yearPicker.selected = selected;
+    if (this?._monthPicker) this._monthPicker.selected = selected;
+    if (this?._datePicker) this._datePicker.selected = selected;
+  }
+
+  get focused(): Date | undefined {
+    return this._focused;
+  }
+
+  set focused(focused: Date | undefined) {
+    this._focused = focused;
+    if (this?._yearPicker) this._yearPicker.focused = focused;
+    if (this?._monthPicker) this._monthPicker.focused = focused;
+    if (this?._datePicker) this._datePicker.focused = focused;
+  }
+
   get yearPicker(): YearPicker {
-    if (!this._yearPicker) this.createYearPicker();
+    if (!this._yearPicker) {
+      const options = this.getInitialOptions();
+      this._yearPicker = new YearPicker(cloneDate(this._ref), options);
+    }
     return this._yearPicker!;
   }
 
   get monthPicker(): MonthPicker {
-    if (!this._monthPicker) this.createMonthPicker();
+    if (!this._monthPicker) {
+      const options = this.getInitialOptions();
+      this._monthPicker = new MonthPicker(cloneDate(this._ref), options);
+    }
     return this._monthPicker!;
   }
 
   get datePicker(): DatePicker {
-    if (!this._datePicker) this.createDatePicker();
+    if (!this._datePicker) {
+      const options = this.getInitialOptions();
+      this._datePicker = new DatePicker(cloneDate(this._ref), options);
+    }
     return this._datePicker!;
   }
 
@@ -97,24 +136,13 @@ export class DatePickle {
     return !!this?._datePicker;
   }
 
-  private createYearPicker(): void {
-    this._yearPicker = new YearPicker(cloneDate(this._ref), false);
-    this._yearPicker.min = this._min;
-    this._yearPicker.max = this._max;
-    this._yearPicker.shouldUpdate = true;
-  }
-
-  private createMonthPicker(): void {
-    this._monthPicker = new MonthPicker(this._locale, false);
-    this._monthPicker.min = this._min;
-    this._monthPicker.max = this._max;
-    this._monthPicker.shouldUpdate = true;
-  }
-
-  private createDatePicker(): void {
-    this._datePicker = new DatePicker(cloneDate(this._ref), false);
-    this._datePicker.min = this._min;
-    this._datePicker.max = this._max;
-    this._datePicker.shouldUpdate = true;
+  private getInitialOptions(): PickerOptions {
+    return {
+      min: this._min,
+      max: this._max,
+      locale: this._locale,
+      selected: this._selected,
+      focused: this._selected,
+    };
   }
 }

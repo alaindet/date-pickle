@@ -1,12 +1,12 @@
 import { range, comparableDate } from '../utils';
-import { YearItem } from '../types';
+import { PickerOptions, YearItem } from '../types';
 import { Picker } from './picker';
 
 const YEARS_COUNT = 12;
 
 export class YearPicker extends Picker<YearItem> {
-  constructor(current?: Date, shouldUpdate = true) {
-    super(current, shouldUpdate);
+  constructor(current?: Date, options?: PickerOptions) {
+    super(current, options);
   }
 
   get year(): number {
@@ -30,9 +30,13 @@ export class YearPicker extends Picker<YearItem> {
 
   protected buildItems(): YearItem[] {
     const d = new Date();
-    const thisYearComp = d.getUTCFullYear();
-    const minComp = this?.min ? comparableDate(this._min!, 'year') : null;
-    const maxComp = this?.max ? comparableDate(this._max!, 'year') : null;
+
+    // Init comparable values;
+    const nowComp = this.comparable(d);
+    const minComp = this.comparable(this?.min);
+    const maxComp = this.comparable(this?.max);
+    const selectedComp = this.comparable(this?.selected);
+    const focusedComp = this.comparable(this?.focused);
 
     const half = Math.floor(YEARS_COUNT / 2);
     const year = this._ref.getUTCFullYear();
@@ -41,19 +45,23 @@ export class YearPicker extends Picker<YearItem> {
 
     return range(inf, sup).map(year => {
       d.setUTCFullYear(year);
-      const yearComp = comparableDate(d, 'year');
-
-      const isCurrent = yearComp === thisYearComp;
+      const itemComp = this.comparable(d) as number;
 
       let isDisabled = false;
-      if (minComp) isDisabled = yearComp < minComp;
-      if (maxComp) isDisabled = yearComp > maxComp;
+      if (minComp) isDisabled = itemComp < minComp;
+      if (maxComp) isDisabled = itemComp > maxComp;
 
       return {
         year,
-        isCurrent,
+        isNow: itemComp === nowComp,
         isDisabled,
+        isSelected: itemComp === selectedComp,
+        isFocused: itemComp === focusedComp,
       };
     });
+  }
+
+  private comparable(d?: Date): number | null {
+    return d ? comparableDate(d, 'year') : null;
   }
 }
