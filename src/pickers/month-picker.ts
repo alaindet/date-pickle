@@ -6,9 +6,18 @@ const FIRST_MONTH_INDEX = 0;
 const LAST_MONTH_INDEX = 11;
 
 export class MonthPicker extends Picker<MonthItem> {
-
   constructor(current?: Date, options?: PickerOptions) {
     super(current, options);
+  }
+
+  next(): void {
+    this._ref.setUTCFullYear(this._ref.getUTCFullYear() + 1);
+    this.updateItems();
+  }
+
+  prev(): void {
+    this._ref.setUTCFullYear(this._ref.getUTCFullYear() - 1);
+    this.updateItems();
   }
 
   protected buildItems(): MonthItem[] {

@@ -9,15 +9,6 @@ export class YearPicker extends Picker<YearItem> {
     super(current, options);
   }
 
-  get year(): number {
-    return this._ref.getUTCFullYear();
-  }
-
-  set year(year: number) {
-    this._ref.setUTCFullYear(year);
-    this.updateItems();
-  }
-
   next(): void {
     this._ref.setUTCFullYear(this._ref.getUTCFullYear() + YEARS_COUNT);
     this.updateItems();

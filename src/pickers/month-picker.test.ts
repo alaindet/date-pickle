@@ -88,6 +88,20 @@ describe('MonthPicker', () => {
     expect(comparable(focused!)).toEqual(comparable(d));
   });
 
+  it('should show next year when calling next()', () => {
+    const picker = new MonthPicker(new Date('2000-01-01'));
+    picker.next();
+    const year = picker.current.getUTCFullYear();
+    expect(year).toEqual(2001);
+  });
+
+  it('should show previous year when calling prev()', () => {
+    const picker = new MonthPicker(new Date('2000-01-01'));
+    picker.prev();
+    const year = picker.current.getUTCFullYear();
+    expect(year).toEqual(1999);
+  });
+
   it('should select given month via options', () => {
     const d = new Date('2022-02-02');
     const selected = new Date('2022-03-03');

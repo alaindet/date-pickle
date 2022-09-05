@@ -120,7 +120,7 @@ export class DatePickle {
 
   set current(current: Date) {
     this._ref = current;
-    if (this?._yearPicker) this._yearPicker.year = current.getFullYear();
+    if (this?._yearPicker) this._yearPicker.current = current;
     if (this?._datePicker) this._datePicker.current = current;
   }
 

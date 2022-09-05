@@ -1,12 +1,94 @@
 # Date Pickle
 
+![Date Pickle logo](https://raw.githubusercontent.com/alaindet/date-pickle/main/logo.png)
+
+Date Pickle is framework-agnostic fully-tested browser library written in TypeScript for **creating calendars** in the browser.
+
+Time unit names (months, weekdays) are translated with the provided locale via [Intl](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl), so Date Pickle only works on browsers.
+
+## Quick start
+
+```
+# Coming soon!
+# npm install date-pickle
+```
+
+### Manual installation
+```
+git clone https://github.com/alaindet/date-pickle
+cd ./date-pickle
+npm run install
+npm run release # Creates date-pickle-<VERSION>.tgz
+```
+
+In your project
+
+```
+npm install PATH_TO_DATE_PICKLE_TGZ_FILE
+# Ex.: npm install ../date-pickle/date-pickle-0.0.4.tgz
+```
+
+## At a glance
+
+```ts
+import { DatePickle } from 'date-pickle';
+
+const pickle = new DatePickle(new Date('2022-09-02'), 'en');
+const datePicker = pickle.datePicker;
+
+// Synchronous access to items
+console.log(datePicker.items);
+// [
+//   ...omitted,
+//   {
+//     date: 2022-09-09T22:00:00.000Z,
+//     isWeekend: true,
+//     isCurrent: false,
+//     isDisabled: false
+//   },
+//   ...omitted,
+// ]
+
+// Asynchronous access to items
+datePicker.onItemsChange(items => console.log(items));
+// Prints same as above
+
+// First month of the year, localized
+let firstMonthName = pickle.monthPicker.items![0].name;
+console.log(firstMonthName); // 'january'
+
+// Change localization (it's propagated to inner month picker)
+pickle.locale = 'it';
+firstMonthName = pickle.monthPicker.items![0].name;
+console.log(firstMonthName); // 'gennaio'
+
+// Set some state then update items
+pickle.sync = false;
+datePicker.max = new Date('2001-01-20');
+datePicker.current = new Date('2001-03-03'); // Set to march
+datePicker.prev(); // Go to february
+datePicker.prev(); // Go to january
+pickle.sync = true; // <-- Re-enables items calculation
+
+console.log(datePicker.items);
+// [
+//   ...
+//   { date: 2001-01-19T23:00:00.000Z, isDisabled: false, ... },
+//   { date: 2001-01-20T23:00:00.000Z, isDisabled: true, ... },
+//   ...
+// ]
+
+// Standalone picker (doesn't share any state with other pickers)
+const datePickerStandalone = new DatePicker(new Date());
+```
+
 ## Introduction
 
 - At the core of Date Pickle are pickers. Available pickers are `DatePicker`, `MonthPicker` and `YearPicker`
 - Each picker is a class that can be instantiated alone or by an instance of the `DatePickle` main class
 - The `DatePickle` instance allows to lazy-load the three pickers and share state among them
-- The basic output of pickers are a list of **items**, which are objects calculated upon picker state changes
-- Each picker has some state and events, signaling state changes
+- The basic output of pickers is a list of **items**, which are objects calculated when state changes
+- Each picker has some state and events, fired on state changes
 
 ## Items
 
@@ -53,12 +135,12 @@ Please note that
 
 ```ts
 const picker = new DatePicker();
-picker.selected = new Date();
 
 // This fires immediately, since related state (items) exist
 picker.onItems(items => console.log('items', items));
 
 // This callback waits because related state exists, but sync = false
+picker.selected = new Date();
 picker.sync = false;
 picker.onSelected((d: Date) => console.log('selected', d));
 picker.sync = true; // Now onSelected fires
@@ -84,9 +166,19 @@ const picker = new DatePicker();
 picker.selected = new Date('2022-01-01');
 ```
 
+State is composed of these keys
+
+- `items`: List of items, based on picker
+- `min`: Minium date allowed (items before this are disabled)
+- `max`: Maximum date allowed (items after this are disabled)
+- `locale`: Language to use when translating (ex.: months names)
+- `selected`: Currently select date
+- `focused`: Currently focused date (different from selected, since in accessible calendar users can move between dates by focusing them, but only one is then is selected)
+- `sync`: Whether to recalculate items and fire events when state changes or not
+
 ## State synchronization
 
-**NOTE**: Examples above are **NOT EQUIVALENT**. In fact, in the second the state is set later, so it is initialized to its default value, items are calculated automatically, then state is changed with `picker.selected` and items are recalculated again. To prevent unnecessary calculations, either set values upon creation with options (first example), or use the `sync` property like this
+**NOTE**: Examples above are **NOT EQUIVALENT**. In fact, in the second example the state is set later, so the state gets initialized to its default value, items are calculated automatically, then the state is changed with `picker.selected` and items are recalculated again. To prevent unnecessary calculations, either set values upon creation via options (first example), or use the `sync` property like this
 
 ```ts
 // Create a picker with sync = false, no items are calculated
@@ -117,20 +209,21 @@ picker.sync = true;
 - Why 12 years and not a *decade*? Simply because 12 is a very comfortable number to work with, while building UIs: a year has 12 months, so switching between a `MonthPicker` and `YearPicker` does not disrupt the UI, also you can have 4 rows of 3 years, 3 rows of 4 years, 6 rows of 2 years etc.
 
 - Items on a page are primarily calculated based on a inaccessible `ref` state key which is completely managed by the library and represents a `Date` around which items are calculated
-- All pickers have a number of methods to change page (by internally changing `ref` state key)
+- Ex.: Items in a month are calculated around a fictious `ref` set to midnight of the 15th day of that month
+- All pickers have a number of methods to change page (by internally changing the `ref` state key)
   - `now`
-    - Switch to a page containing today
+    - Switches to the page containing today
   - `prev`
     - Only `DatePicker` and `YearPicker`
-    - Switch to previous page (ex.: previous month for `DatePicker`)
+    - Switches to previous page (ex.: previous month for `DatePicker`)
   - `next`
     - Only `DatePicker` and `YearPicker`
-    - Switch to next page (ex.: next month for `DatePicker`)
+    - Switches to next page (ex.: next month for `DatePicker`)
 
 ## Disabling items
-- All items share a `isDisabled` boolean key telling the UI the item is disabled (usually greyed out and unclickable, like days from previou and next month on a regular date picker)
+- All items have a `isDisabled` boolean key telling the UI if the item is disabled (usually grayed out and unclickable, like days from previous and next month on a regular date picker)
 - Disabled state of items can be regulated by setting either one or both the `min` and the `max` property on any picker
-- `min`/`max` form an inclusive range (meaning items `>= min` and `<=max`) have `isDisabled = false`
+- `min`/`max` values form an inclusive range (meaning items `>= min` and `<= max`) of items with `isDisabled = false`
 - When setting `min`/`max` values, items are compared with `min`/`max` with a precision that depends on their picker
 - Ex.: `min`/`max` on `YearPicker` are compared by same year
 - Ex.: `min`/`max` on `DatePicker` are compared by same day
@@ -150,6 +243,6 @@ console.log(items[11].isDisabled); // true (May 6th)
 ```
 
 ## `DatePicker` "peeking" days from previous and next months
-- The `DatePicker` has a distinctive algorithm to calculate items, so that days from the previous and next month are shown, if the current month's days do not start on monday and/or do not end on sunday
+- The `DatePicker` has a distinctive algorithm to calculate items, so that days from the previous and next month are shown to fill the weeks, if the current month's days do not start on monday and/or do not end on sunday
 - This behavior is completely expected by any date picker, but please mind that, since calculated items are more than the days of their month, most likely the **first** item is **NOT** is the first day of the month and the **last** item is **NOT** the last day of the month
 - Also, days "peeking" from previous and next months always have `isDisabled: true` by default, regardless of the `min`/`max` values
