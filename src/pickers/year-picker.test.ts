@@ -8,7 +8,7 @@ describe('YearPicker', () => {
 
   it('should return items around given year', () => {
     const picker = new YearPicker(new Date('2001-06-07'));
-    const result = picker.items!.map(i => i.year);
+    const result = picker.items!.map(i => i.date.getUTCFullYear());
     const expected = range(1996, 2007);
     expect(result).toEqual(expected);
   });
@@ -18,7 +18,7 @@ describe('YearPicker', () => {
     const picker = new YearPicker(now);
     const items = picker.items!;
     const thisYear = now.getUTCFullYear();
-    const index = items!.findIndex(i => i.year === thisYear);
+    const index = items!.findIndex(i => i.date.getUTCFullYear() === thisYear);
     expect(items[index].isNow).toBeTruthy();
   });
 
@@ -78,17 +78,17 @@ describe('YearPicker', () => {
 
   it('should show next years when calling next()', () => {
     const picker = new YearPicker(new Date('2000-01-01'));
-    const lastYear1 = picker.items![0].year;
+    const lastYear1 = picker.items![0].date.getUTCFullYear();
     picker.next();
-    const lastYear2 = picker.items![0].year;
+    const lastYear2 = picker.items![0].date.getUTCFullYear();
     expect(lastYear2).toEqual(lastYear1 + 12);
   });
 
   it('should show previous years when calling prev()', () => {
     const picker = new YearPicker(new Date('2000-01-01'));
-    const lastYear1 = picker.items![0].year;
+    const lastYear1 = picker.items![0].date.getUTCFullYear();
     picker.prev();
-    const lastYear2 = picker.items![0].year;
+    const lastYear2 = picker.items![0].date.getUTCFullYear();
     expect(lastYear2).toEqual(lastYear1 - 12);
   });
 
@@ -96,10 +96,10 @@ describe('YearPicker', () => {
     const year1970 = new Date(0);
     const thisYear = new Date().getFullYear();
     const picker = new YearPicker(year1970);
-    const items1970 = picker.items!.map(i => i.year);
+    const items1970 = picker.items!.map(i => i.date.getUTCFullYear());
     expect(items1970).not.toContainEqual(thisYear);
     picker.now();
-    const items = picker.items!.map(i => i.year);
+    const items = picker.items!.map(i => i.date.getUTCFullYear());
     expect(items).toContainEqual(thisYear);
   });
 
@@ -108,8 +108,8 @@ describe('YearPicker', () => {
     const selected = new Date('2020-02-02');
     const picker = new YearPicker(d, { selected });
     const items = picker.items!;
-    const year2020 = items.find(y => y.year === 2020);
-    const year2022 = items.find(y => y.year === 2022);
+    const year2020 = items.find(y => y.date.getUTCFullYear() === 2020);
+    const year2022 = items.find(y => y.date.getUTCFullYear() === 2022);
     expect(year2020?.isSelected).toBeTruthy();
     expect(year2022?.isSelected).toBeFalsy();
   });
@@ -119,8 +119,8 @@ describe('YearPicker', () => {
     const picker = new YearPicker(d);
     picker.selected = new Date('2020-02-02');
     const items = picker.items!;
-    const year2020 = items.find(y => y.year === 2020);
-    const year2022 = items.find(y => y.year === 2022);
+    const year2020 = items.find(y => y.date.getUTCFullYear() === 2020);
+    const year2022 = items.find(y => y.date.getUTCFullYear() === 2022);
     expect(year2020?.isSelected).toBeTruthy();
     expect(year2022?.isSelected).toBeFalsy();
   });
@@ -130,8 +130,8 @@ describe('YearPicker', () => {
     const focused = new Date('2020-02-02');
     const picker = new YearPicker(d, { focused });
     const items = picker.items!;
-    const year2020 = items.find(y => y.year === 2020);
-    const year2022 = items.find(y => y.year === 2022);
+    const year2020 = items.find(y => y.date.getUTCFullYear() === 2020);
+    const year2022 = items.find(y => y.date.getUTCFullYear() === 2022);
     expect(year2020?.isFocused).toBeTruthy();
     expect(year2022?.isFocused).toBeFalsy();
   });
@@ -141,10 +141,21 @@ describe('YearPicker', () => {
     const picker = new YearPicker(d);
     picker.focused = new Date('2020-02-02');
     const items = picker.items!;
-    const year2020 = items.find(y => y.year === 2020);
-    const year2022 = items.find(y => y.year === 2022);
+    const year2020 = items.find(y => y.date.getUTCFullYear() === 2020);
+    const year2022 = items.find(y => y.date.getUTCFullYear() === 2022);
     expect(year2020?.isFocused).toBeTruthy();
     expect(year2022?.isFocused).toBeFalsy();
+  });
+
+  it('should have unique IDs for all items', () => {
+    const picker = new YearPicker(new Date('2022-09-08'));
+    const ids: { [id: number]: true } = {};
+    let isUnique = true;
+    picker.items?.some(item => {
+      if (ids[item.id]) isUnique = false;
+      ids[item.id] = true;
+    });
+    expect(isUnique).toBeTruthy();
   });
 });
 

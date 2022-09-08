@@ -1,11 +1,11 @@
-import { range, comparableDate } from '../utils';
+import { range, comparableDate, cloneDate } from '../utils';
 import { PickerOptions, YearItem } from '../types';
 import { Picker } from './picker';
 
 const YEARS_COUNT = 12;
 
 export class YearPicker extends Picker<YearItem> {
-  constructor(ref?: Date, options?: PickerOptions) {
+  constructor(ref?: Date | PickerOptions, options?: PickerOptions) {
     super(ref, options);
   }
 
@@ -20,10 +20,13 @@ export class YearPicker extends Picker<YearItem> {
   }
 
   protected buildItems(): YearItem[] {
-    const d = new Date();
+
+    // Fictous point in time
+    // July 1st is half year so it's nice!
+    const d = new Date(2022, 6, 1);
 
     // Init comparable values;
-    const nowComp = this.comparable(d);
+    const nowComp = this.comparable(new Date());
     const minComp = this.comparable(this?.min);
     const maxComp = this.comparable(this?.max);
     const selectedComp = this.comparable(this?.selected);
@@ -43,7 +46,9 @@ export class YearPicker extends Picker<YearItem> {
       if (maxComp) isDisabled = itemComp > maxComp;
 
       return {
-        year,
+        id: year,
+        label: `${year}`,
+        date: cloneDate(d),
         isNow: itemComp === nowComp,
         isDisabled,
         isSelected: itemComp === selectedComp,

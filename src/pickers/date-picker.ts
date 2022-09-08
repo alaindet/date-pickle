@@ -4,7 +4,7 @@ import { Picker } from './picker';
 
 export class DatePicker extends Picker<DayItem> {
 
-  constructor(ref?: Date, options?: PickerOptions) {
+  constructor(ref?: Date | PickerOptions, options?: PickerOptions) {
     super(ref, options);
   }
 
@@ -100,8 +100,13 @@ export class DatePicker extends Picker<DayItem> {
     return dates.map(d => {
       const itemComp = this.comparable(d)!;
       const weekday = d.getUTCDay();
+      const day = d.getUTCDate();
+      const month = d.getUTCMonth() + 1;
+      const id = Number(`${month}${day}`);
 
       return {
+        id,
+        label: `${day}`,
         date: d,
         isWeekend: weekday === SUNDAY || weekday === SATURDAY,
         isNow: itemComp === nowComp,

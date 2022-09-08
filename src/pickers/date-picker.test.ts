@@ -227,6 +227,17 @@ describe('DatePicker', () => {
     expect(firstItem.isDisabled).toBeTruthy();
     expect(lastItem.isDisabled).toBeTruthy();
   });
+
+  it('should have unique IDs for all items', () => {
+    const picker = new DatePicker(new Date('2022-09-08'));
+    const ids: { [id: number]: true } = {};
+    let isUnique = true;
+    picker.items?.some(item => {
+      if (ids[item.id]) isUnique = false;
+      ids[item.id] = true;
+    });
+    expect(isUnique).toBeTruthy();
+  });
 });
 
 export {};
