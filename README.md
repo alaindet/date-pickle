@@ -2,30 +2,14 @@
 
 ![Date Pickle logo](https://raw.githubusercontent.com/alaindet/date-pickle/main/logo.png)
 
-Date Pickle is framework-agnostic fully-tested browser library written in TypeScript for **creating calendars** in the browser.
+Date Pickle is a TypeScript browser library for **creating calendars**. It is framework-agnostic, fully tested and with zero runtime dependencies.
 
-Time unit names (months, weekdays) are translated with the provided locale via [Intl](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl), so Date Pickle only works on browsers.
+Time unit names (months, weekdays) are translated with the provided locale via the [Intl](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl) browser API, so Date Pickle only works on browsers.
 
-## Quick start
-
-```
-# Coming soon!
-# npm install date-pickle
-```
-
-### Manual installation
-```
-git clone https://github.com/alaindet/date-pickle
-cd ./date-pickle
-npm run install
-npm run release # Creates date-pickle-<VERSION>.tgz
-```
-
-In your project
+## Installation
 
 ```
-npm install PATH_TO_DATE_PICKLE_TGZ_FILE
-# Ex.: npm install ../date-pickle/date-pickle-0.0.4.tgz
+npm install date-pickle
 ```
 
 ## At a glance
@@ -33,18 +17,19 @@ npm install PATH_TO_DATE_PICKLE_TGZ_FILE
 ```ts
 import { DatePickle } from 'date-pickle';
 
-const pickle = new DatePickle(new Date('2022-09-02'), 'en');
-const datePicker = pickle.datePicker;
+const pickle = new DatePickle(new Date('2022-09-07'));
 
-// Synchronous access to items
+const datePicker = pickle.datePicker;
 console.log(datePicker.items);
 // [
 //   ...omitted,
 //   {
-//     date: 2022-09-09T22:00:00.000Z,
-//     isWeekend: true,
-//     isCurrent: false,
-//     isDisabled: false
+//     date: 2022-09-09T00:00:00.000Z,
+//     isWeekend: false,
+//     isNow: false,
+//     isDisabled: false,
+//     isSelected: false,
+//     isFocused: false
 //   },
 //   ...omitted,
 // ]
@@ -54,6 +39,7 @@ datePicker.onItemsChange(items => console.log(items));
 // Prints same as above
 
 // First month of the year, localized
+pickle.locale = 'en';
 let firstMonthName = pickle.monthPicker.items![0].name;
 console.log(firstMonthName); // 'january'
 
@@ -65,7 +51,7 @@ console.log(firstMonthName); // 'gennaio'
 // Set some state then update items
 pickle.sync = false;
 datePicker.max = new Date('2001-01-20');
-datePicker.current = new Date('2001-03-03'); // Set to march
+datePicker.ref = new Date('2001-03-03'); // Set to march
 datePicker.prev(); // Go to february
 datePicker.prev(); // Go to january
 pickle.sync = true; // <-- Re-enables items calculation
