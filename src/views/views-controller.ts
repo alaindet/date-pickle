@@ -67,7 +67,7 @@ export class DatePickleViewsController {
       this._view = DatePickleView.DatePicker;
       break;
     case DatePickleView.YearPicker:
-      this._view = DatePickleView.YearPicker;
+      this._view = DatePickleView.MonthPicker;
       break;
     }
 
