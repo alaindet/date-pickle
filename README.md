@@ -24,12 +24,14 @@ console.log(datePicker.items);
 // [
 //   ...omitted,
 //   {
-//     date: 2022-09-09T00:00:00.000Z,
+//     id: 829,
+//     label: '29',
+//     date: 2022-08-29T00:00:00.000Z,
 //     isWeekend: false,
 //     isNow: false,
-//     isDisabled: false,
+//     isDisabled: true,
 //     isSelected: false,
-//     isFocused: false
+//     isFocused: false,
 //   },
 //   ...omitted,
 // ]
@@ -82,9 +84,19 @@ Items (of types `DayItem`, `MonthItem` and `YearItem`) all extend a common `Date
 
 ```ts
 interface DatePickleItem {
+  // Unique value in a collection of items
+  id: number;
+  // Can be used in UI, ex.: "january" for MonthPicker, "2022" for YearPicker
+  label: string;
+  // Date instance of the item
+  date: Date;
+  // Whether the item is now (ex.: "today" for DatePicker, "this month" for MonthPicker)
   isNow: boolean;
+  // Whether the item is disabled (out of min/max range, belonging to adjacent months)
   isDisabled: boolean;
+  // Whether the item is selected, based on `selected: Date` property
   isSelected: boolean;
+  // Wheter the item is focused, based on `focused: Date` property
   isFocused: boolean;
 }
 ```
@@ -93,7 +105,6 @@ Each picker has specific items, for example `DatePicker` outputs `DayItem` items
 
 ```ts
 interface DayItem extends DatePickleItem {
-  date: Date;
   isWeekend: boolean;
 }
 ```
@@ -155,7 +166,7 @@ picker.selected = new Date('2022-01-01');
 State is composed of these keys
 
 - `items`: List of items, based on picker
-- `min`: Minium date allowed (items before this are disabled)
+- `min`: Minimum date allowed (items before this are disabled)
 - `max`: Maximum date allowed (items after this are disabled)
 - `locale`: Language to use when translating (ex.: months names)
 - `selected`: Currently select date
@@ -168,8 +179,7 @@ State is composed of these keys
 
 ```ts
 // Create a picker with sync = false, no items are calculated
-const options = { sync: false };
-const picker = new DatePicker(new Date(), options);
+const picker = new DatePicker(new Date(), { sync: false });
 
 // Alter some state
 picker.min = new Date('2010-03-03');
@@ -194,17 +204,12 @@ picker.sync = true;
 
 - Why 12 years and not a *decade*? Simply because 12 is a very comfortable number to work with, while building UIs: a year has 12 months, so switching between a `MonthPicker` and `YearPicker` does not disrupt the UI, also you can have 4 rows of 3 years, 3 rows of 4 years, 6 rows of 2 years etc.
 
-- Items on a page are primarily calculated based on a inaccessible `ref` state key which is completely managed by the library and represents a `Date` around which items are calculated
+- Items on a page are primarily calculated based on the `ref` state key representing a `Date` around which items are calculated
 - Ex.: Items in a month are calculated around a fictious `ref` set to midnight of the 15th day of that month
 - All pickers have a number of methods to change page (by internally changing the `ref` state key)
-  - `now`
-    - Switches to the page containing today
-  - `prev`
-    - Only `DatePicker` and `YearPicker`
-    - Switches to previous page (ex.: previous month for `DatePicker`)
-  - `next`
-    - Only `DatePicker` and `YearPicker`
-    - Switches to next page (ex.: next month for `DatePicker`)
+  - `now()`: Switches to the page containing today
+  - `prev()`: Switches to previous page (ex.: previous month for `DatePicker`)
+  - `next()`: Switches to next page (ex.: next month for `DatePicker`)
 
 ## Disabling items
 - All items have a `isDisabled` boolean key telling the UI if the item is disabled (usually grayed out and unclickable, like days from previous and next month on a regular date picker)

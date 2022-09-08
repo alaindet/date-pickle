@@ -14,14 +14,30 @@ export abstract class Picker<ItemType = unknown> {
   protected _focusedHandler?: DatePickleEventHandler<Date | undefined>;
   protected _sync = true;
 
-  constructor(ref?: Date, options?: PickerOptions) {
-    this._ref = ref ?? new Date();
+  constructor(refOrOptions?: PickerOptions | Date, options?: PickerOptions) {
+
+    // Ex.: new Picker()
+    if (!refOrOptions) {
+      this._ref = new Date();
+      this.updateItems();
+      return;
+    }
+
+    // Ex.: new Picker(new Date('2000-01-01'))
+    if (refOrOptions instanceof Date) {
+      this._ref = refOrOptions;
+      options = options ?? {};
+    }
+
+    // Parse options
+    if (options?.ref) this._ref = options.ref;
     if (options?.min) this._min = options.min;
     if (options?.max) this._max = options.max;
     if (options?.sync) this._sync = options.sync;
     if (options?.locale) this._locale = options.locale;
     if (options?.selected) this._selected = options.selected;
     if (options?.focused) this._focused = options.focused;
+
     this.updateItems();
   }
 

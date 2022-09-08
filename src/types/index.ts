@@ -1,6 +1,9 @@
 export type DatePickleEventHandler<T = unknown> = (data: T) => void;
 
 export interface DatePickleItem {
+  id: number; // Has to be unique
+  label: string; // Can be shown on th UI
+  date: Date;
   isNow: boolean;
   isDisabled: boolean;
   isSelected: boolean;
@@ -8,22 +11,17 @@ export interface DatePickleItem {
 }
 
 export interface DayItem extends DatePickleItem {
-  date: Date;
   isWeekend: boolean;
 }
 
-export interface MonthItem extends DatePickleItem {
-  number: number;
-  name: string;
-}
+export type MonthItem = DatePickleItem;
 
-export interface YearItem extends DatePickleItem {
-  year: number;
-}
+export type YearItem = DatePickleItem;
 
 export type Locale = string; // TODO: Better typing?
 
 export interface PickerOptions {
+  ref?: Date;
   min?: Date | null;
   max?: Date | null;
   locale?: Locale | null;

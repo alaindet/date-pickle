@@ -1,4 +1,4 @@
-import { comparableDate, range } from '../utils';
+import { cloneDate, comparableDate, range } from '../utils';
 import { MonthItem, PickerOptions } from '../types';
 import { Picker } from './picker';
 
@@ -6,7 +6,7 @@ const FIRST_MONTH_INDEX = 0;
 const LAST_MONTH_INDEX = 11;
 
 export class MonthPicker extends Picker<MonthItem> {
-  constructor(ref?: Date, options?: PickerOptions) {
+  constructor(ref?: Date | PickerOptions, options?: PickerOptions) {
     super(ref, options);
   }
 
@@ -21,10 +21,13 @@ export class MonthPicker extends Picker<MonthItem> {
   }
 
   protected buildItems(): MonthItem[] {
-    const d = new Date();
+
+    // Fictous point in time
+    // July 1st is half year so it's nice!
+    const d = new Date(Date.UTC(2022, 6, 1));
 
     // Init comparable values
-    const nowComp = this.comparable(d);
+    const nowComp = this.comparable(new Date());
     const minComp = this.comparable(this?.min);
     const maxComp = this.comparable(this?.max);
     const selectedComp = this.comparable(this?.selected);
@@ -35,7 +38,7 @@ export class MonthPicker extends Picker<MonthItem> {
 
       const itemComp = this.comparable(d) as number;
 
-      const name = d
+      const label = d
         .toLocaleString(this._locale, { month: 'long' })
         .toLocaleLowerCase();
 
@@ -44,8 +47,9 @@ export class MonthPicker extends Picker<MonthItem> {
       if (maxComp) isDisabled = itemComp > maxComp;
 
       return {
-        number: monthIndex + 1,
-        name,
+        id: monthIndex + 1,
+        label,
+        date: cloneDate(d),
         isNow: itemComp === nowComp,
         isDisabled,
         isSelected: itemComp === selectedComp,

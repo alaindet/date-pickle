@@ -8,8 +8,8 @@ describe('MonthPicker', () => {
 
   it('should return the 12 months of any year', () => {
     const picker = new MonthPicker();
-    const result = picker.items!.map(i => i.number);
-    const expected = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+    const result = picker.items!.map(i => i.date.getUTCMonth()).join(', ');
+    const expected = '0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11';
     expect(result).toEqual(expected);
   });
 
@@ -17,19 +17,19 @@ describe('MonthPicker', () => {
     const now = new Date();
     const picker = new MonthPicker(now);
     const items = picker.items!;
-    const thisMonth = now.getMonth() + 1;
-    const index = items.findIndex(i => i.number === thisMonth);
+    const thisMonth = now.getUTCMonth();
+    const index = items.findIndex(i => i.date.getUTCMonth() === thisMonth);
     expect(items[index].isNow).toBeTruthy();
   });
 
   it('should translate month names for english locale', () => {
     const picker = new MonthPicker(new Date(), { locale: 'en' });
-    expect(picker.items![0].name).toEqual('january');
+    expect(picker.items![0].label).toEqual('january');
   });
 
   it('should translate month names for italian locale', () => {
     const picker = new MonthPicker(new Date(), { locale: 'it' });
-    expect(picker.items![7].name).toEqual('agosto');
+    expect(picker.items![7].label).toEqual('agosto');
   });
 
   it('should disable items lower than min', () => {
@@ -144,6 +144,17 @@ describe('MonthPicker', () => {
     const march2022 = items[2];
     expect(march2022?.isFocused).toBeTruthy();
     expect(februrary2022?.isFocused).toBeFalsy();
+  });
+
+  it('should have unique IDs for all items', () => {
+    const picker = new MonthPicker(new Date('2022-09-08'));
+    const ids: { [id: number]: true } = {};
+    let isUnique = true;
+    picker.items?.some(item => {
+      if (ids[item.id]) isUnique = false;
+      ids[item.id] = true;
+    });
+    expect(isUnique).toBeTruthy();
   });
 });
 
