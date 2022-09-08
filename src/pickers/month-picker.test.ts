@@ -91,14 +91,14 @@ describe('MonthPicker', () => {
   it('should show next year when calling next()', () => {
     const picker = new MonthPicker(new Date('2000-01-01'));
     picker.next();
-    const year = picker.current.getUTCFullYear();
+    const year = picker.ref.getUTCFullYear();
     expect(year).toEqual(2001);
   });
 
   it('should show previous year when calling prev()', () => {
     const picker = new MonthPicker(new Date('2000-01-01'));
     picker.prev();
-    const year = picker.current.getUTCFullYear();
+    const year = picker.ref.getUTCFullYear();
     expect(year).toEqual(1999);
   });
 

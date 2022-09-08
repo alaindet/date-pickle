@@ -4,8 +4,8 @@ import { Picker } from './picker';
 
 export class DatePicker extends Picker<DayItem> {
 
-  constructor(current?: Date, options?: PickerOptions) {
-    super(current, options);
+  constructor(ref?: Date, options?: PickerOptions) {
+    super(ref, options);
   }
 
   next(): void {
@@ -75,10 +75,10 @@ export class DatePicker extends Picker<DayItem> {
   // Thanks to https://bobbyhadz.com/blog/javascript-get-all-dates-in-month
   private getDaysInMonth(year: number, month: number): Date[] {
     const d = new Date(Date.UTC(year, month, 1));
-    const currentMonth = d.getUTCMonth();
+    const theMonth = d.getUTCMonth();
     const days: Date[] = [];
 
-    while(d.getUTCMonth() === currentMonth) {
+    while(d.getUTCMonth() === theMonth) {
       days.push(new Date(d.getTime()));
       d.setUTCDate(d.getUTCDate() + 1);
     }
