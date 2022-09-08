@@ -1,5 +1,6 @@
 import { DatePickle } from './date-pickle';
 import { comparableDate } from './utils';
+import { PickerType } from './types';
 
 const locale = 'en';
 const year = (d: Date) => comparableDate(d, 'year');
@@ -25,17 +26,17 @@ describe('DatePickle', () => {
     const d = new Date('2022-09-02');
     const dpk = new DatePickle(d, { locale });
 
-    expect(dpk.existsYearPicker()).toBeFalsy();
+    expect(dpk.exists(PickerType.YearPicker)).toBeFalsy();
     dpk.yearPicker;
-    expect(dpk.existsYearPicker()).toBeTruthy();
+    expect(dpk.exists(PickerType.YearPicker)).toBeTruthy();
 
-    expect(dpk.existsMonthPicker()).toBeFalsy();
+    expect(dpk.exists(PickerType.MonthPicker)).toBeFalsy();
     dpk.monthPicker;
-    expect(dpk.existsMonthPicker()).toBeTruthy();
+    expect(dpk.exists(PickerType.MonthPicker)).toBeTruthy();
 
-    expect(dpk.existsDatePicker()).toBeFalsy();
+    expect(dpk.exists(PickerType.DatePicker)).toBeFalsy();
     dpk.datePicker;
-    expect(dpk.existsDatePicker()).toBeTruthy();
+    expect(dpk.exists(PickerType.DatePicker)).toBeTruthy();
   });
 
   it('should propagate min value to pickers', () => {

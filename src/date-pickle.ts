@@ -1,24 +1,28 @@
 import { YearPicker } from './pickers/year-picker';
 import { MonthPicker } from './pickers/month-picker';
 import { DatePicker } from './pickers/date-picker';
-import { Locale, PickerOptions } from './types';
+import { Locale, PickerOptions, DatePickleView } from './types';
 import { cloneDate } from './utils';
+import { DatePickleViewsController } from './views/views-controller';
 
 export class DatePickle {
 
   // Pickers
-  private _yearPicker?: YearPicker;
-  private _monthPicker?: MonthPicker;
-  private _datePicker?: DatePicker;
+  protected _yearPicker?: YearPicker;
+  protected _monthPicker?: MonthPicker;
+  protected _datePicker?: DatePicker;
 
   // Properties
-  private _ref!: Date;
-  private _locale!: Locale;
-  private _min?: Date;
-  private _max?: Date;
-  private _selected?: Date;
-  private _focused?: Date;
-  private _sync = true;
+  protected _ref!: Date;
+  protected _locale!: Locale;
+  protected _min?: Date;
+  protected _max?: Date;
+  protected _selected?: Date;
+  protected _focused?: Date;
+  protected _sync = true;
+
+  // View
+  public view = new DatePickleViewsController(this);
 
   constructor(ref?: Date, options?: PickerOptions) {
     this._ref = ref ?? new Date();
@@ -126,16 +130,12 @@ export class DatePickle {
     if (this?._datePicker) this._datePicker.ref = ref;
   }
 
-  existsYearPicker(): boolean {
-    return !!this?._yearPicker;
-  }
-
-  existsMonthPicker(): boolean {
-    return !!this?._monthPicker;
-  }
-
-  existsDatePicker(): boolean {
-    return !!this?._datePicker;
+  exists(pickerType: DatePickleView): boolean {
+    switch (pickerType) {
+    case DatePickleView.YearPicker: return !!this?._yearPicker;
+    case DatePickleView.MonthPicker: return !!this?._monthPicker;
+    case DatePickleView.DatePicker: return !!this?._datePicker;
+    }
   }
 
   private getInitialOptions(): PickerOptions {

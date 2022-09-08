@@ -29,3 +29,14 @@ export interface PickerOptions {
   focused?: Date | null;
   sync?: boolean | null;
 }
+
+export enum DatePickleView {
+  YearPicker = 'year-picker',
+  MonthPicker = 'month-picker',
+  DatePicker = 'date-picker',
+}
+
+export interface DatePickleViewChangeEvent {
+  from: DatePickleView | null;
+  to: DatePickleView;
+}
