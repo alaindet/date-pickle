@@ -1,6 +1,7 @@
 import { DatePickleEventHandler, Locale, PickerOptions } from '../types';
 
 export abstract class Picker<ItemType = unknown> {
+
   protected _ref!: Date;
   protected _items: ItemType[] = [];
   protected _min?: Date;
@@ -13,8 +14,8 @@ export abstract class Picker<ItemType = unknown> {
   protected _focusedHandler?: DatePickleEventHandler<Date | undefined>;
   protected _sync = true;
 
-  constructor(current?: Date, options?: PickerOptions) {
-    this._ref = current ?? new Date();
+  constructor(ref?: Date, options?: PickerOptions) {
+    this._ref = ref ?? new Date();
     if (options?.min) this._min = options.min;
     if (options?.max) this._max = options.max;
     if (options?.sync) this._sync = options.sync;
@@ -24,12 +25,12 @@ export abstract class Picker<ItemType = unknown> {
     this.updateItems();
   }
 
-  get current(): Date {
+  get ref(): Date {
     return this._ref;
   }
 
-  set current(current: Date | null) {
-    this._ref = current ?? new Date();
+  set ref(ref: Date | null) {
+    this._ref = ref ?? new Date();
     this.updateItems();
   }
 

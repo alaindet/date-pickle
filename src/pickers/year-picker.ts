@@ -5,8 +5,8 @@ import { Picker } from './picker';
 const YEARS_COUNT = 12;
 
 export class YearPicker extends Picker<YearItem> {
-  constructor(current?: Date, options?: PickerOptions) {
-    super(current, options);
+  constructor(ref?: Date, options?: PickerOptions) {
+    super(ref, options);
   }
 
   next(): void {

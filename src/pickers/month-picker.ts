@@ -6,8 +6,8 @@ const FIRST_MONTH_INDEX = 0;
 const LAST_MONTH_INDEX = 11;
 
 export class MonthPicker extends Picker<MonthItem> {
-  constructor(current?: Date, options?: PickerOptions) {
-    super(current, options);
+  constructor(ref?: Date, options?: PickerOptions) {
+    super(ref, options);
   }
 
   next(): void {

@@ -5,11 +5,13 @@ import { Locale, PickerOptions } from './types';
 import { cloneDate } from './utils';
 
 export class DatePickle {
+
   // Pickers
   private _yearPicker?: YearPicker;
   private _monthPicker?: MonthPicker;
   private _datePicker?: DatePicker;
 
+  // Properties
   private _ref!: Date;
   private _locale!: Locale;
   private _min?: Date;
@@ -18,8 +20,8 @@ export class DatePickle {
   private _focused?: Date;
   private _sync = true;
 
-  constructor(current?: Date, options?: PickerOptions) {
-    this._ref = current ?? new Date();
+  constructor(ref?: Date, options?: PickerOptions) {
+    this._ref = ref ?? new Date();
     if (options?.min) this._min = options.min;
     if (options?.max) this._max = options.max;
     if (options?.sync) this._sync = options.sync;
@@ -118,10 +120,10 @@ export class DatePickle {
     return this._datePicker!;
   }
 
-  set current(current: Date) {
-    this._ref = current;
-    if (this?._yearPicker) this._yearPicker.current = current;
-    if (this?._datePicker) this._datePicker.current = current;
+  set ref(ref: Date) {
+    this._ref = ref;
+    if (this?._yearPicker) this._yearPicker.ref = ref;
+    if (this?._datePicker) this._datePicker.ref = ref;
   }
 
   existsYearPicker(): boolean {
