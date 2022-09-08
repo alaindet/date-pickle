@@ -3,18 +3,20 @@
 
 export type Movement2D = (index: number) => number | null;
 
+export interface Movements2D {
+  up: Movement2D;
+  right: Movement2D;
+  down: Movement2D;
+  left: Movement2D;
+}
+
 /**
  * Returns a collection of functions to move in a 2d grid
  * The 2d grid is represented as monodimensional array
  * size is array length
  * width is width of every row
  */
-export const get2dMovements = (size: number, width: number): {
-  up: Movement2D;
-  right: Movement2D;
-  down: Movement2D;
-  left: Movement2D;
-} => {
+export const get2dMovements = (size: number, width: number): Movements2D => {
 
   const onSameRow = (a: number | null, b: number | null): boolean => {
     if (a === null || b === null) return false;
