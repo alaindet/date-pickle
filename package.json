@@ -12,7 +12,7 @@
     "lint": "eslint --ext .js,.ts .",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
 
-    "release": "npm run build && npm run pack",
+    "release": "npm run build && npm pack",
     "prepare": "npm run build",
     "preversion": "npm run lint",
     "version": "npm run format && git add -A src",
