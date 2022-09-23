@@ -7,7 +7,7 @@
     "esModuleInterop": true,
     "isolatedModules": true,
     "lib": ["es6"],
-    "module": "commonjs",
+    "module": "ES2020",
     "moduleResolution": "node",
     "noImplicitAny": true,
     "outDir": "./dist",
