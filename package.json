@@ -3,6 +3,7 @@
   "version": "0.0.13",
   "description": "A framework-agnostic library to manage calendars",
   "main": "dist/index.js",
+  "type": "module",
   "types": "dist/index.d.ts",
   "scripts": {
     "start": "npx nodemon",
