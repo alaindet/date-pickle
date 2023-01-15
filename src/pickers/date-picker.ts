@@ -24,7 +24,6 @@ export class DatePicker extends Picker<DayItem> {
 
     const days = this.getDaysInCurrentMonth();
 
-    // TODO: Manage peek property?
     const peek = true;
 
     if (peek) {
@@ -87,18 +86,21 @@ export class DatePicker extends Picker<DayItem> {
   }
 
   private toCalendarDays(dates: Date[]): DayItem[] {
-    const [inf, sup] = this.getAllowedDateRange();
-    const infComp = this.comparable(inf)!;
-    const supComp = this.comparable(sup)!;
+    const allowedRange = this.getAllowedDateRange();
+    const inf = this.comparable(allowedRange[0])!;
+    const sup = this.comparable(allowedRange[1])!;
 
     const SUNDAY = 0;
     const SATURDAY = 6;
-    const nowComp = this.comparable(new Date());
-    const selectedComp = this.comparable(this?.selected);
-    const focusedComp = this.comparable(this?.focused);
+    const now = this.comparable(new Date());
+    const selected = this.comparable(this?.selected);
+    const focused = this.comparable(this?.focused);
+    const rangeStart = this.comparable(this?.range?.from);
+    const rangeEnd = this.comparable(this?.range?.to);
+    const isAnyRange = !!rangeStart && !!rangeEnd;
 
     return dates.map(d => {
-      const itemComp = this.comparable(d)!;
+      const item = this.comparable(d)!;
       const weekday = d.getUTCDay();
       const day = d.getUTCDate();
       const month = d.getUTCMonth() + 1;
@@ -109,10 +111,13 @@ export class DatePicker extends Picker<DayItem> {
         label: `${day}`,
         date: d,
         isWeekend: weekday === SUNDAY || weekday === SATURDAY,
-        isNow: itemComp === nowComp,
-        isDisabled: itemComp < infComp || itemComp > supComp,
-        isSelected: itemComp === selectedComp,
-        isFocused: itemComp === focusedComp,
+        isNow: item === now,
+        isDisabled: item < inf || item > sup,
+        isSelected: item === selected,
+        isFocused: item === focused,
+        inRange: isAnyRange && rangeStart <= item && item <= rangeEnd,
+        isRangeStart: item === rangeStart,
+        isRangeEnd: item === rangeEnd,
       };
     });
   }

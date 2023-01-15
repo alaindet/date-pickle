@@ -1,0 +1,9 @@
+- [x] Add `inRange: boolean` to items
+- [x] Add `isRangeStart: boolean` to items
+- [x] Add `isRangeEnd: boolean` to items
+- [ ] Add `range: DateRange`
+- [ ] Update CHANGELOG.md key to pickers
+- [x] Add range to other pickles' items
+- [ ] Add tests
+- [ ] Update README.md
+- [ ] Validate range and throw exceptions

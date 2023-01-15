@@ -1,7 +1,7 @@
-import { DatePickleEventHandler, Locale, PickerOptions } from '../types';
+import { InvalidDateRangeError } from '../errors';
+import { DatePickleEventHandler, DateRange, Locale, PickerOptions } from '../types';
 
 export abstract class Picker<ItemType = unknown> {
-
   protected _ref!: Date;
   protected _items: ItemType[] = [];
   protected _min?: Date;
@@ -9,13 +9,13 @@ export abstract class Picker<ItemType = unknown> {
   protected _locale = 'default';
   protected _selected?: Date;
   protected _focused?: Date;
+  protected _range?: DateRange;
   protected _itemsChangeHandler?: DatePickleEventHandler<ItemType[]>;
   protected _selectedHandler?: DatePickleEventHandler<Date | undefined>;
   protected _focusedHandler?: DatePickleEventHandler<Date | undefined>;
   protected _sync = true;
 
   constructor(refOrOptions?: PickerOptions | Date, options?: PickerOptions) {
-
     // Ex.: new Picker()
     if (!refOrOptions) {
       this._ref = new Date();
@@ -37,6 +37,9 @@ export abstract class Picker<ItemType = unknown> {
     if (options?.locale) this._locale = options.locale;
     if (options?.selected) this._selected = options.selected;
     if (options?.focused) this._focused = options.focused;
+    if (this.validateRange(options?.range)) {
+      this._range = options!.range as DateRange;
+    }
 
     this.updateItems();
   }
@@ -110,6 +113,19 @@ export abstract class Picker<ItemType = unknown> {
     this._focusedHandler && this._focusedHandler(focused);
   }
 
+  get range(): DateRange | undefined {
+    return this._range;
+  }
+
+  set range(range: Partial<DateRange> | undefined | null) {
+    if (range === null) range = undefined;
+    if (!this.validateRange(range)) {
+      throw new InvalidDateRangeError('Invalid date range provided', range);
+    }
+    this._range = range as DateRange;
+    this.updateItems();
+  }
+
   get items(): ItemType[] | undefined {
     return this._items;
   }
@@ -137,11 +153,18 @@ export abstract class Picker<ItemType = unknown> {
   updateItems(): void {
     if (!this._sync) return;
     this._items = this.buildItems();
-    this._itemsChangeHandler && this._itemsChangeHandler(this._items);
+    if (this._itemsChangeHandler) this._itemsChangeHandler(this._items);
   }
 
   // Overridden by child class
   protected buildItems(): ItemType[] {
     return [];
   }
-}
+
+  private validateRange(range?: PickerOptions['range']): boolean {
+    if (!range) return false;
+    if (!range.from || !range.to) return false;
+    if (range.to.getTime() > range.from.getTime()) return false;
+    return true;
+  }
+} 
