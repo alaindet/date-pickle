@@ -1,13 +1,17 @@
-import { cloneDate, comparableDate, range } from '../../utils';
-import { MonthItem, PickerOptions } from '../../types';
+import { cloneDate, range } from '../../utils';
+import { MonthItem, PickerOptions, TIME_INTERVAL } from '../../types';
 import { Picker } from '../picker';
 
 const FIRST_MONTH_INDEX = 0;
 const LAST_MONTH_INDEX = 11;
 
 export class MonthPicker extends Picker<MonthItem> {
+
   constructor(ref?: Date | PickerOptions, options?: PickerOptions) {
     super(ref, options);
+    this._focusOffset = 3; // Jumps one season by default
+    this._interval = TIME_INTERVAL.MONTH;
+    this.updateItems();
   }
 
   next(): void {
@@ -28,16 +32,16 @@ export class MonthPicker extends Picker<MonthItem> {
     const d = new Date(Date.UTC(year, 6, 1));
 
     // Init comparable values
-    const nowComp = this.comparable(new Date());
-    const minComp = this.comparable(this?.min);
-    const maxComp = this.comparable(this?.max);
-    const selectedComp = this.comparable(this?.selected);
-    const focusedComp = this.comparable(this?.focused);
+    const nowComp = this.toComparable(new Date());
+    const minComp = this.toComparable(this?.min);
+    const maxComp = this.toComparable(this?.max);
+    const selectedComp = this.toComparable(this?.selected);
+    const focusedComp = this.toComparable(this?.focused);
 
     return range(FIRST_MONTH_INDEX, LAST_MONTH_INDEX).map(monthIndex => {
       d.setUTCMonth(monthIndex);
 
-      const itemComp = this.comparable(d) as number;
+      const itemComp = this.toComparable(d)!;
 
       const label = d
         .toLocaleString(this._locale, { month: 'long' })
@@ -57,9 +61,5 @@ export class MonthPicker extends Picker<MonthItem> {
         isFocused: itemComp === focusedComp,
       };
     });
-  }
-
-  private comparable(d?: Date): number | null {
-    return d ? comparableDate(d, 'month') : null;
   }
 }

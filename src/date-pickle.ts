@@ -2,7 +2,7 @@ import { YearPicker } from './pickers/year-picker/year-picker';
 import { MonthPicker } from './pickers/month-picker/month-picker';
 import { DatePicker } from './pickers/date-picker/date-picker';
 import { Locale, PickerOptions } from './types';
-import { cloneDate } from './utils';
+import { cloneDate, parsePickerInput } from './utils';
 
 export class DatePickle {
 
@@ -11,23 +11,26 @@ export class DatePickle {
   private _monthPicker?: MonthPicker;
   private _datePicker?: DatePicker;
 
-  // Properties
   private _ref!: Date;
   private _locale!: Locale;
   private _min?: Date;
   private _max?: Date;
   private _selected?: Date;
   private _focused?: Date;
+  protected _focusOffset!: number; // Defined by child class
   private _sync = true;
 
-  constructor(ref?: Date, options?: PickerOptions) {
-    this._ref = ref ?? new Date();
-    if (options?.min) this._min = options.min;
-    if (options?.max) this._max = options.max;
-    if (options?.sync) this._sync = options.sync;
-    if (options?.locale) this._locale = options.locale;
-    if (options?.selected) this._selected = options.selected;
-    if (options?.focused) this._focused = options.focused;
+  constructor(refOrOptions?: PickerOptions | Date, options?: PickerOptions) {
+    const input = parsePickerInput(refOrOptions, options);
+    this._ref = input.ref;
+    this._ref = input.options.ref ?? this._ref;
+    this._locale = input.options.locale ?? this._locale;
+    this._min = input.options.min ?? this._min;
+    this._max = input.options.max ?? this._max;
+    this._selected = input.options.selected ?? this._selected;
+    this._focused = input.options.focused ?? this._focused;
+    this._focusOffset = input.options.focusOffset ?? this._focusOffset;
+    this._sync = input.options.sync ?? this._sync;
   }
 
   get locale(): Locale {
@@ -145,6 +148,8 @@ export class DatePickle {
       locale: this._locale,
       selected: this._selected,
       focused: this._selected,
+      focusOffset: this._focusOffset,
+      sync: this._sync,
     };
   }
 }

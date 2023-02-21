@@ -1,11 +1,14 @@
-import { cloneDate, comparableDate } from '../../utils';
-import { DayItem, PickerOptions } from '../../types';
+import { cloneDate } from '../../utils';
+import { DayItem, PickerOptions, TIME_INTERVAL } from '../../types';
 import { Picker } from '../picker';
 
 export class DatePicker extends Picker<DayItem> {
 
   constructor(ref?: Date | PickerOptions, options?: PickerOptions) {
     super(ref, options);
+    this._focusOffset = 7; // Jumps one week by default
+    this._interval = TIME_INTERVAL.DAY;
+    this.updateItems();
   }
 
   next(): void {
@@ -88,17 +91,17 @@ export class DatePicker extends Picker<DayItem> {
 
   private toCalendarDays(dates: Date[]): DayItem[] {
     const [inf, sup] = this.getAllowedDateRange();
-    const infComp = this.comparable(inf)!;
-    const supComp = this.comparable(sup)!;
+    const infComp = this.toComparable(inf)!;
+    const supComp = this.toComparable(sup)!;
 
     const SUNDAY = 0;
     const SATURDAY = 6;
-    const nowComp = this.comparable(new Date());
-    const selectedComp = this.comparable(this?.selected);
-    const focusedComp = this.comparable(this?.focused);
+    const nowComp = this.toComparable(new Date());
+    const selectedComp = this.toComparable(this?.selected);
+    const focusedComp = this.toComparable(this?.focused);
 
     return dates.map(d => {
-      const itemComp = this.comparable(d)!;
+      const itemComp = this.toComparable(d)!;
       const weekday = d.getUTCDay();
       const day = d.getUTCDate();
       const month = d.getUTCMonth() + 1;
@@ -137,20 +140,16 @@ export class DatePicker extends Picker<DayItem> {
 
     // Restrict range from bottom?
     if (this._min) {
-      const minComp = this.comparable(this.min)!;
-      inf = minComp > this.comparable(inf)! ? this._min! : inf;
+      const minComp = this.toComparable(this.min)!;
+      inf = minComp > this.toComparable(inf)! ? this._min! : inf;
     }
 
     // Restrict range from top?
     if (this._max) {
-      const maxComp = this.comparable(this._max)!;
-      sup = maxComp < this.comparable(sup)! ? this._max! : sup;
+      const maxComp = this.toComparable(this._max)!;
+      sup = maxComp < this.toComparable(sup)! ? this._max! : sup;
     }
 
     return [inf, sup];
-  }
-
-  private comparable(d?: Date): number | null {
-    return d ? comparableDate(d, 'day') : null;
   }
 }

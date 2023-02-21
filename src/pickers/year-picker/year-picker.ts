@@ -1,12 +1,16 @@
-import { range, comparableDate, cloneDate } from '../../utils';
-import { PickerOptions, YearItem } from '../../types';
+import { range, cloneDate } from '../../utils';
+import { PickerOptions, TIME_INTERVAL, YearItem } from '../../types';
 import { Picker } from '../picker';
 
 const YEARS_COUNT = 12;
 
 export class YearPicker extends Picker<YearItem> {
+
   constructor(ref?: Date | PickerOptions, options?: PickerOptions) {
     super(ref, options);
+    this._focusOffset = 3;
+    this._interval = TIME_INTERVAL.YEAR;
+    this.updateItems();
   }
 
   next(): void {
@@ -26,11 +30,11 @@ export class YearPicker extends Picker<YearItem> {
     const d = new Date(2022, 6, 1);
 
     // Init comparable values;
-    const nowComp = this.comparable(new Date());
-    const minComp = this.comparable(this?.min);
-    const maxComp = this.comparable(this?.max);
-    const selectedComp = this.comparable(this?.selected);
-    const focusedComp = this.comparable(this?.focused);
+    const nowComp = this.toComparable(new Date());
+    const minComp = this.toComparable(this?.min);
+    const maxComp = this.toComparable(this?.max);
+    const selectedComp = this.toComparable(this?.selected);
+    const focusedComp = this.toComparable(this?.focused);
 
     const half = Math.floor(YEARS_COUNT / 2);
     const year = this._ref.getUTCFullYear();
@@ -39,7 +43,7 @@ export class YearPicker extends Picker<YearItem> {
 
     return range(inf, sup).map(year => {
       d.setUTCFullYear(year);
-      const itemComp = this.comparable(d) as number;
+      const itemComp = this.toComparable(d)!;
 
       let isDisabled = false;
       if (minComp) isDisabled = itemComp < minComp;
@@ -55,9 +59,5 @@ export class YearPicker extends Picker<YearItem> {
         isFocused: itemComp === focusedComp,
       };
     });
-  }
-
-  private comparable(d?: Date): number | null {
-    return d ? comparableDate(d, 'year') : null;
   }
 }

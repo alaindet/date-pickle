@@ -1,10 +1,7 @@
 import { DatePickle } from './date-pickle';
-import { comparableDate } from './utils';
+import { expectDatesToBeOnTheSameDay, expectDatesToBeOnTheSameMonth, expectDatesToBeOnTheSameYear } from './tests/matchers';
 
 const locale = 'en';
-const year = (d: Date) => comparableDate(d, 'year');
-const month = (d: Date) => comparableDate(d, 'month');
-const day = (d: Date) => comparableDate(d, 'day');
 
 describe('DatePickle', () => {
 
@@ -42,42 +39,40 @@ describe('DatePickle', () => {
     const d = new Date('2022-09-02');
     const dpk = new DatePickle(d, { locale });
 
-    const assertMinPropagated = (min: Date) => {
-      const minTimestamp = min.getTime();
+    const expectMinDatePropagated = (min: Date) => {
       dpk.min = min;
-      expect(dpk.yearPicker.min?.getTime()).toEqual(minTimestamp);
-      expect(dpk.monthPicker.min?.getTime()).toEqual(minTimestamp);
-      expect(dpk.datePicker.min?.getTime()).toEqual(minTimestamp);
+      expect(dpk.yearPicker.min).toEqual(min);
+      expect(dpk.monthPicker.min).toEqual(min);
+      expect(dpk.datePicker.min).toEqual(min);
     };
 
     const oldMin = new Date('2020-01-01');
     dpk.min = oldMin;
-    assertMinPropagated(oldMin);
+    expectMinDatePropagated(oldMin);
 
     const newMin = new Date('2021-02-03');
     dpk.min = newMin;
-    assertMinPropagated(newMin);
+    expectMinDatePropagated(newMin);
   });
 
   it('should propagate max value to pickers', () => {
     const d = new Date('2022-09-02');
     const dpk = new DatePickle(d, { locale });
 
-    const assertMaxPropagated = (max: Date) => {
-      const maxTimestamp = max.getTime();
+    const expectMaxDatePropagated = (max: Date) => {
       dpk.max = max;
-      expect(dpk.yearPicker.max?.getTime()).toEqual(maxTimestamp);
-      expect(dpk.monthPicker.max?.getTime()).toEqual(maxTimestamp);
-      expect(dpk.datePicker.max?.getTime()).toEqual(maxTimestamp);
+      expect(dpk.yearPicker.max).toEqual(max);
+      expect(dpk.monthPicker.max).toEqual(max);
+      expect(dpk.datePicker.max).toEqual(max);
     };
 
     const oldMax = new Date('2020-01-01');
     dpk.max = oldMax;
-    assertMaxPropagated(oldMax);
+    expectMaxDatePropagated(oldMax);
 
     const newMax = new Date('2020-01-01');
     dpk.max = newMax;
-    assertMaxPropagated(newMax);
+    expectMaxDatePropagated(newMax);
   });
 
   it('should propagate locale value to pickers', () => {
@@ -98,9 +93,9 @@ describe('DatePickle', () => {
     const monthPicker = dpk.monthPicker;
     const datePicker = dpk.datePicker;
     dpk.selected = selected;
-    expect(year(yearPicker.selected!)).toEqual(year(selected));
-    expect(month(monthPicker.selected!)).toEqual(month(selected));
-    expect(day(datePicker.selected!)).toEqual(day(selected));
+    expectDatesToBeOnTheSameYear(yearPicker.selected!, selected);
+    expectDatesToBeOnTheSameMonth(monthPicker.selected!, selected);
+    expectDatesToBeOnTheSameDay(datePicker.selected!, selected);
   });
 
   it('should propagate focused value to pickers', () => {
@@ -111,10 +106,8 @@ describe('DatePickle', () => {
     const monthPicker = dpk.monthPicker;
     const datePicker = dpk.datePicker;
     dpk.focused = focused;
-    expect(year(yearPicker.focused!)).toEqual(year(focused));
-    expect(month(monthPicker.focused!)).toEqual(month(focused));
-    expect(day(datePicker.focused!)).toEqual(day(focused));
+    expectDatesToBeOnTheSameYear(yearPicker.focused!, focused);
+    expectDatesToBeOnTheSameMonth(monthPicker.focused!, focused);
+    expectDatesToBeOnTheSameDay(datePicker.focused!, focused);
   });
 });
-
-export {};

@@ -1,4 +1,5 @@
-import { PickerEventHandler, Locale, PickerOptions } from '../types';
+import { parsePickerInput, comparableDate } from '../utils';
+import { PickerEventHandler, Locale, PickerOptions, TimeInterval } from '../types';
 
 export abstract class Picker<ItemType = unknown> {
 
@@ -7,38 +8,28 @@ export abstract class Picker<ItemType = unknown> {
   protected _min?: Date;
   protected _max?: Date;
   protected _locale = 'default';
-  protected _selected?: Date;
-  protected _focused?: Date;
   protected _itemsChangeHandler?: PickerEventHandler<ItemType[]>;
-  protected _selectedHandler?: PickerEventHandler<Date | undefined>;
-  protected _focusedHandler?: PickerEventHandler<Date | undefined>;
   protected _sync = true;
 
+  protected _selected?: Date;
+  protected _selectedHandler?: PickerEventHandler<Date | undefined>;
+
+  protected _focused?: Date;
+  protected _focusOffset!: number; // Defined by child class
+  protected _focusedHandler?: PickerEventHandler<Date | undefined>;
+  protected _interval!: TimeInterval; // Defined by child class
+
   constructor(refOrOptions?: PickerOptions | Date, options?: PickerOptions) {
-
-    // Ex.: new Picker()
-    if (!refOrOptions) {
-      this._ref = new Date();
-      this.updateItems();
-      return;
-    }
-
-    // Ex.: new Picker(new Date('2000-01-01'))
-    if (refOrOptions instanceof Date) {
-      this._ref = refOrOptions;
-      options = options ?? {};
-    }
-
-    // Parse options
-    if (options?.ref) this._ref = options.ref;
-    if (options?.min) this._min = options.min;
-    if (options?.max) this._max = options.max;
-    if (options?.sync) this._sync = options.sync;
-    if (options?.locale) this._locale = options.locale;
-    if (options?.selected) this._selected = options.selected;
-    if (options?.focused) this._focused = options.focused;
-
-    this.updateItems();
+    const input = parsePickerInput(refOrOptions, options);
+    this._ref = input.ref;
+    this._ref = input.options.ref ?? this._ref;
+    this._min = input.options.min ?? this._min;
+    this._max = input.options.max ?? this._max;
+    this._locale = input.options.locale ?? this._locale;
+    this._selected = input.options.selected ?? this._selected;
+    this._focused = input.options.focused ?? this._focused;
+    this._focusOffset = input.options.focusOffset ?? this._focusOffset;
+    this._sync = input.options.sync ?? this._sync;
   }
 
   get ref(): Date {
@@ -143,5 +134,9 @@ export abstract class Picker<ItemType = unknown> {
   // Overridden by child class
   protected buildItems(): ItemType[] {
     return [];
+  }
+
+  protected toComparable(d?: Date | null): number | null {
+    return d ? comparableDate(d, this._interval) : null;
   }
 }
