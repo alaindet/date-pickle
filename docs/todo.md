@@ -1,0 +1,11 @@
+- [ ] add publish guide
+- [ ] update tsconfig.json target, module and lib
+- [ ] refactor types
+- [ ] add enum-like type for time interval
+- [ ] add custom matchers
+- [ ] remove 2d movements
+- [ ] add changelog
+- [ ] update version to 0.0.14
+- [ ] update readme.md
+- [ ] add focus management to Picker
+- [ ] update picker options
