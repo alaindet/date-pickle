@@ -1,6 +1,6 @@
-import { range, comparableDate, cloneDate } from '../utils';
-import { PickerOptions, YearItem } from '../types';
-import { Picker } from './picker';
+import { range, comparableDate, cloneDate } from '../../utils';
+import { PickerOptions, YearItem } from '../../types';
+import { Picker } from '../picker';
 
 const YEARS_COUNT = 12;
 

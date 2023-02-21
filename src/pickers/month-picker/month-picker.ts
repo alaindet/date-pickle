@@ -1,6 +1,6 @@
-import { cloneDate, comparableDate, range } from '../utils';
-import { MonthItem, PickerOptions } from '../types';
-import { Picker } from './picker';
+import { cloneDate, comparableDate, range } from '../../utils';
+import { MonthItem, PickerOptions } from '../../types';
+import { Picker } from '../picker';
 
 const FIRST_MONTH_INDEX = 0;
 const LAST_MONTH_INDEX = 11;

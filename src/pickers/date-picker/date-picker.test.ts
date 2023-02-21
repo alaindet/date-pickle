@@ -1,5 +1,5 @@
-import { cloneDate, comparableDate } from '../utils';
-import { DayItem } from '../types';
+import { cloneDate, comparableDate } from '../../utils';
+import { DayItem } from '../../types';
 import { DatePicker } from './date-picker';
 
 const comparable = (d: Date) => comparableDate(d, 'day');

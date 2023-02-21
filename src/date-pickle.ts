@@ -1,6 +1,6 @@
-import { YearPicker } from './pickers/year-picker';
-import { MonthPicker } from './pickers/month-picker';
-import { DatePicker } from './pickers/date-picker';
+import { YearPicker } from './pickers/year-picker/year-picker';
+import { MonthPicker } from './pickers/month-picker/month-picker';
+import { DatePicker } from './pickers/date-picker/date-picker';
 import { Locale, PickerOptions } from './types';
 import { cloneDate } from './utils';
 

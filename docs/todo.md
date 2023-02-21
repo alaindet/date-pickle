@@ -4,7 +4,7 @@
 - [x] refactor types
 - [x] add enum-like type for time interval
 - [x] add custom matchers
-- [ ] implement custom matchers
+- [x] implement custom matchers
 - [x] remove 2d movements
 - [ ] add changelog
 - [ ] update version to 0.0.14 via `npm version 0.0.14`

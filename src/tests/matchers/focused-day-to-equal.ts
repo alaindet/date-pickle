@@ -1,6 +1,6 @@
-import { DatePicker } from '.../../pickers/date-picker';
-import { MonthPicker } from '../../pickers/month-picker';
-import { YearPicker } from '../../pickers/year-picker';
+import { DatePicker } from '.../../pickers/date-picker/date-picker';
+import { MonthPicker } from '../../pickers/month-picker/month-picker';
+import { YearPicker } from '../../pickers/year-picker/year-picker';
 import { TimeInterval } from '../../types';
 import { expectDatesToBeOnTheSameTimeInterval } from './date-to-equal-within-interval';
 
