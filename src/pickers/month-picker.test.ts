@@ -5,7 +5,6 @@ import { MonthPicker } from './month-picker';
 const comparable = (d: Date) => comparableDate(d, 'month');
 
 describe('MonthPicker', () => {
-
   it('should return the 12 months of any year', () => {
     const picker = new MonthPicker();
     const result = picker.items!.map(i => i.date.getUTCMonth()).join(', ');
@@ -13,6 +12,7 @@ describe('MonthPicker', () => {
     expect(result).toEqual(expected);
   });
 
+  // Failed
   it('should mark this month with isNow = true', () => {
     const now = new Date();
     const picker = new MonthPicker(now);
@@ -32,6 +32,7 @@ describe('MonthPicker', () => {
     expect(picker.items![7].label).toEqual('agosto');
   });
 
+  // Failed
   it('should disable items lower than min', () => {
     const now = new Date();
     const min = cloneDate(now);
@@ -44,6 +45,7 @@ describe('MonthPicker', () => {
     expect(august.isDisabled).toBeFalsy();
   });
 
+  // Failed
   it('should disable items greater than max', () => {
     const now = new Date();
     const max = cloneDate(now);

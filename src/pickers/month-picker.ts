@@ -22,9 +22,10 @@ export class MonthPicker extends Picker<MonthItem> {
 
   protected buildItems(): MonthItem[] {
 
-    // Fictous point in time
+    // Fictious point in time
     // July 1st is half year so it's nice!
-    const d = new Date(Date.UTC(2022, 6, 1));
+    const year = this._ref.getUTCFullYear();
+    const d = new Date(Date.UTC(year, 6, 1));
 
     // Init comparable values
     const nowComp = this.comparable(new Date());
