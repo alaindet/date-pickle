@@ -1,4 +1,4 @@
-import { DatePickleEventHandler, Locale, PickerOptions } from '../types';
+import { PickerEventHandler, Locale, PickerOptions } from '../types';
 
 export abstract class Picker<ItemType = unknown> {
 
@@ -9,9 +9,9 @@ export abstract class Picker<ItemType = unknown> {
   protected _locale = 'default';
   protected _selected?: Date;
   protected _focused?: Date;
-  protected _itemsChangeHandler?: DatePickleEventHandler<ItemType[]>;
-  protected _selectedHandler?: DatePickleEventHandler<Date | undefined>;
-  protected _focusedHandler?: DatePickleEventHandler<Date | undefined>;
+  protected _itemsChangeHandler?: PickerEventHandler<ItemType[]>;
+  protected _selectedHandler?: PickerEventHandler<Date | undefined>;
+  protected _focusedHandler?: PickerEventHandler<Date | undefined>;
   protected _sync = true;
 
   constructor(refOrOptions?: PickerOptions | Date, options?: PickerOptions) {
@@ -119,17 +119,17 @@ export abstract class Picker<ItemType = unknown> {
     this.updateItems();
   }
 
-  onItemsChange(handler: DatePickleEventHandler<ItemType[]>): void {
+  onItemsChange(handler: PickerEventHandler<ItemType[]>): void {
     this._itemsChangeHandler = handler;
     if (this.items && this._sync) handler(this.items);
   }
 
-  onSelected(handler: DatePickleEventHandler<Date | undefined>): void {
+  onSelected(handler: PickerEventHandler<Date | undefined>): void {
     this._selectedHandler = handler;
     if (this._selected && this._sync) handler(this._selected);
   }
 
-  onFocused(handler: DatePickleEventHandler<Date | undefined>): void {
+  onFocused(handler: PickerEventHandler<Date | undefined>): void {
     this._focusedHandler = handler;
     if (this._focused && this._sync) handler(this._focused);
   }
