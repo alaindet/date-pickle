@@ -1,6 +1,7 @@
 import { YearItem } from '../../types';
 import { comparableDate, range } from '../../utils';
 import { YearPicker } from './year-picker';
+import { expectDatesToBeOnTheSameYear } from '../../tests/matchers';
 
 const comparable = (d: Date) => comparableDate(d, 'year');
 
@@ -114,17 +115,6 @@ describe('YearPicker', () => {
     expect(year2022?.isSelected).toBeFalsy();
   });
 
-  it('should select given year via setter', () => {
-    const d = new Date('2022-02-02');
-    const picker = new YearPicker(d);
-    picker.selected = new Date('2020-02-02');
-    const items = picker.items!;
-    const year2020 = items.find(y => y.date.getUTCFullYear() === 2020);
-    const year2022 = items.find(y => y.date.getUTCFullYear() === 2022);
-    expect(year2020?.isSelected).toBeTruthy();
-    expect(year2022?.isSelected).toBeFalsy();
-  });
-
   it('should focus given year via options', () => {
     const d = new Date('2022-02-02');
     const focused = new Date('2020-02-02');
@@ -134,6 +124,17 @@ describe('YearPicker', () => {
     const year2022 = items.find(y => y.date.getUTCFullYear() === 2022);
     expect(year2020?.isFocused).toBeTruthy();
     expect(year2022?.isFocused).toBeFalsy();
+  });
+
+  it('should select given year via setter', () => {
+    const d = new Date('2022-02-02');
+    const picker = new YearPicker(d);
+    picker.selected = new Date('2020-02-02');
+    const items = picker.items!;
+    const year2020 = items.find(y => y.date.getUTCFullYear() === 2020);
+    const year2022 = items.find(y => y.date.getUTCFullYear() === 2022);
+    expect(year2020?.isSelected).toBeTruthy();
+    expect(year2022?.isSelected).toBeFalsy();
   });
 
   it('should focus given year via setter', () => {
@@ -157,6 +158,72 @@ describe('YearPicker', () => {
     });
     expect(isUnique).toBeTruthy();
   });
-});
 
-export {};
+  describe('focus management', () => {
+    it('should move focus to the previous year', () => {
+      const d = new Date('2023-02-20');
+      const expected = new Date('2022-02-20'); // Month/day unused
+      const picker = new YearPicker(d, { focused: d });
+      picker.focusPreviousItem();
+      expectDatesToBeOnTheSameYear(picker.focused!, expected);
+    });
+
+    it('should move focus to the next year', () => {
+      const d = new Date('2022-02-20');
+      const expected = new Date('2023-02-20'); // Month/day unused
+      const picker = new YearPicker(d, { focused: d });
+      picker.focusNextItem();
+      expectDatesToBeOnTheSameYear(picker.focused!, expected);
+    });
+
+    it('should move focus to 3 years behind', () => {
+      const d = new Date('2023-02-20');
+      const expected = new Date('2020-02-20'); // Month/day unused
+      const picker = new YearPicker(d, { focused: d });
+      picker.focusPreviousItemByOffset();
+      expectDatesToBeOnTheSameYear(picker.focused!, expected);
+    });
+
+    it('should move focus to a year behind by custom offset', () => {
+      const d = new Date('2023-02-20');
+      const expected = new Date('2013-02-20'); // Month/day unused
+      const picker = new YearPicker(d, { focused: d });
+      picker.focusOffset = 10;
+      picker.focusPreviousItemByOffset();
+      expectDatesToBeOnTheSameYear(picker.focused!, expected);
+    });
+
+    it('should move focus to 3 years ahead', () => {
+      const d = new Date('2019-02-20');
+      const expected = new Date('2022-02-20'); // Month/day unused
+      const picker = new YearPicker(d, { focused: d });
+      picker.focusNextItemByOffset();
+      expectDatesToBeOnTheSameYear(picker.focused!, expected);
+    });
+
+    it('should move focus to a year ahead by custom offset', () => {
+      const d = new Date('2010-02-20');
+      const expected = new Date('2020-02-20'); // Month/day unused
+      const picker = new YearPicker(d, { focused: d });
+      picker.focusOffset = 10;
+      picker.focusNextItemByOffset();
+      expectDatesToBeOnTheSameYear(picker.focused!, expected);
+    });
+
+    it('should move focus to first year of the page', () => {
+      const d = new Date('2006-02-20');
+      const expected = new Date('2001-02-20'); // Month/day unused
+      const picker = new YearPicker(d, { focused: d });
+      picker.focusFirstItemOfPage();
+      expectDatesToBeOnTheSameYear(picker.focused!, expected);
+    });
+
+    it('should move focus to last year of the page', () => {
+      const d = new Date('2006-02-20');
+      const expected = new Date('2012-02-20'); // Month/day unused
+      const picker = new YearPicker(d, { focused: d });
+      picker.focusLasItemOfPage();
+      expectDatesToBeOnTheSameYear(picker.focused!, expected);
+    });
+  });
+});

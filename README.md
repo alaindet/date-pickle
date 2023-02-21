@@ -2,7 +2,7 @@
 
 ![Date Pickle logo](https://raw.githubusercontent.com/alaindet/date-pickle/main/logo.png)
 
-Date Pickle is a TypeScript browser library for **creating calendars**. It is framework-agnostic, fully tested and with zero runtime dependencies.
+Date Pickle is a TypeScript browser library to **create calendars**. It is framework-agnostic, fully tested and with zero runtime dependencies.
 
 Time unit names (months, weekdays) are translated with the provided locale via the [Intl](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl) browser API, so Date Pickle only works on browsers.
 

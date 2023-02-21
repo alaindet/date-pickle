@@ -1,7 +1,7 @@
-import { parsePickerInput, comparableDate } from '../utils';
-import { PickerEventHandler, Locale, PickerOptions, TimeInterval } from '../types';
+import { parsePickerInput, comparableDate, cloneDate, addTimeInterval } from '../utils';
+import { PickerEventHandler, Locale, PickerOptions, TimeInterval, BaseItem } from '../types';
 
-export abstract class Picker<ItemType = unknown> {
+export abstract class Picker<ItemType extends BaseItem> {
 
   protected _ref!: Date;
   protected _items: ItemType[] = [];
@@ -101,8 +101,28 @@ export abstract class Picker<ItemType = unknown> {
     this._focusedHandler && this._focusedHandler(focused);
   }
 
+  get focusOffset(): number {
+    return this._focusOffset;
+  }
+
+  set focusOffset(focusOffset: number) {
+    this._focusOffset = focusOffset;
+  }
+
   get items(): ItemType[] | undefined {
     return this._items;
+  }
+
+  thenSync(fn: () => void): void {
+    if (!this._sync) {
+      fn();
+      return;
+    }
+
+    this._sync = false;
+    fn();
+    this.updateItems();
+    this._sync = true;
   }
 
   now(): void {
@@ -131,6 +151,66 @@ export abstract class Picker<ItemType = unknown> {
     this._itemsChangeHandler && this._itemsChangeHandler(this._items);
   }
 
+  focusPreviousItem(): void {
+    this.thenSync(() => {
+      this.initFocusedIfNeeded();
+      this.focused = addTimeInterval(this.focused!, -1, this._interval);
+    });
+  }
+
+  // TODO: Move to mixin
+  focusNextItem(): void {
+    this.thenSync(() => {
+      this.initFocusedIfNeeded();
+      this.focused = addTimeInterval(this.focused!, 1, this._interval);
+    });
+  }
+
+
+  // TODO: Move to mixin
+  focusPreviousItemByOffset(): void {
+    this.thenSync(() => {
+      this.initFocusedIfNeeded();
+      const offset = -1 * this._focusOffset;
+      this.focused = addTimeInterval(this.focused!, offset, this._interval);
+    });
+  }
+
+  // TODO: Move to mixin
+  focusNextItemByOffset(): void {
+    this.thenSync(() => {
+      this.initFocusedIfNeeded();
+      const offset = this._focusOffset;
+      this.focused = addTimeInterval(this.focused!, offset, this._interval);
+    });
+  }
+
+  // TODO: Move to mixin
+  focusFirstItemOfPage(): void {
+    this.thenSync(() => {
+      this.initFocusedIfNeeded();
+      const index = this._items.findIndex(item => !item.isDisabled);
+      if (!index) throw new Error('no valid items');
+      this.focused = cloneDate(this._items[index].date);
+    });
+  }
+
+  // TODO: Move to mixin
+  focusLasItemOfPage(): void {
+    this.thenSync(() => {
+      this.initFocusedIfNeeded();
+      let foundIndex = -1;
+      for (let i = this._items.length - 1; i >= 0; i--) {
+        if (!this._items[i].isDisabled) {
+          foundIndex = i;
+          break;
+        }
+      }
+      if (foundIndex === -1) throw new Error('no valid items');
+      this.focused = cloneDate(this._items[foundIndex].date);
+    });
+  }
+
   // Overridden by child class
   protected buildItems(): ItemType[] {
     return [];
@@ -138,5 +218,20 @@ export abstract class Picker<ItemType = unknown> {
 
   protected toComparable(d?: Date | null): number | null {
     return d ? comparableDate(d, this._interval) : null;
+  }
+
+  // TODO: Move to mixin
+  private initFocusedIfNeeded(): void {
+
+    if (this._focused) {
+      return;
+    }
+
+    if (this._selected) {
+      this._focused = cloneDate(this._selected);
+      return;
+    }
+
+    this._focused = cloneDate(this._items[0].date);
   }
 }
