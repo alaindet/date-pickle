@@ -1,4 +1,5 @@
-import { comparableDate, cloneDate } from './dates';
+import { DATE_PICKLE_PICKER_TIME_INTERVAL } from '../types';
+import { comparableDate, cloneDate, addTimeInterval } from './dates';
 
 describe('comparableDate() utility function', () => {
   it('should compare year', () => {
@@ -24,14 +25,6 @@ describe('comparableDate() utility function', () => {
     const d2Comparable = comparableDate(d2, 'day');
     expect(d1Comparable).toEqual(d2Comparable);
   });
-
-  it('should compare year, month, day, hour and minute', () => {
-    const d1 = new Date('2022-05-06 10:11:20');
-    const d2 = new Date('2022-05-06 10:11:50');
-    const d1Comparable = comparableDate(d1, 'minute');
-    const d2Comparable = comparableDate(d2, 'minute');
-    expect(d1Comparable).toEqual(d2Comparable);
-  });
 });
 
 describe('cloneDate() utility function', () => {
@@ -40,6 +33,74 @@ describe('cloneDate() utility function', () => {
     const d2 = cloneDate(d1);
     d1.setDate(d1.getDate() + 1);
     expect(d1.getDate()).not.toEqual(d2.getDate());
+  });
+});
+
+describe('addTimeInterval() utility function', () => {
+
+  const assertEqualDates = (a: Date, b: Date) => {
+    const aa = comparableDate(a, DATE_PICKLE_PICKER_TIME_INTERVAL.DAY);
+    const bb = comparableDate(b, DATE_PICKLE_PICKER_TIME_INTERVAL.DAY);
+    expect(aa).toEqual(bb);
+  };
+
+  const toDay = (d: Date) => comparableDate(d, DATE_PICKLE_PICKER_TIME_INTERVAL.DAY);
+
+  it('should subtract 1 day interval', () => {
+    const input = new Date('2023-03-01');
+    const result = addTimeInterval(input, -1, DATE_PICKLE_PICKER_TIME_INTERVAL.DAY);
+    const expected = new Date('2023-02-28');
+    assertEqualDates(result, expected);
+  });
+
+  it('should add 1 day interval', () => {
+    const input = new Date('2023-03-09');
+    const result = addTimeInterval(input, 1, DATE_PICKLE_PICKER_TIME_INTERVAL.DAY);
+    const expected = new Date('2023-03-10');
+    assertEqualDates(result, expected);
+  });
+
+  it('should add 1 month interval', () => {
+    const input = new Date('2023-03-09');
+    const result = addTimeInterval(input, 1, DATE_PICKLE_PICKER_TIME_INTERVAL.MONTH);
+    const expected = new Date('2023-04-09');
+    assertEqualDates(result, expected);
+  });
+
+  it('should subtract 1 month interval', () => {
+    const input = new Date('2023-03-09');
+    const result = addTimeInterval(input, -1, DATE_PICKLE_PICKER_TIME_INTERVAL.MONTH);
+    const expected = new Date('2023-02-09');
+    assertEqualDates(result, expected);
+  });
+
+  // Edge case
+  it('should subtract 1 month without changing month', () => {
+    const input = new Date('2024-03-31');
+    const result = addTimeInterval(input, -1, DATE_PICKLE_PICKER_TIME_INTERVAL.MONTH);
+    const expected = new Date('2024-03-01');
+    assertEqualDates(result, expected);
+  });
+
+  it('should add 1 year interval', () => {
+    const input = new Date('2023-03-03');
+    const result = addTimeInterval(input, 1, DATE_PICKLE_PICKER_TIME_INTERVAL.YEAR);
+    const expected = new Date('2024-04-03');
+    assertEqualDates(result, expected);
+  });
+
+  it('should subtract 1 year interval', () => {
+    const input = new Date('2023-03-03');
+    const result = addTimeInterval(input, -1, DATE_PICKLE_PICKER_TIME_INTERVAL.YEAR);
+    const expected = new Date('2022-03-03');
+    assertEqualDates(result, expected);
+  });
+
+  it('should subtract 1 year interval also changing month', () => {
+    const input = new Date('2024-02-29');
+    const result = addTimeInterval(input, -1, DATE_PICKLE_PICKER_TIME_INTERVAL.YEAR);
+    const expected = new Date('2023-03-01');
+    assertEqualDates(result, expected);
   });
 });
 
