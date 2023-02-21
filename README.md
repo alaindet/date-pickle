@@ -80,10 +80,10 @@ const datePickerStandalone = new DatePicker(new Date());
 
 ## Items
 
-Items (of types `DayItem`, `MonthItem` and `YearItem`) all extend a common `DatePickleItem` interface
+Items (of types `DayItem`, `MonthItem` and `YearItem`) all extend a common `BaseItem` interface
 
 ```ts
-interface DatePickleItem {
+type BaseItem  = {
   // Unique value in a collection of items
   id: number;
   // Can be used in UI, ex.: "january" for MonthPicker, "2022" for YearPicker
@@ -98,15 +98,15 @@ interface DatePickleItem {
   isSelected: boolean;
   // Wheter the item is focused, based on `focused: Date` property
   isFocused: boolean;
-}
+};
 ```
 
 Each picker has specific items, for example `DatePicker` outputs `DayItem` items having a unique `isWeekend` boolean key
 
 ```ts
-interface DayItem extends DatePickleItem {
+type DayItem = BaseItem & {
   isWeekend: boolean;
-}
+};
 ```
 
 ## Picker events
@@ -117,7 +117,7 @@ Whenever relevant parts of the state get updated (including recalculating items)
 - `onSelected`
 - `onFocused`
 
-All these methods register a `DatePickleEventHandler` callback, which simply returns the data associated with the event as the only function argument, ex.
+All these methods register a `PickerEventHandler` callback, which simply returns the data associated with the event as the only function argument, ex.
 
 ```ts
 const picker = new DatePicker();
