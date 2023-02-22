@@ -6,6 +6,9 @@
 - [ ] update tsconfig.json target, module and lib
 - [ ] update version to 0.0.14 via `npm version 0.0.14`
 
+- [x] Add tests and test utilities for inspecting items
+- [x] Add temporary offsets as arguments to focusPreviousItemByOffset and focusNextItemByOffset
+- [x] Add a shared focusItemByOffset(offset: number)
 - [x] add custom matchers
 - [x] add enum-like type for time interval
 - [x] define `protected interval: TimeInterval` on pickers
@@ -14,6 +17,4 @@
 - [x] Remove `comparable` method from pickers
 - [x] remove 2d movements
 - [x] update picker options
-
-- [ ] Refactor updateItems() by removing this._sync
-- [ ] Add tests and test utilities for inspecting items
+- [x] Refactor updateItems() by removing this._sync

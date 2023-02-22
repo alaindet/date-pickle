@@ -1,4 +1,4 @@
-import { parsePickerInput, comparableDate, cloneDate, addTimeInterval } from '../utils';
+import { parsePickerInput, comparableDate, cloneDate, addTimeInterval, findLastIndex } from '../utils';
 import { PickerEventHandler, Locale, PickerOptions, TimeInterval, BaseItem } from '../types';
 
 export abstract class Picker<ItemType extends BaseItem> {
@@ -116,30 +116,9 @@ export abstract class Picker<ItemType extends BaseItem> {
   thenUpdateItems(fn: () => void): void {
     const syncBackup = this._sync;
     this._sync = false;
-
-    // TODO: Remove
-    console.log('syncBackup', syncBackup);
-
     fn();
-
-    /*
-    updateItems(): void {
-      if (!this._sync) return;
-      this._items = this.buildItems();
-      this._itemsChangeHandler && this._itemsChangeHandler(this._items);
-    }
-    */
-
-    // TODO: Remove
-    const beforeHash = JSON.stringify(this._items);
-
-    this.updateItems();
-
-    // TODO: Remove
-    const afterHash = JSON.stringify(this._items);
-
-    console.log('items changed? ', beforeHash !== afterHash ? 'YES' : 'NO');
-
+    this._items = this.buildItems();
+    this._itemsChangeHandler && this._itemsChangeHandler(this._items);
     this._sync = syncBackup;
   }
 
@@ -169,71 +148,49 @@ export abstract class Picker<ItemType extends BaseItem> {
     this._itemsChangeHandler && this._itemsChangeHandler(this._items);
   }
 
-  focusPreviousItem(): void {
+  focusItemByOffset(_offset: number): void {
+    const offset = _offset ?? this._focusOffset;
     this.thenUpdateItems(() => {
       this.initFocusedIfNeeded();
-
-      // TODO: Remove
-      console.log('focusPreviousItem before ' + this.focused?.toISOString());
-
-      this.focused = addTimeInterval(this.focused!, -1, this._interval);
-
-      // TODO: Remove
-      console.log('focusPreviousItem after ' + this.focused?.toISOString());
-    });
-  }
-
-  // TODO: Move to mixin
-  focusNextItem(): void {
-    this.thenUpdateItems(() => {
-      this.initFocusedIfNeeded();
-      this.focused = addTimeInterval(this.focused!, 1, this._interval);
-    });
-  }
-
-
-  // TODO: Move to mixin
-  focusPreviousItemByOffset(): void {
-    this.thenUpdateItems(() => {
-      this.initFocusedIfNeeded();
-      const offset = -1 * this._focusOffset;
       this.focused = addTimeInterval(this.focused!, offset, this._interval);
     });
   }
 
-  // TODO: Move to mixin
-  focusNextItemByOffset(): void {
+  focusItemByIndex(index?: number): void {
+    if (index === undefined || index < 0 || index > this._items.length - 1) {
+      throw new Error('invalid index');
+    }
+    if (index === -1) {
+      throw new Error('no valid items');
+    }
     this.thenUpdateItems(() => {
       this.initFocusedIfNeeded();
-      const offset = this._focusOffset;
-      this.focused = addTimeInterval(this.focused!, offset, this._interval);
-    });
-  }
-
-  // TODO: Move to mixin
-  focusFirstItemOfPage(): void {
-    this.thenUpdateItems(() => {
-      this.initFocusedIfNeeded();
-      const index = this._items.findIndex(item => !item.isDisabled);
-      if (!index) throw new Error('no valid items');
       this.focused = cloneDate(this._items[index].date);
     });
   }
 
-  // TODO: Move to mixin
-  focusLasItemOfPage(): void {
-    this.thenUpdateItems(() => {
-      this.initFocusedIfNeeded();
-      let foundIndex = -1;
-      for (let i = this._items.length - 1; i >= 0; i--) {
-        if (!this._items[i].isDisabled) {
-          foundIndex = i;
-          break;
-        }
-      }
-      if (foundIndex === -1) throw new Error('no valid items');
-      this.focused = cloneDate(this._items[foundIndex].date);
-    });
+  focusPreviousItem(): void {
+    this.focusItemByOffset(-1);
+  }
+
+  focusNextItem(): void {
+    this.focusItemByOffset(1);
+  }
+
+  focusPreviousItemByOffset(_offset?: number): void {
+    this.focusItemByOffset(-1 * (_offset ?? this._focusOffset));
+  }
+
+  focusNextItemByOffset(_offset?: number): void {
+    this.focusItemByOffset(_offset ?? this._focusOffset);
+  }
+
+  focusFirstItemOfPage(): void {
+    this.focusItemByIndex(this._items.findIndex(item => !item.isDisabled));
+  }
+
+  focusLastItemOfPage(): void {
+    this.focusItemByIndex(findLastIndex(this._items, item => !item.isDisabled));
   }
 
   // Overridden by child class

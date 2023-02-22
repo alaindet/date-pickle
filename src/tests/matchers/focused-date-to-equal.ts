@@ -11,4 +11,7 @@ export function expectFocusedDateToEqual(
 ): void {
   expect(picker.focused).not.toBeUndefined();
   expectDatesToBeOnTheSameTimeInterval(picker.focused!, expected, interval);
+  const focusedItems = (picker.items ?? []).filter(item => item.isFocused);
+  expect(focusedItems.length).toEqual(1);
+  expectDatesToBeOnTheSameTimeInterval(focusedItems[0].date, expected, interval);
 }

@@ -1,12 +1,9 @@
-import { YearPicker } from "./pickers/year-picker/year-picker";
+// console.log('Date Pickle Demo');
 
-console.log('\n\n');
+// export {};
+
+import { MonthPicker } from './pickers/month-picker/month-picker';
 
 const d = new Date('2006-02-20');
-// const expected = new Date('2001-02-20'); // Month/day unused
-const picker = new YearPicker(d, { focused: d });
-picker.focusPreviousItem();
-
-picker.onItemsChange(items => {
-  console.table(items.map(({ date, isFocused }) => ({ date, isFocused })));
-});
+const picker = new MonthPicker(d, { focused: d });
+console.table(picker.items);

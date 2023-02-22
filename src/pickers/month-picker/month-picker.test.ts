@@ -1,5 +1,5 @@
-import { expectDatesToBeOnTheSameMonth } from '../../tests/matchers';
-import { MonthItem } from '../../types';
+import { expectDatesToBeOnTheSameMonth, expectFocusedDateToEqual } from '../../tests/matchers';
+import { MonthItem, TIME_INTERVAL } from '../../types';
 import { cloneDate, comparableDate } from '../../utils';
 import { MonthPicker } from './month-picker';
 
@@ -161,70 +161,101 @@ describe('MonthPicker', () => {
   });
 
   describe('focus management', () => {
+
+    function expectFocusedDateToBeOnTheSameMonth(picker: MonthPicker, expected: Date): void {
+      expectFocusedDateToEqual(picker, expected, TIME_INTERVAL.MONTH);
+    }
+
     it('should move focus to previous month', () => {
       const d = new Date('2023-02-20');
-      const expected = new Date('2023-01-06'); // Day unused
       const picker = new MonthPicker(d, { focused: d });
       picker.focusPreviousItem();
-      expectDatesToBeOnTheSameMonth(picker.focused!, expected);
+      expectFocusedDateToBeOnTheSameMonth(picker, new Date('2023-01-06'));
     });
 
     it('should move focus to the next month', () => {
       const d = new Date('2012-03-09');
-      const expected = new Date('2012-04-09'); // Day unused
       const picker = new MonthPicker(d, { focused: d });
       picker.focusNextItem();
-      expectDatesToBeOnTheSameMonth(picker.focused!, expected);
+      expectFocusedDateToBeOnTheSameMonth(picker, new Date('2012-04-09'));
     });
 
     it('should move focus to 3 months behind', () => {
       const d = new Date('2023-02-20');
-      const expected = new Date('2022-11-20'); // Day unused
       const picker = new MonthPicker(d, { focused: d });
       picker.focusPreviousItemByOffset();
-      expectDatesToBeOnTheSameMonth(picker.focused!, expected);
+      expectFocusedDateToBeOnTheSameMonth(picker, new Date('2022-11-20'));
     });
 
     it('should move focus to a month behind by custom offset', () => {
       const d = new Date('2023-02-20');
-      const expected = new Date('2022-05-29'); // Day unused
       const picker = new MonthPicker(d, { focused: d });
       picker.focusOffset = 9;
       picker.focusPreviousItemByOffset();
-      expectDatesToBeOnTheSameMonth(picker.focused!, expected);
+      expectFocusedDateToBeOnTheSameMonth(picker, new Date('2022-05-29'));
+
+      // Custom one-time offset
+      picker.focusPreviousItemByOffset(2);
+      expectFocusedDateToBeOnTheSameMonth(picker, new Date('2022-03-27'));
     });
 
     it('should move focus to 3 months ahead', () => {
       const d = new Date('2019-02-20');
-      const expected = new Date('2019-05-17'); // Day unused
       const picker = new MonthPicker(d, { focused: d });
       picker.focusNextItemByOffset();
-      expectDatesToBeOnTheSameMonth(picker.focused!, expected);
+      expectFocusedDateToBeOnTheSameMonth(picker, new Date('2019-05-17'));
     });
 
     it('should move focus to a month ahead by custom offset', () => {
       const d = new Date('2010-06-06');
-      const expected = new Date('2011-03-07'); // Day unused
       const picker = new MonthPicker(d, { focused: d });
       picker.focusOffset = 9;
       picker.focusNextItemByOffset();
-      expectDatesToBeOnTheSameMonth(picker.focused!, expected);
+      expectFocusedDateToBeOnTheSameMonth(picker, new Date('2011-03-07'));
+
+      // Custom one-time offset
+      picker.focusNextItemByOffset(2);
+      expectFocusedDateToBeOnTheSameMonth(picker, new Date('2011-05-29'));
     });
 
     it('should move focus to first month of the page', () => {
       const d = new Date('2006-09-09');
-      const expected = new Date('2006-01-31'); // Day unused
       const picker = new MonthPicker(d, { focused: d });
       picker.focusFirstItemOfPage();
-      expectDatesToBeOnTheSameMonth(picker.focused!, expected);
+      expectFocusedDateToBeOnTheSameMonth(picker, new Date('2006-01-31'));
     });
 
     it('should move focus to last month of the page', () => {
       const d = new Date('2006-08-18');
-      const expected = new Date('2006-12-25'); // Day unused
       const picker = new MonthPicker(d, { focused: d });
-      picker.focusLasItemOfPage();
-      expectDatesToBeOnTheSameMonth(picker.focused!, expected);
+      picker.focusLastItemOfPage();
+      expectFocusedDateToBeOnTheSameMonth(picker, new Date('2006-12-25'));
+    });
+
+    it('should move focus by an arbitray number of years', () => {
+      const d = new Date('2006-02-20');
+      const picker = new MonthPicker(d, { focused: d });
+      picker.focusItemByOffset(-3); // Doesn't affect focusOffset property
+      expectFocusedDateToBeOnTheSameMonth(picker, new Date('2005-11-20'));
+      picker.focusItemByOffset(10); // Doesn't affect focusOffset property
+      expectFocusedDateToBeOnTheSameMonth(picker, new Date('2006-09-20'));
+      picker.focusNextItemByOffset(); // Uses pristine focusOffset property
+      expectFocusedDateToBeOnTheSameMonth(picker, new Date('2006-12-20'));
+    });
+
+    it('should move focus to an arbitrary index on the page', () => {
+      const d = new Date('2006-02-20');
+      const picker = new MonthPicker(d, { focused: d });
+
+      picker.focusItemByIndex(2);
+      expectFocusedDateToBeOnTheSameMonth(picker, new Date('2006-03-09'));
+
+      picker.focusItemByIndex(6);
+      expectFocusedDateToBeOnTheSameMonth(picker, new Date('2006-07-20'));
+
+      expect(() => picker.focusItemByIndex(-4)).toThrowError();
+      expect(() => picker.focusItemByIndex(undefined)).toThrowError();
+      expect(() => picker.focusItemByIndex(picker.items?.length)).toThrowError();
     });
   });
 });

@@ -353,7 +353,7 @@ describe('DatePicker', () => {
       const d = new Date('2023-08-15');
       const expected = new Date('2023-08-31');
       const picker = new DatePicker(d, { focused: d });
-      picker.focusLasItemOfPage();
+      picker.focusLastItemOfPage();
       expectDatesToBeOnTheSameDay(picker.focused!, expected);
     });
   });
