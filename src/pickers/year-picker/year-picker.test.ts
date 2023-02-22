@@ -166,6 +166,9 @@ describe('YearPicker', () => {
       const picker = new YearPicker(d, { focused: d });
       picker.focusPreviousItem();
       expectDatesToBeOnTheSameYear(picker.focused!, expected);
+      const focusedItems = (picker.items ?? []).filter(item => item.isFocused);
+      expect(focusedItems.length).toEqual(1);
+      expectDatesToBeOnTheSameYear(focusedItems[0].date, expected);
     });
 
     it('should move focus to the next year', () => {

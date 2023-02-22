@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Added
 - `/jest.config.ts`
 - Add unit tests for base `Picker` class
-- Add `Picker.thenSync()` method to group state changes before updating items
+- Add `Picker.thenUpdateItems()` method to group state changes before updating items
 
 ### Changed
 - Change `DatePickle.constructor` signature

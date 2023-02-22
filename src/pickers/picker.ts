@@ -113,16 +113,34 @@ export abstract class Picker<ItemType extends BaseItem> {
     return this._items;
   }
 
-  thenSync(fn: () => void): void {
-    if (!this._sync) {
-      fn();
-      return;
-    }
-
+  thenUpdateItems(fn: () => void): void {
+    const syncBackup = this._sync;
     this._sync = false;
+
+    // TODO: Remove
+    console.log('syncBackup', syncBackup);
+
     fn();
+
+    /*
+    updateItems(): void {
+      if (!this._sync) return;
+      this._items = this.buildItems();
+      this._itemsChangeHandler && this._itemsChangeHandler(this._items);
+    }
+    */
+
+    // TODO: Remove
+    const beforeHash = JSON.stringify(this._items);
+
     this.updateItems();
-    this._sync = true;
+
+    // TODO: Remove
+    const afterHash = JSON.stringify(this._items);
+
+    console.log('items changed? ', beforeHash !== afterHash ? 'YES' : 'NO');
+
+    this._sync = syncBackup;
   }
 
   now(): void {
@@ -152,15 +170,22 @@ export abstract class Picker<ItemType extends BaseItem> {
   }
 
   focusPreviousItem(): void {
-    this.thenSync(() => {
+    this.thenUpdateItems(() => {
       this.initFocusedIfNeeded();
+
+      // TODO: Remove
+      console.log('focusPreviousItem before ' + this.focused?.toISOString());
+
       this.focused = addTimeInterval(this.focused!, -1, this._interval);
+
+      // TODO: Remove
+      console.log('focusPreviousItem after ' + this.focused?.toISOString());
     });
   }
 
   // TODO: Move to mixin
   focusNextItem(): void {
-    this.thenSync(() => {
+    this.thenUpdateItems(() => {
       this.initFocusedIfNeeded();
       this.focused = addTimeInterval(this.focused!, 1, this._interval);
     });
@@ -169,7 +194,7 @@ export abstract class Picker<ItemType extends BaseItem> {
 
   // TODO: Move to mixin
   focusPreviousItemByOffset(): void {
-    this.thenSync(() => {
+    this.thenUpdateItems(() => {
       this.initFocusedIfNeeded();
       const offset = -1 * this._focusOffset;
       this.focused = addTimeInterval(this.focused!, offset, this._interval);
@@ -178,7 +203,7 @@ export abstract class Picker<ItemType extends BaseItem> {
 
   // TODO: Move to mixin
   focusNextItemByOffset(): void {
-    this.thenSync(() => {
+    this.thenUpdateItems(() => {
       this.initFocusedIfNeeded();
       const offset = this._focusOffset;
       this.focused = addTimeInterval(this.focused!, offset, this._interval);
@@ -187,7 +212,7 @@ export abstract class Picker<ItemType extends BaseItem> {
 
   // TODO: Move to mixin
   focusFirstItemOfPage(): void {
-    this.thenSync(() => {
+    this.thenUpdateItems(() => {
       this.initFocusedIfNeeded();
       const index = this._items.findIndex(item => !item.isDisabled);
       if (!index) throw new Error('no valid items');
@@ -197,7 +222,7 @@ export abstract class Picker<ItemType extends BaseItem> {
 
   // TODO: Move to mixin
   focusLasItemOfPage(): void {
-    this.thenSync(() => {
+    this.thenUpdateItems(() => {
       this.initFocusedIfNeeded();
       let foundIndex = -1;
       for (let i = this._items.length - 1; i >= 0; i--) {
@@ -232,6 +257,6 @@ export abstract class Picker<ItemType extends BaseItem> {
       return;
     }
 
-    this._focused = cloneDate(this._items[0].date);
+    this._focused = cloneDate(this._ref);
   }
 }

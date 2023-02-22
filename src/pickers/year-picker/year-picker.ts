@@ -36,6 +36,9 @@ export class YearPicker extends Picker<YearItem> {
     const selectedComp = this.toComparable(this?.selected);
     const focusedComp = this.toComparable(this?.focused);
 
+    // TODO: Remove
+    console.log('focusedComp', focusedComp);
+
     const half = Math.floor(YEARS_COUNT / 2);
     const year = this._ref.getUTCFullYear();
     const inf = year - half + 1;
