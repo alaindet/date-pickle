@@ -1,10 +1,24 @@
-import { range, cloneDate } from '../../utils';
-import { PickerOptions, TIME_INTERVAL, YearItem } from '../../types';
+import { range, cloneDate, getUniqueYearId } from '../../utils';
+import { PickerOptions, TIME_INTERVAL, YearItem, YearPickerStartWith, YEAR_PICKER_START_WITH } from '../../types';
 import { Picker } from '../picker';
 
-const YEARS_COUNT = 12;
+const YEARS_COUNT = 10;
 
 export class YearPicker extends Picker<YearItem> {
+
+  private _startWith: YearPickerStartWith = YEAR_PICKER_START_WITH.FIRST_OF_DECADE;
+
+  get startWith(): YearPickerStartWith {
+    return this._startWith;
+  }
+
+  set startWith(startWith: YearPickerStartWith) {
+    if (!Object.values(YEAR_PICKER_START_WITH).includes(startWith)) {
+      throw new Error('invalid value for startWith property');
+    }
+    this._startWith = startWith;
+    this.updateItems();
+  }
 
   constructor(ref?: Date | PickerOptions, options?: PickerOptions) {
     super(ref, options);
@@ -23,25 +37,37 @@ export class YearPicker extends Picker<YearItem> {
     this.updateItems();
   }
 
+  private getYearsRange(): number[] {
+    const year = this._ref.getUTCFullYear(); // 2023
+    const first = Math.floor(year / YEARS_COUNT) * YEARS_COUNT; // 2020
+    const last = first + YEARS_COUNT; // 2030
+    const yearsRange = range(first, last);
+
+    switch (this._startWith) {
+      case YEAR_PICKER_START_WITH.FIRST_OF_DECADE:
+      case YEAR_PICKER_START_WITH.X0:
+        return [...yearsRange, last + 1];
+      case YEAR_PICKER_START_WITH.LAST_OF_PREVIOUS_DECADE:
+      case YEAR_PICKER_START_WITH.X9:
+        return [first - 1, ...yearsRange];;
+    }
+  }
+
   protected buildItems(): YearItem[] {
 
     // Fictous point in time
     // July 1st is half year so it's nice!
-    const d = new Date(2022, 6, 1);
+    const y = this._ref.getUTCFullYear();
+    const d = new Date(Date.UTC(y, 6, 1));
 
-    // Init comparable values;
+    // Init comparable values
     const nowComp = this.toComparable(new Date());
     const minComp = this.toComparable(this?.min);
     const maxComp = this.toComparable(this?.max);
     const selectedComp = this.toComparable(this?.selected);
     const focusedComp = this.toComparable(this?.focused);
 
-    const half = Math.floor(YEARS_COUNT / 2);
-    const year = this._ref.getUTCFullYear();
-    const inf = year - half + 1;
-    const sup = year + half;
-
-    return range(inf, sup).map(year => {
+    return this.getYearsRange().map(year => {
       d.setUTCFullYear(year);
       const itemComp = this.toComparable(d)!;
 
@@ -50,7 +76,7 @@ export class YearPicker extends Picker<YearItem> {
       if (maxComp) isDisabled = itemComp > maxComp;
 
       return {
-        id: year,
+        id: getUniqueYearId(d),
         label: `${year}`,
         date: cloneDate(d),
         isNow: itemComp === nowComp,

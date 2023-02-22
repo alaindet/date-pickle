@@ -97,6 +97,13 @@ export abstract class Picker<ItemType extends BaseItem> {
   set focused(focused: Date | undefined | null) {
     if (focused === null) focused = undefined;
     this._focused = focused;
+
+    // Focused items MUST be on the page
+    // This updates the whole page if needed
+    if (this._focused) {
+      this._ref = cloneDate(focused as Date);
+    }
+
     this.updateItems();
     this._focusedHandler && this._focusedHandler(focused);
   }
@@ -178,7 +185,8 @@ export abstract class Picker<ItemType extends BaseItem> {
   }
 
   focusPreviousItemByOffset(_offset?: number): void {
-    this.focusItemByOffset(-1 * (_offset ?? this._focusOffset));
+    const offset = _offset ?? this._focusOffset;
+    this.focusItemByOffset(-1 * offset);
   }
 
   focusNextItemByOffset(_offset?: number): void {

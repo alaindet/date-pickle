@@ -1,4 +1,4 @@
-import { cloneDate, range } from '../../utils';
+import { cloneDate, getUniqueMonthId, range } from '../../utils';
 import { MonthItem, PickerOptions, TIME_INTERVAL } from '../../types';
 import { Picker } from '../picker';
 
@@ -52,7 +52,7 @@ export class MonthPicker extends Picker<MonthItem> {
       if (maxComp) isDisabled = itemComp > maxComp;
 
       return {
-        id: monthIndex + 1,
+        id: getUniqueMonthId(d),
         label,
         date: cloneDate(d),
         isNow: itemComp === nowComp,

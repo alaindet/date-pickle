@@ -7,10 +7,10 @@ const comparable = (d: Date) => comparableDate(d, 'year');
 
 describe('YearPicker', () => {
 
-  it('should return items around given year', () => {
+  it('should return years in the given decade', () => {
     const picker = new YearPicker(new Date('2001-06-07'));
     const result = picker.items!.map(i => i.date.getUTCFullYear());
-    const expected = range(1996, 2007);
+    const expected = range(2000, 2011);
     expect(result).toEqual(expected);
   });
 
@@ -23,27 +23,26 @@ describe('YearPicker', () => {
     expect(items[index].isNow).toBeTruthy();
   });
 
-  it('should disable items lower than min', () => {
-    const d = new Date('2001-06-07');
-    const min = new Date('1999-06-07');
+  it('should disable years lower than min', () => {
+    const d = new Date('2006-01-02');
+    const min = new Date('2003-08-08');
     const picker = new YearPicker(d, { min });
     const items = picker.items!;
-    const year1998 = items[2];
-    const year1999 = items[3];
-    expect(year1998.isDisabled).toBeTruthy(); // < min
-    expect(year1999.isDisabled).toBeFalsy(); // >= min
+    const year2002 = items[2];
+    const year2003 = items[3];
+    expect(year2002.isDisabled).toBeTruthy(); // < min
+    expect(year2003.isDisabled).toBeFalsy(); // >= min
   });
 
-  it('should disable items greater than max', () => {
-    const d = new Date('2001-06-07');
-    const max = new Date('2003-06-07');
+  it('should disable years greater than max', () => {
+    const d = new Date('2006-01-02');
+    const max = new Date('2008-10-10');
     const picker = new YearPicker(d, { max });
-    picker.sync = true;
     const items = picker.items!;
-    const year2003 = items[7];
-    const year2004 = items[8];
-    expect(year2003.isDisabled).toBeFalsy(); // <= max
-    expect(year2004.isDisabled).toBeTruthy(); // > max
+    const year2008 = items[8];
+    const year2009 = items[9];
+    expect(year2008.isDisabled).toBeFalsy(); // <= max
+    expect(year2009.isDisabled).toBeTruthy(); // > max
   });
 
   it('should trigger onItemsChange', async () => {
@@ -79,18 +78,18 @@ describe('YearPicker', () => {
 
   it('should show next years when calling next()', () => {
     const picker = new YearPicker(new Date('2000-01-01'));
-    const lastYear1 = picker.items![0].date.getUTCFullYear();
+    const firstYearBefore = picker.items![0].date.getUTCFullYear();
     picker.next();
-    const lastYear2 = picker.items![0].date.getUTCFullYear();
-    expect(lastYear2).toEqual(lastYear1 + 12);
+    const firstYearAfter = picker.items![0].date.getUTCFullYear();
+    expect(firstYearAfter).toEqual(firstYearBefore + 10);
   });
 
   it('should show previous years when calling prev()', () => {
     const picker = new YearPicker(new Date('2000-01-01'));
-    const lastYear1 = picker.items![0].date.getUTCFullYear();
+    const firstYearBefore = picker.items![0].date.getUTCFullYear();
     picker.prev();
-    const lastYear2 = picker.items![0].date.getUTCFullYear();
-    expect(lastYear2).toEqual(lastYear1 - 12);
+    const firstYearAfter = picker.items![0].date.getUTCFullYear();
+    expect(firstYearAfter).toEqual(firstYearBefore - 10);
   });
 
   it('should reset to now', () => {
@@ -159,6 +158,41 @@ describe('YearPicker', () => {
     expect(isUnique).toBeTruthy();
   });
 
+  describe('startWith property', () => {
+
+    const getFirstItemYear = (items: YearItem[]): number => {
+      return items[0].date.getUTCFullYear();
+    };
+
+    const getLastItemYear = (items: YearItem[]): number => {
+      return items[items.length - 1].date.getUTCFullYear();
+    };
+
+    it('should start with first year of the given decade', () => {
+      const d = new Date('2006-02-20');
+      const picker = new YearPicker(d, { focused: d });
+      picker.startWith = 'firstOfDecade';
+      // picker.startWith = 'x0'; // Equivalent
+      expect(getFirstItemYear(picker.items!)).toEqual(2000);
+      expect(getLastItemYear(picker.items!)).toEqual(2011);
+      picker.focusItemByOffset(-10);
+      expect(getFirstItemYear(picker.items!)).toEqual(1990);
+      expect(getLastItemYear(picker.items!)).toEqual(2001);
+    });
+
+    it('should start with first year of the given decade', () => {
+      const d = new Date('2006-02-20');
+      const picker = new YearPicker(d, { focused: d });
+      picker.startWith = 'lastOfPreviousDecade';
+      picker.startWith = 'x9'; // Equivalent
+      expect(getFirstItemYear(picker.items!)).toEqual(1999);
+      expect(getLastItemYear(picker.items!)).toEqual(2010);
+      picker.focusItemByOffset(10);
+      expect(getFirstItemYear(picker.items!)).toEqual(2009);
+      expect(getLastItemYear(picker.items!)).toEqual(2020);
+    });
+  });
+
   describe('focus management', () => {
 
     function expectFocusedDateToBeOnTheSameYear(picker: YearPicker, expected: Date): void {
@@ -186,7 +220,7 @@ describe('YearPicker', () => {
       expectFocusedDateToBeOnTheSameYear(picker, new Date('2020-02-20'));
     });
 
-    fit('should move focus to some year behind by custom offset', () => {
+    it('should move focus to some year behind by custom offset', () => {
       const d = new Date('2023-02-20');
       const picker = new YearPicker(d, { focused: d });
       picker.focusOffset = 10;
@@ -195,7 +229,7 @@ describe('YearPicker', () => {
 
       // Custom one-time offset
       picker.focusPreviousItemByOffset(5);
-      expectFocusedDateToBeOnTheSameYear(picker, new Date('2005-02-20'));
+      expectFocusedDateToBeOnTheSameYear(picker, new Date('2008-02-20'));
     });
 
     it('should move focus to 3 years ahead', () => {
@@ -221,14 +255,14 @@ describe('YearPicker', () => {
       const d = new Date('2006-02-20');
       const picker = new YearPicker(d, { focused: d });
       picker.focusFirstItemOfPage();
-      expectFocusedDateToBeOnTheSameYear(picker, new Date('2001-02-20'));
+      expectFocusedDateToBeOnTheSameYear(picker, new Date('2000-01-01'));
     });
 
     it('should move focus to last year of the page', () => {
       const d = new Date('2006-02-20');
       const picker = new YearPicker(d, { focused: d });
       picker.focusLastItemOfPage();
-      expectFocusedDateToBeOnTheSameYear(picker, new Date('2012-02-20'));
+      expectFocusedDateToBeOnTheSameYear(picker, new Date('2011-02-03'));
     });
 
     it('should move focus by an arbitray number of years', () => {
@@ -247,10 +281,10 @@ describe('YearPicker', () => {
       const picker = new YearPicker(d, { focused: d });
 
       picker.focusItemByIndex(2);
-      expectFocusedDateToBeOnTheSameYear(picker, new Date('2003-02-20'));
+      expectFocusedDateToBeOnTheSameYear(picker, new Date('2002-02-20'));
 
       picker.focusItemByIndex(8);
-      expectFocusedDateToBeOnTheSameYear(picker, new Date('2009-02-20'));
+      expectFocusedDateToBeOnTheSameYear(picker, new Date('2008-02-20'));
 
       expect(() => picker.focusItemByIndex(-4)).toThrowError();
       expect(() => picker.focusItemByIndex(undefined)).toThrowError();

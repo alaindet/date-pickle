@@ -1,4 +1,4 @@
-import { cloneDate } from '../../utils';
+import { cloneDate, getUniqueDayId } from '../../utils';
 import { DayItem, PickerOptions, TIME_INTERVAL } from '../../types';
 import { Picker } from '../picker';
 
@@ -104,11 +104,9 @@ export class DatePicker extends Picker<DayItem> {
       const itemComp = this.toComparable(d)!;
       const weekday = d.getUTCDay();
       const day = d.getUTCDate();
-      const month = d.getUTCMonth() + 1;
-      const id = Number(`${month}${day}`);
 
       return {
-        id,
+        id: getUniqueDayId(d),
         label: `${day}`,
         date: d,
         isWeekend: weekday === SUNDAY || weekday === SATURDAY,

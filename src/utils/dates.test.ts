@@ -1,5 +1,5 @@
 import { TIME_INTERVAL } from '../types';
-import { comparableDate, cloneDate, addTimeInterval } from './dates';
+import { comparableDate, cloneDate, addTimeInterval, getUniqueYearId, getUniqueMonthId, getUniqueDayId } from './dates';
 import { expectDatesToBeOnTheSameDay } from '../tests/matchers';
 
 describe('comparableDate() utility function', () => {
@@ -95,6 +95,25 @@ describe('addTimeInterval() utility function', () => {
     const expected = new Date('2023-03-01');
     expectDatesToBeOnTheSameDay(result, expected);
   });
-});
 
-export {};
+  describe('getUniqueYearId() utility function', () => {
+    it('should given unique year ID', () => {
+      const result = getUniqueYearId(new Date('2012-03-09'));
+      expect(result).toEqual(20129999);
+    });
+  });
+
+  describe('getUniqueMonthId() utility function', () => {
+    it('should given unique month ID', () => {
+      const result = getUniqueMonthId(new Date('2012-03-09'));
+      expect(result).toEqual(20120399);
+    });
+  });
+
+  describe('getUniqueDayId() utility function', () => {
+    it('should given unique day ID', () => {
+      const result = getUniqueDayId(new Date('2012-03-09'));
+      expect(result).toEqual(20120309);
+    });
+  });
+});

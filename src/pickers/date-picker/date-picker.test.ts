@@ -1,7 +1,7 @@
 import { cloneDate, comparableDate } from '../../utils';
-import { DayItem } from '../../types';
+import { DayItem, TIME_INTERVAL } from '../../types';
 import { DatePicker } from './date-picker';
-import { expectDatesToBeOnTheSameDay } from '../../tests/matchers';
+import { expectDatesToBeOnTheSameDay, expectFocusedDateToEqual } from '../../tests/matchers';
 
 const comparable = (d: Date) => comparableDate(d, 'day');
 
@@ -241,120 +241,105 @@ describe('DatePicker', () => {
   });
 
   describe('focus management', () => {
+
+    function getPageHash(picker: DatePicker): string {
+      return picker.items!.map(item => item.id).join('');
+    }
+
+    function didPageChange(picker: DatePicker, fn: () => void): boolean {
+      const before = getPageHash(picker);
+      fn();
+      return before !== getPageHash(picker);
+    }
+
+    function expectFocusedDateToBeOnTheSameDay(picker: DatePicker, expected: Date): void {
+      expectFocusedDateToEqual(picker, expected, TIME_INTERVAL.DAY);
+    }
+
     it('should move focus to previous day', () => {
       const d = new Date('2023-02-20');
-      const expected = new Date('2023-02-19');
       const picker = new DatePicker(d, { focused: d });
       picker.focusPreviousItem();
-      expectDatesToBeOnTheSameDay(picker.focused!, expected);
+      expectFocusedDateToBeOnTheSameDay(picker, new Date('2023-02-19'));
 
-      // Skip to previous page
-      const d2 = new Date('2024-03-01');
-      picker.ref = d2;
-      picker.focused = d2;
-      const expected2 = new Date('2024-02-29');
-      picker.focusPreviousItem();
-      expectDatesToBeOnTheSameDay(picker.focused!, expected2);
+      picker.focused = new Date('2023-01-01');
+      const pageChanged = didPageChange(picker, () => picker.focusPreviousItem());
+      expect(pageChanged).toBeTruthy();
+      expectFocusedDateToBeOnTheSameDay(picker, new Date('2022-12-31'));
     });
 
     it('should move focus to the next day', () => {
       const d = new Date('2023-02-20');
-      const expected = new Date('2023-02-21');
       const picker = new DatePicker(d, { focused: d });
       picker.focusNextItem();
-      expectDatesToBeOnTheSameDay(picker.focused!, expected);
+      expectFocusedDateToBeOnTheSameDay(picker, new Date('2023-02-21'));
 
-      // Skip to next page
-      const d2 = new Date('2022-02-28');
-      picker.ref = d2;
-      picker.focused = d2;
-      const expected2 = new Date('2022-03-01');
-      picker.focusNextItem();
-      expectDatesToBeOnTheSameDay(picker.focused!, expected2);
+      picker.focused = new Date('2022-02-28');
+      const pageChanged = didPageChange(picker, () => picker.focusNextItem());
+      expect(pageChanged).toBeTruthy();
+      expectFocusedDateToBeOnTheSameDay(picker, new Date('2022-03-01'));
     });
 
     it('should move focus to a week earlier', () => {
       const d1 = new Date('2023-02-20');
-      const expected1 = new Date('2023-02-13');
       const picker = new DatePicker(d1, { focused: d1 });
       picker.focusPreviousItemByOffset();
-      expectDatesToBeOnTheSameDay(picker.focused!, expected1);
+      expectFocusedDateToBeOnTheSameDay(picker, new Date('2023-02-13'));
 
-      // Skip to previous page
-      const d2 = new Date('2023-02-02');
-      picker.ref = d2;
-      picker.focused = d2;
-      const expected2 = new Date('2023-01-26');
-      picker.focusPreviousItemByOffset();
-      expectDatesToBeOnTheSameDay(picker.focused!, expected2);
+      picker.focused = new Date('2023-02-02');
+      const pageChanged = didPageChange(picker, () => picker.focusPreviousItemByOffset());
+      expect(pageChanged).toBeTruthy();
+      expectFocusedDateToBeOnTheSameDay(picker, new Date('2023-01-26'));
     });
 
     it('should move focus to a day behind by custom offset', () => {
       const d = new Date('2023-02-20');
-      const expected = new Date('2023-02-17');
       const picker = new DatePicker(d, { focused: d });
-      picker.focusOffset = 3;
-      picker.focusPreviousItemByOffset();
-      expectDatesToBeOnTheSameDay(picker.focused!, expected);
+      picker.focusPreviousItemByOffset(3);
+      expectFocusedDateToBeOnTheSameDay(picker, new Date('2023-02-17'));
 
-      // Skip to previous page
-      const d2 = new Date('2023-02-05');
-      picker.ref = d2;
-      picker.focused = d2;
-      const expected2 = new Date('2023-01-22');
-      picker.focusOffset = 14;
-      picker.focusPreviousItemByOffset();
-      expectDatesToBeOnTheSameDay(picker.focused!, expected2);
+      picker.focused = new Date('2023-02-05');
+      const pageChanged = didPageChange(picker, () => picker.focusPreviousItemByOffset(14));
+      expect(pageChanged).toBeTruthy();
+      expectFocusedDateToBeOnTheSameDay(picker, new Date('2023-01-22'));
     });
 
     it('should move focus to a week ahead', () => {
       const d = new Date('2019-02-20');
-      const expected = new Date('2019-02-27');
       const picker = new DatePicker(d, { focused: d });
       picker.focusNextItemByOffset();
-      expectDatesToBeOnTheSameDay(picker.focused!, expected);
+      expectFocusedDateToBeOnTheSameDay(picker, new Date('2019-02-27'));
 
-      // Skip to next page
-      const d2 = new Date('2021-02-27');
-      picker.ref = d2;
-      picker.focused = d2;
-      const expected2 = new Date('2021-03-06');
-      picker.focusNextItemByOffset();
-      expectDatesToBeOnTheSameDay(picker.focused!, expected2);
+      picker.focused = new Date('2021-02-27');
+      const pageChanged = didPageChange(picker, () => picker.focusNextItemByOffset());
+      expect(pageChanged).toBeTruthy();
+      expectFocusedDateToBeOnTheSameDay(picker, new Date('2021-03-06'));
     });
 
     it('should move focus to a day ahead by custom offset', () => {
       const d = new Date('2010-06-06');
-      const expected = new Date('2010-06-15');
       const picker = new DatePicker(d, { focused: d });
-      picker.focusOffset = 9;
-      picker.focusNextItemByOffset();
-      expectDatesToBeOnTheSameDay(picker.focused!, expected);
+      picker.focusNextItemByOffset(9);
+      expectFocusedDateToBeOnTheSameDay(picker, new Date('2010-06-15'));
 
-      // Skip to next page
-      const d2 = new Date('2023-02-20');
-      picker.ref = d2;
-      picker.focused = d2;
-      const expected2 = new Date('2023-03-06');
-      picker.focusOffset = 14;
-      picker.focusNextItemByOffset();
-      expectDatesToBeOnTheSameDay(picker.focused!, expected2);
+      picker.focused = new Date('2023-02-20');
+      const pageChanged = didPageChange(picker, () => picker.focusNextItemByOffset(14));
+      expect(pageChanged).toBeTruthy();
+      expectFocusedDateToBeOnTheSameDay(picker, new Date('2023-03-06'));
     });
 
     it('should move focus to first day of the page', () => {
       const d = new Date('2023-08-15');
-      const expected = new Date('2023-08-01');
       const picker = new DatePicker(d, { focused: d });
       picker.focusFirstItemOfPage();
-      expectDatesToBeOnTheSameDay(picker.focused!, expected);
+      expectFocusedDateToBeOnTheSameDay(picker, new Date('2023-08-01'));
     });
 
     it('should move focus to last month of the page', () => {
       const d = new Date('2023-08-15');
-      const expected = new Date('2023-08-31');
       const picker = new DatePicker(d, { focused: d });
       picker.focusLastItemOfPage();
-      expectDatesToBeOnTheSameDay(picker.focused!, expected);
+      expectFocusedDateToBeOnTheSameDay(picker, new Date('2023-08-31'));
     });
   });
 });

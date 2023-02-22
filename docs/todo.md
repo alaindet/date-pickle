@@ -1,11 +1,15 @@
 - [ ] add changelog
-- [ ] add focus management to Picker
 - [ ] add guide on how to publish
 - [ ] update readme.md
 - [ ] update to absolute imports
 - [ ] update tsconfig.json target, module and lib
 - [ ] update version to 0.0.14 via `npm version 0.0.14`
+- [ ] remove the years count of 12 from README
 
+- [x] add focus management to Picker
+- [x] update focused and ref in focus-related methods
+- [x] derive ref from focused date
+- [x] add tests for YearPicker.startWith property
 - [x] Add tests and test utilities for inspecting items
 - [x] Add temporary offsets as arguments to focusPreviousItemByOffset and focusNextItemByOffset
 - [x] Add a shared focusItemByOffset(offset: number)

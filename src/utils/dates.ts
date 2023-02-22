@@ -67,3 +67,18 @@ export function addTimeInterval(
 
   return d;
 }
+
+// Ex: 2012 => 20129999
+export function getUniqueYearId(date: Date): number {
+  return Number(`${y(date)}9999`);
+}
+
+// Ex.: 2012-03 => 20120399
+export function getUniqueMonthId(date: Date): number {
+  return Number(`${y(date)}${m(date)}99`);
+}
+
+// Ex.: 2012-03-09 => 20120309
+export function getUniqueDayId(date: Date): number {
+  return Number(`${y(date)}${m(date)}${d(date)}`);
+}

@@ -11,9 +11,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Add unit tests for base `Picker` class
 - Add `Picker.thenUpdateItems()` method to group state changes before updating items
 - Add `findLastIndex()` utility function
+- Add `getUniqueDayId` utility function
+- Add `startWith` property to `YearPicker`
 
 ### Changed
 - Change `DatePickle.constructor` signature
+- Use `getUniqueDayId` to guarantee uniqueness for any item of any picker
+  - This is used to differentiate pages
 
 ### Removed
 - `/jest.config.js`
