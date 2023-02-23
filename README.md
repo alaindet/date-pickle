@@ -178,4 +178,4 @@ dp.focusPreviousItemByOffset(10);
 - `focusItemByOffset()` accepts negative integers as well to go back in time
 
 ## Public API
-See [Date Pickle Public API](https://raw.githubusercontent.com/alaindet/date-pickle/main/docs/public-api.md)
+See [Date Pickle Public API](https://github.com/alaindet/date-pickle/blob/main/docs/public-api.md)
