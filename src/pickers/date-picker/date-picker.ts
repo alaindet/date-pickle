@@ -1,63 +1,57 @@
-import { cloneDate, comparableDate } from '../utils';
-import { DayItem, PickerOptions } from '../types';
-import { Picker } from './picker';
+import { cloneDate, getUniqueDayId } from '../../utils';
+import { DayItem, PickerOptions, TIME_INTERVAL } from '../../types';
+import { BasePicker } from '../base-picker';
 
-export class DatePicker extends Picker<DayItem> {
+export class DatePicker extends BasePicker<DayItem> {
 
-  constructor(ref?: Date | PickerOptions, options?: PickerOptions) {
-    super(ref, options);
+  constructor(cursor?: Date | PickerOptions, options?: PickerOptions) {
+    super(cursor, options);
+    this.props.focusOffset = 7; // Jumps one week by default
+    this.props.interval = TIME_INTERVAL.DAY;
+    this.updateItems();
   }
 
   next(): void {
-    this._ref.setUTCDate(15);
-    this._ref.setUTCMonth(this._ref.getUTCMonth() + 1);
-    this.updateItems();
+    const cursor = cloneDate(this._cursor);
+    cursor.setUTCDate(15);
+    cursor.setUTCMonth(cursor.getUTCMonth() + 1);
+    this.cursor = cursor;
   }
 
   prev(): void {
-    this._ref.setUTCDate(15);
-    this._ref.setUTCMonth(this._ref.getUTCMonth() - 1);
-    this.updateItems();
+    const cursor = cloneDate(this._cursor);
+    cursor.setUTCDate(15);
+    cursor.setUTCMonth(cursor.getUTCMonth() - 1);
+    this.cursor = cursor;
   }
 
   protected buildItems(): DayItem[] {
-
     const days = this.getDaysInCurrentMonth();
-
-    // TODO: Manage peek property?
-    const peek = true;
-
-    if (peek) {
-      days.unshift(...this.getDaysInPreviousMonth());
-      days.push(...this.getDaysInNextMonth());
-    }
-
+    days.unshift(...this.getDaysInPreviousMonth());
+    days.push(...this.getDaysInNextMonth());
     return this.toCalendarDays(days);
   }
 
   private getDaysInCurrentMonth(): Date[] {
-    return this.getDaysInMonth(
-      this._ref.getUTCFullYear(),
-      this._ref.getUTCMonth(),
-    );
+    const y = this._cursor.getUTCFullYear();
+    const m = this._cursor.getUTCMonth();
+    return this.getDaysInMonth(y, m);
   }
 
   private getDaysInPreviousMonth(): Date[] {
-    const d = cloneDate(this._ref);
+    const d = cloneDate(this._cursor);
     d.setUTCDate(15);
     d.setUTCMonth(d.getUTCMonth() - 1);
     const days = this.getDaysInMonth(d.getUTCFullYear(), d.getUTCMonth());
     const lastDayOfPrevMonth = days[days.length - 1];
     const lastWeekday = lastDayOfPrevMonth.getUTCDay();
     const offset = -lastWeekday;
-    if (offset === 0) {
-      return [];
-    }
+    if (offset === 0) return [];
     return days.slice(-lastWeekday);
   }
 
   private getDaysInNextMonth(): Date[] {
-    const d = cloneDate(this._ref);
+    const d = cloneDate(this._cursor);
     d.setUTCDate(15);
     d.setUTCMonth(d.getUTCMonth() + 1);
     const days = this.getDaysInMonth(d.getUTCFullYear(), d.getUTCMonth());
@@ -88,24 +82,22 @@ export class DatePicker extends Picker<DayItem> {
 
   private toCalendarDays(dates: Date[]): DayItem[] {
     const [inf, sup] = this.getAllowedDateRange();
-    const infComp = this.comparable(inf)!;
-    const supComp = this.comparable(sup)!;
+    const infComp = this.toComparable(inf)!;
+    const supComp = this.toComparable(sup)!;
 
     const SUNDAY = 0;
     const SATURDAY = 6;
-    const nowComp = this.comparable(new Date());
-    const selectedComp = this.comparable(this?.selected);
-    const focusedComp = this.comparable(this?.focused);
+    const nowComp = this.toComparable(new Date());
+    const selectedComp = this.toComparable(this.props?.selected);
+    const focusedComp = this.toComparable(this.props?.focused);
 
     return dates.map(d => {
-      const itemComp = this.comparable(d)!;
+      const itemComp = this.toComparable(d)!;
       const weekday = d.getUTCDay();
       const day = d.getUTCDate();
-      const month = d.getUTCMonth() + 1;
-      const id = Number(`${month}${day}`);
 
       return {
-        id,
+        id: getUniqueDayId(d),
         label: `${day}`,
         date: d,
         isWeekend: weekday === SUNDAY || weekday === SATURDAY,
@@ -118,13 +110,13 @@ export class DatePicker extends Picker<DayItem> {
   }
 
   private getFirstDayOfCurrentMonth(): Date {
-    const d = cloneDate(this._ref);
+    const d = cloneDate(this._cursor);
     d.setUTCDate(1);
     return d;
   }
 
   private getLastDayOfCurrentMonth(): Date {
-    const d = cloneDate(this._ref);
+    const d = cloneDate(this._cursor);
     d.setUTCDate(1);
     d.setUTCMonth(d.getUTCMonth() + 1);
     d.setUTCDate(d.getUTCDate() - 1);
@@ -136,21 +128,17 @@ export class DatePicker extends Picker<DayItem> {
     let sup = this.getLastDayOfCurrentMonth();
 
     // Restrict range from bottom?
-    if (this._min) {
-      const minComp = this.comparable(this.min)!;
-      inf = minComp > this.comparable(inf)! ? this._min! : inf;
+    if (this.props.min) {
+      const minComp = this.toComparable(this.min)!;
+      inf = minComp > this.toComparable(inf)! ? this.props.min! : inf;
     }
 
     // Restrict range from top?
-    if (this._max) {
-      const maxComp = this.comparable(this._max)!;
-      sup = maxComp < this.comparable(sup)! ? this._max! : sup;
+    if (this.props.max) {
+      const maxComp = this.toComparable(this.props.max)!;
+      sup = maxComp < this.toComparable(sup)! ? this.props.max! : sup;
     }
 
     return [inf, sup];
-  }
-
-  private comparable(d?: Date): number | null {
-    return d ? comparableDate(d, 'day') : null;
   }
 }

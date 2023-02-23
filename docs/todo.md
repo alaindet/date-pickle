@@ -1,0 +1,42 @@
+- [ ] add changelog
+- [ ] add guide on how to publish
+- [ ] update to absolute imports
+- [ ] update tsconfig.json target, module and lib
+- [ ] update version to 0.0.14 via `npm version 0.0.14`
+- [ ] Document the startWith from YearPicker
+
+- [x] update readme.md
+- [x] add public API to README.md
+- [x] always return array from "get items()"
+- [x] Add focus management description on README.md
+- [x] Add flag to onItemsChange to avoid firing immediately
+- [x] Event listeners DO NOT trigger by default
+- [x] Add methods to de-register event listeners
+- [x] Group options and handlers in BasePicker
+- [x] Add tests for "immediate" argument of events
+- [x] Add tests for changing pages implicitly when setting focused and selected
+- [x] Remove synchronization
+- [x] Change cursor also when setting "selected" property
+- [x] Change "ref" to "cursor"?
+- [x] Change "Picker" to "BasePicker"
+- [x] Add grouped changes then synchronize
+- [x] Change "onSelected" and "onFocused" as "onSelectedChange" and "onFocusedChange"
+- [x] remove the years count of 12 from README
+- [x] Remove "DatePickle" class?
+- [x] cursor option takes precedence over cursor as 1st argument
+- [x] add focus management to Picker
+- [x] update focused and ref in focus-related methods
+- [x] derive ref from focused date
+- [x] add tests for YearPicker.startWith property
+- [x] Add tests and test utilities for inspecting items
+- [x] Add temporary offsets as arguments to focusPreviousItemByOffset and focusNextItemByOffset
+- [x] Add a shared focusItemByOffset(offset: number)
+- [x] add custom matchers
+- [x] add enum-like type for time interval
+- [x] define `protected interval: TimeInterval` on pickers
+- [x] implement custom matchers
+- [x] refactor types
+- [x] Remove `comparable` method from pickers
+- [x] remove 2d movements
+- [x] update picker options
+- [x] Refactor updateItems() by removing this._sync

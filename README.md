@@ -2,238 +2,180 @@
 
 ![Date Pickle logo](https://raw.githubusercontent.com/alaindet/date-pickle/main/logo.png)
 
-Date Pickle is a TypeScript browser library for **creating calendars**. It is framework-agnostic, fully tested and with zero runtime dependencies.
+Date Pickle is a ~2 kB (gzipped) framework-agnostic fully tested TypeScript library with zero runtime dependencies for **creating calendars** (date pickers, month pickers, year pickers) and managing their state. It features date selection, min/max ranges and focus management for accessibility.
 
-Time unit names (months, weekdays) are translated with the provided locale via the [Intl](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl) browser API, so Date Pickle only works on browsers.
+It is **not a UI library**: you take care of the UI and the user interaction with your favorite framework/library and Date Pickle takes care of managing and outputting immutable state.
 
-## Installation
+## How does it work?
 
-```
-npm install date-pickle
-```
-
-## At a glance
-
-```ts
-import { DatePickle } from 'date-pickle';
-
-const pickle = new DatePickle(new Date('2022-09-07'));
-
-const datePicker = pickle.datePicker;
-console.log(datePicker.items);
-// [
-//   ...omitted,
-//   {
-//     id: 829,
-//     label: '29',
-//     date: 2022-08-29T00:00:00.000Z,
-//     isWeekend: false,
-//     isNow: false,
-//     isDisabled: true,
-//     isSelected: false,
-//     isFocused: false,
-//   },
-//   ...omitted,
-// ]
-
-// Asynchronous access to items
-datePicker.onItemsChange(items => console.log(items));
-// Prints same as above
-
-// First month of the year, localized
-pickle.locale = 'en';
-let firstMonthName = pickle.monthPicker.items![0].name;
-console.log(firstMonthName); // 'january'
-
-// Change localization (it's propagated to inner month picker)
-pickle.locale = 'it';
-firstMonthName = pickle.monthPicker.items![0].name;
-console.log(firstMonthName); // 'gennaio'
-
-// Set some state then update items
-pickle.sync = false;
-datePicker.max = new Date('2001-01-20');
-datePicker.ref = new Date('2001-03-03'); // Set to march
-datePicker.prev(); // Go to february
-datePicker.prev(); // Go to january
-pickle.sync = true; // <-- Re-enables items calculation
-
-console.log(datePicker.items);
-// [
-//   ...
-//   { date: 2001-01-19T23:00:00.000Z, isDisabled: false, ... },
-//   { date: 2001-01-20T23:00:00.000Z, isDisabled: true, ... },
-//   ...
-// ]
-
-// Standalone picker (doesn't share any state with other pickers)
-const datePickerStandalone = new DatePicker(new Date());
-```
-
-## Introduction
-
-- At the core of Date Pickle are pickers. Available pickers are `DatePicker`, `MonthPicker` and `YearPicker`
-- Each picker is a class that can be instantiated alone or by an instance of the `DatePickle` main class
-- The `DatePickle` instance allows to lazy-load the three pickers and share state among them
-- The basic output of pickers is a list of **items**, which are objects calculated when state changes
-- Each picker has some state and events, fired on state changes
+- At its core, Date Pickle is a collection of configurable picker classes:
+  - `DatePicker`
+  - `MonthPicker`
+  - `YearPicker`
+- The library is synchronous, you can register callbacks that get notified at each state change
+- The two main concepts are `items` and `pages`
+- An `item` is an object containing UI-friendly info for that item (say "a day" for a typical `DatePicker` or "a month" for a `MonthPicker`), with properties like `isSelected`, `isFocused`, `label`
+- Items are contextual to pickers, e.g. an item is
+  - a day in a month for a `DatePicker`,
+  - a month in a year for a `MonthPicker`
+  - a year in a decade for a `YearPicker`
+- A `page` is just a collection of related items, e.g. a page is "a month" for a `DatePicker` etc.
+- Pages can include items "peeking" from previous/following pages, like days from a previous month filling up the week, or years in the previous/following decade filling up a typical 4x3 grid
+- Pickers expose methods to alter the state and callbacks to listen to it
+- `DatePickle` is just an optional parent class for lazy instantiation of individual pickers sharing the same options
 
 ## Items
 
-Items (of types `DayItem`, `MonthItem` and `YearItem`) all extend a common `DatePickleItem` interface
+Items are of types `DayItem`, `MonthItem` and `YearItem` and they all extend a common `BaseItem` type
 
 ```ts
-interface DatePickleItem {
-  // Unique value in a collection of items
+type BaseItem  = {
+
+  // Guaranteed unique 8-digit ID across all pages and all pickers
+  // Ex.: "2023-02-23" is 20230223, "2022-08" is 20220899, "2020" is 20209999
   id: number;
+
   // Can be used in UI, ex.: "january" for MonthPicker, "2022" for YearPicker
   label: string;
-  // Date instance of the item
+
+  // Date instance of the item for further checks and manipulations
   date: Date;
-  // Whether the item is now (ex.: "today" for DatePicker, "this month" for MonthPicker)
+
+  // Whether the item is now: "today" for DatePicker, "this month" for MonthPicker,
+  // "this year" for YearPicker
   isNow: boolean;
-  // Whether the item is disabled (out of min/max range, belonging to adjacent months)
+
+  // Whether the item is disabled (out of min/max range or peeking from adjacent months
+  // in the case of DatePicker)
   isDisabled: boolean;
-  // Whether the item is selected, based on `selected: Date` property
+
+  // Whether the item is selected, based on the `selected: Date` picker's property
   isSelected: boolean;
-  // Wheter the item is focused, based on `focused: Date` property
+
+  // Wheter the item is focused, based on the `focused: Date` picker's property
   isFocused: boolean;
-}
+};
 ```
 
-Each picker has specific items, for example `DatePicker` outputs `DayItem` items having a unique `isWeekend` boolean key
+`MonthItem` and `YearItem` extend the `BaseItem` as it is, while the `DayItem` adds a property
 
 ```ts
-interface DayItem extends DatePickleItem {
+type DayItem = BaseItem & {
   isWeekend: boolean;
-}
+};
 ```
 
-## Picker events
+## Quick usage
+```ts
+import { DatePicker } from './pickers/date-picker/date-picker';
 
-Whenever relevant parts of the state get updated (including recalculating items), pickers fire several events that you can listen to via callbacks, registered via these methods
+const dp = new DatePicker(new Date('2022-09-09'));
 
-- `onItemsChange`
-- `onSelected`
-- `onFocused`
+// Listen to items
+dp.onItemsChange(items => console.log(items));
 
-All these methods register a `DatePickleEventHandler` callback, which simply returns the data associated with the event as the only function argument, ex.
+// [
+//   ...
+//     {
+//     id: 20220903,
+//     label: '3',
+//     date: 2022-09-03T00:00:00.000Z,
+//     isWeekend: true,
+//     isNow: false,
+//     isDisabled: false,
+//     isSelected: false,
+//     isFocused: false
+//   },
+//   ...
+// ]
+
+// Listen to focused date
+dp.onFocusedChange(focused => console.log(focused));
+
+// Listen to selected date
+dp.onSelectedChange(selected => console.log(selected));
+
+// Move cursor to the previous month
+// Updates items immediately, triggers `onItemsChange` handler
+dp.prev();
+
+// Set `isDisabled: true` on all items > '2022-08-08'
+// Updates items immediately, triggers `onItemsChange` handler
+dp.max = new Date('2022-08-08');
+
+// Group state changes and update items afterwards
+dp.updateAfter(() => {
+  dp.next(); // Moves page to September 2022
+  dp.prev(); // Moves page to August 2022
+  dp.next(); // Moves page to September 2022
+  dp.next(); // Moves page to October 2022
+  dp.focused = new Date('2022-10-10');
+});
+```
+
+## Pickers
+- Pickers are instances of `DatePicker`, `MonthPicker` or `YearPicker`
+- A picker has an inner cursor of type `Date` which serves as the base for calculating end members of a page and then all items within it
+  - For example, a cursor set to `2022-01-01` in a `DatePicker` prints out all days in january 2022 (and some days from december 2021 and february 2022)
+- The cursor is mostly abstracted away from the user, but you can access it, change it manually or directly set it when creating the picker, like `const dp = new DatePicker(new Date('2023-02-03'))`
+
+### Initialization
+Pickers can be initialized with zero, one or two arguments
+```ts
+// Zero arguments: Cursor is today, properties use defaults
+const dp1 = new DatePicker();
+
+// One argument: the cursor
+const dp2 = new DatePicker(new Date('2023-02-02'));
+
+// One argument: the options
+const min = new Date('2023-02-10');
+const max = new Date('2023-02-20');
+const dp3 = new DatePicker({ min, max });
+
+// Two arguments: cursor and options
+const dp4 = new DatePicker(cursor, { min, max });
+
+// Equivalent to above, you can set the cursor as an option
+const dp5 = new DatePicker({ cursor, min, max });
+```
+
+### Properties
+- Every picker extends an abstract `BasePicker` class and has the same properties
+- Most properties update state immediately when they're explicitly set, unless you set them in an `updateAfter` callback
+- Properties can be set explicitly, like `dp.selected = new Date()`, or upon the picker's creation as options, like `const dp = DatePicker({ selected: new Date() })`
+- The `focused` and the `selected` properties also move the cursor when you set them, since a "focused" or "selected" item on an invisible page makes no sense
+
+## Focus management
+Let's say you build a simple calendar with rows of days representing weeks as usual. There's already a focused element, you press Arrow Up and you want the day "on top" to focus, or maybe you press Home and want the first day of the month to focus, how to do that?
+
+Date Pickle helps you by exposing some methods to move focus in a predictable way. For example
 
 ```ts
-const picker = new DatePicker();
-picker.onItemsChange((items: DayItem[]) => console.log('items', items));
-picker.onSelected((d: Date) => console.log('selected', d));
-picker.onFocused((d: Date) => console.log('focused', d));
+const d = new Date('2023-02-23');
+const dp = new DatePicker({ cursor: d, focused: d });
+dp.focusOffset = 7; // Already set to 7 by default
+dp.focusPreviousItemByOffset(); // Moves focus to a week earlier (Arrow Up)
+dp.focusNextItemByOffset(); // Moves focus to a week later (Arrow Down)
+dp.focusFirstItemOfPage(); // Moves focus to first day of month (Home)
+dp.focusLastItemOfPage(); // Moves focus to last day of month (End)
+dp.focusNextItem(); // Moves focus to the next day (Arrow Right)
+dp.focusPreviousItem(); // Moves focus to the previous day (Arrow Left)
+dp.focusItemByIndex(12); // Moves focus to an arbitrary item index on a page
+dp.focusItemByOffset(12); // Moves focus to an arbitrary number of time intervals
+
+dp.focusNextItemByOffset(3);
+// Equivalent to `dp.focusItemByOffset(3)`, does not affect `focusOffset`
+
+dp.focusPreviousItemByOffset(10);
+// Equivalent to `dp.focusItemByOffset(-10)`, does not affect `focusOffset`
 ```
 
-Please note that
-- If `sync` key is disabled (see **Picker state** section below), no callback is fired
-- If `sync` key is enabled, the callback fires every time the related state changes and **immediately upon registration**, if related state is present
+- Moving focus to another page also moves the cursor (and all items) to that page
+- The `focusOffset` represents the number of "time intervals" the focused date must jump, e.g. "day" for `DatePicker`, "month" for `MonthPicker`, "year" for `YearPicker`
+- There can be only up to ONE focused item on the page, or no one focused
+- Date Pickle does not handle HTML, so tabIndex attributes and keyboard event capturing are the user's responsibility
+- `focusItemByOffset()` accepts negative integers as well to go back in time
 
-```ts
-const picker = new DatePicker();
-
-// This fires immediately, since related state (items) exist
-picker.onItems(items => console.log('items', items));
-
-// This callback waits because related state exists, but sync = false
-picker.selected = new Date();
-picker.sync = false;
-picker.onSelected((d: Date) => console.log('selected', d));
-picker.sync = true; // Now onSelected fires
-
-// This waits for some focused state, since no related state is found (default is undefined)
-picker.onFocused((d: Date) => console.log('focused', d));
-
-// Now the previously registered onFocused callback fires
-picker.focused = new Date();
-```
-
-## Picker state
-
-**State** is internally managed by any picker, but you can alter it via setters or via options directly upone picker's creation
-
-```ts
-// Initialize state via options
-const options = { selected: new Date('2022-01-01') };
-const picker = new DatePicker(new Date(), options);
-
-// Or create picker and set state later
-const picker = new DatePicker();
-picker.selected = new Date('2022-01-01');
-```
-
-State is composed of these keys
-
-- `items`: List of items, based on picker
-- `min`: Minimum date allowed (items before this are disabled)
-- `max`: Maximum date allowed (items after this are disabled)
-- `locale`: Language to use when translating (ex.: months names)
-- `selected`: Currently select date
-- `focused`: Currently focused date (different from selected, since in accessible calendar users can move between dates by focusing them, but only one is then is selected)
-- `sync`: Whether to recalculate items and fire events when state changes or not
-
-## State synchronization
-
-**NOTE**: Examples above are **NOT EQUIVALENT**. In fact, in the second example the state is set later, so the state gets initialized to its default value, items are calculated automatically, then the state is changed with `picker.selected` and items are recalculated again. To prevent unnecessary calculations, either set values upon creation via options (first example), or use the `sync` property like this
-
-```ts
-// Create a picker with sync = false, no items are calculated
-const picker = new DatePicker(new Date(), { sync: false });
-
-// Alter some state
-picker.min = new Date('2010-03-03');
-picker.max = new Date('2020-03-03');
-picker.locale = 'it';
-
-// Re-enable sync (recalculates items)
-picker.sync = true;
-
-// Another state manipulation session, later
-picker.sync = false;
-picker.focused = new Date('2022-06-06');
-picker.locale = 'en';
-picker.sync = true;
-```
-
-## Changing pages
-- A *page* is just a collection of items depending on the picker, so a page is
-  - a month for `DatePicker`
-  - a year for a `MonthPicker`
-  - 12 years for a `YearPicker`
-
-- Why 12 years and not a *decade*? Simply because 12 is a very comfortable number to work with, while building UIs: a year has 12 months, so switching between a `MonthPicker` and `YearPicker` does not disrupt the UI, also you can have 4 rows of 3 years, 3 rows of 4 years, 6 rows of 2 years etc.
-
-- Items on a page are primarily calculated based on the `ref` state key representing a `Date` around which items are calculated
-- Ex.: Items in a month are calculated around a fictious `ref` set to midnight of the 15th day of that month
-- All pickers have a number of methods to change page (by internally changing the `ref` state key)
-  - `now()`: Switches to the page containing today
-  - `prev()`: Switches to previous page (ex.: previous month for `DatePicker`)
-  - `next()`: Switches to next page (ex.: next month for `DatePicker`)
-
-## Disabling items
-- All items have a `isDisabled` boolean key telling the UI if the item is disabled (usually grayed out and unclickable, like days from previous and next month on a regular date picker)
-- Disabled state of items can be regulated by setting either one or both the `min` and the `max` property on any picker
-- `min`/`max` values form an inclusive range (meaning items `>= min` and `<= max`) of items with `isDisabled = false`
-- When setting `min`/`max` values, items are compared with `min`/`max` with a precision that depends on their picker
-- Ex.: `min`/`max` on `YearPicker` are compared by same year
-- Ex.: `min`/`max` on `DatePicker` are compared by same day
-- Comparisons are performed via Date Pickle's `comparableDate()` utility
-
-```ts
-const d = new Date('2022-05-05');
-const picker = new DatePicker(d);
-picker.min = new Date('2022-05-04');
-picker.max = new Date('2022-05-05');
-
-const items = picker.items!;
-console.log(items[8].isDisabled);  // true (May 3rd)
-console.log(items[9].isDisabled);  // false (May 4th)
-console.log(items[10].isDisabled); // false (May 5th)
-console.log(items[11].isDisabled); // true (May 6th)
-```
-
-## `DatePicker` "peeking" days from previous and next months
-- The `DatePicker` has a distinctive algorithm to calculate items, so that days from the previous and next month are shown to fill the weeks, if the current month's days do not start on monday and/or do not end on sunday
-- This behavior is completely expected by any date picker, but please mind that, since calculated items are more than the days of their month, most likely the **first** item is **NOT** is the first day of the month and the **last** item is **NOT** the last day of the month
-- Also, days "peeking" from previous and next months always have `isDisabled: true` by default, regardless of the `min`/`max` values
+## Public API
+See [Date Pickle Public API](https://raw.githubusercontent.com/alaindet/date-pickle/main/docs/public-api.md)

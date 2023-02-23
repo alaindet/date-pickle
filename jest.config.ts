@@ -4,7 +4,8 @@ const config: Config = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   verbose: true,
-  maxWorkers: '50%',
+  maxWorkers: '1',
+  // maxWorkers: '50%',
 };
 
 export default config;
