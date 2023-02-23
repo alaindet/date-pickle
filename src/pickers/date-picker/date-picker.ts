@@ -4,8 +4,8 @@ import { BasePicker } from '../base-picker';
 
 export class DatePicker extends BasePicker<DayItem> {
 
-  constructor(ref?: Date | PickerOptions, options?: PickerOptions) {
-    super(ref, options);
+  constructor(cursor?: Date | PickerOptions, options?: PickerOptions) {
+    super(cursor, options);
     this.props.focusOffset = 7; // Jumps one week by default
     this.props.interval = TIME_INTERVAL.DAY;
     this.updateItems();

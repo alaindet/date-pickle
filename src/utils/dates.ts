@@ -1,38 +1,24 @@
 import { padStart } from './pad-start';
 import { TimeInterval, TIME_INTERVAL } from './../types';
 
-type DateSegmentParser = (d: Date) => string;
-type Comparator = (d: Date) => number;
-
 const y = (d: Date) => String(d.getUTCFullYear());
 const m = (d: Date) => padStart(d.getUTCMonth() + 1, '0', 2);
 const d = (d: Date) => padStart(d.getUTCDate(), '0', 2);
-const createComparator = (...parsers: DateSegmentParser[]): Comparator => {
-  return (date: Date) => Number(parsers.map(p => p(date)).join(''));
-};
 
 export function comparableDate(
   date: Date | undefined | null,
-  precision: TimeInterval,
+  interval: TimeInterval,
 ): number | null {
 
   if (!date) {
     return null;
   }
 
-  switch (precision) {
-
-    case TIME_INTERVAL.DAY:
-      return createComparator(y, m, d)(date);
-
-    case TIME_INTERVAL.MONTH:
-      return createComparator(y, m)(date);
-
-    case TIME_INTERVAL.YEAR:
-      return createComparator(y)(date);
-
-    default:
-      throw new Error('invalid time interval ' + precision);
+  switch (interval) {
+    case TIME_INTERVAL.DAY: return getUniqueDayId(date);
+    case TIME_INTERVAL.MONTH: return getUniqueMonthId(date);
+    case TIME_INTERVAL.YEAR: return getUniqueYearId(date);
+    default: throw new Error('invalid time interval ' + interval);
   }
 }
 

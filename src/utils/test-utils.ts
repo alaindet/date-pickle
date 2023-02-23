@@ -1,11 +1,11 @@
-import { MonthPicker } from './../pickers/month-picker/month-picker';
-import { YearPicker } from 'pickers/year-picker/year-picker';
-import { DatePicker } from 'pickers/date-picker/date-picker';
+import { MonthPicker } from '../pickers/month-picker/month-picker';
+import { YearPicker } from '../pickers/year-picker/year-picker';
+import { DatePicker } from '../pickers/date-picker/date-picker';
 
 function getPageHash(
   picker: DatePicker | MonthPicker | YearPicker,
 ): string {
-  const items = picker.items!;
+  const items = picker.items;
   const first = items[0].id;
   const last = items[items.length - 1].id;
   return `${first}>${last}`;

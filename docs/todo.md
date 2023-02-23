@@ -1,12 +1,14 @@
 - [ ] add changelog
 - [ ] add guide on how to publish
-- [ ] update readme.md
 - [ ] update to absolute imports
 - [ ] update tsconfig.json target, module and lib
 - [ ] update version to 0.0.14 via `npm version 0.0.14`
-- [ ] Add focus management description on README.md
-- [ ] Add public API to README.md
+- [ ] Document the startWith from YearPicker
 
+- [x] update readme.md
+- [x] add public API to README.md
+- [x] always return array from "get items()"
+- [x] Add focus management description on README.md
 - [x] Add flag to onItemsChange to avoid firing immediately
 - [x] Event listeners DO NOT trigger by default
 - [x] Add methods to de-register event listeners

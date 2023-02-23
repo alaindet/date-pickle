@@ -7,8 +7,8 @@ const LAST_MONTH_INDEX = 11;
 
 export class MonthPicker extends BasePicker<MonthItem> {
 
-  constructor(ref?: Date | PickerOptions, options?: PickerOptions) {
-    super(ref, options);
+  constructor(cursor?: Date | PickerOptions, options?: PickerOptions) {
+    super(cursor, options);
     this.props.focusOffset = 3;  // Jumps one season by default
     this.props.interval = TIME_INTERVAL.MONTH;
     this.updateItems();

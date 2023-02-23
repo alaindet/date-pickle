@@ -8,7 +8,7 @@ const comparable = (d: Date) => comparableDate(d, 'month');
 describe('MonthPicker', () => {
   it('should return the 12 months of any year', () => {
     const picker = new MonthPicker();
-    const result = picker.items!.map(i => i.date.getUTCMonth()).join(', ');
+    const result = picker.items.map(i => i.date.getUTCMonth()).join(', ');
     const expected = '0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11';
     expect(result).toEqual(expected);
   });
@@ -17,7 +17,7 @@ describe('MonthPicker', () => {
   it('should mark this month with isNow = true', () => {
     const now = new Date();
     const picker = new MonthPicker(now);
-    const items = picker.items!;
+    const items = picker.items;
     const thisMonth = now.getUTCMonth();
     const index = items.findIndex(i => i.date.getUTCMonth() === thisMonth);
     expect(items[index].isNow).toBeTruthy();
@@ -25,12 +25,12 @@ describe('MonthPicker', () => {
 
   it('should translate month names for english locale', () => {
     const picker = new MonthPicker(new Date(), { locale: 'en' });
-    expect(picker.items![0].label).toEqual('january');
+    expect(picker.items[0].label).toEqual('january');
   });
 
   it('should translate month names for italian locale', () => {
     const picker = new MonthPicker(new Date(), { locale: 'it' });
-    expect(picker.items![7].label).toEqual('agosto');
+    expect(picker.items[7].label).toEqual('agosto');
   });
 
   // Failed
@@ -39,7 +39,7 @@ describe('MonthPicker', () => {
     const min = cloneDate(now);
     min.setUTCMonth(7); // august
     const picker = new MonthPicker(new Date(), { locale: 'en', min });
-    const items = picker.items!;
+    const items = picker.items;
     const july = items[6];
     const august = items[7];
     expect(july.isDisabled).toBeTruthy();
@@ -52,7 +52,7 @@ describe('MonthPicker', () => {
     const max = cloneDate(now);
     max.setUTCMonth(3); // april
     const picker = new MonthPicker(now, { locale: 'en', max });
-    const items = picker.items!;
+    const items = picker.items;
     const april = items[3];
     const may = items[4];
     expect(april.isDisabled).toBeFalsy();
@@ -108,7 +108,7 @@ describe('MonthPicker', () => {
     const d = new Date('2022-02-02');
     const selected = new Date('2022-03-03');
     const picker = new MonthPicker(d, { selected });
-    const items = picker.items!;
+    const items = picker.items;
     const februrary2022 = items[1];
     const march2022 = items[2];
     expect(march2022?.isSelected).toBeTruthy();
@@ -119,7 +119,7 @@ describe('MonthPicker', () => {
     const d = new Date('2022-02-02');
     const picker = new MonthPicker(d);
     picker.selected = new Date('2022-03-03');
-    const items = picker.items!;
+    const items = picker.items;
     const februrary2022 = items[1];
     const march2022 = items[2];
     expect(march2022?.isSelected).toBeTruthy();
@@ -130,7 +130,7 @@ describe('MonthPicker', () => {
     const d = new Date('2022-02-02');
     const focused = new Date('2022-03-03');
     const picker = new MonthPicker(d, { focused });
-    const items = picker.items!;
+    const items = picker.items;
     const februrary2022 = items[1];
     const march2022 = items[2];
     expect(march2022?.isFocused).toBeTruthy();
@@ -141,7 +141,7 @@ describe('MonthPicker', () => {
     const d = new Date('2022-02-02');
     const picker = new MonthPicker(d);
     picker.focused = new Date('2022-03-03');
-    const items = picker.items!;
+    const items = picker.items;
     const februrary2022 = items[1];
     const march2022 = items[2];
     expect(march2022?.isFocused).toBeTruthy();

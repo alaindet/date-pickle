@@ -107,14 +107,14 @@ export abstract class BasePicker<TItem extends BaseItem> {
     this.props.focusOffset = focusOffset;
   }
 
-  get items(): TItem[] | undefined {
-    return this._items;
+  get items(): TItem[] {
+    return this._items ?? [];
   }
 
   updateAfter(fn: () => void): void {
     fn();
     this._items = this.buildItems();
-    if (this.handlers.itemsChange) this.handlers.itemsChange(this._items);
+    if (this.handlers.itemsChange) this.handlers.itemsChange(this._items ?? []);
   }
 
   now(): void {
@@ -148,9 +148,9 @@ export abstract class BasePicker<TItem extends BaseItem> {
     delete this.handlers.focusedChange;
   }
 
-  updateItems(): void {
+  protected updateItems(): void {
     this._items = this.buildItems();
-    if (this.handlers.itemsChange) this.handlers.itemsChange(this._items);
+    if (this.handlers.itemsChange) this.handlers.itemsChange(this._items ?? []);
   }
 
   focusItemByOffset(_offset: number): void {
@@ -211,6 +211,16 @@ export abstract class BasePicker<TItem extends BaseItem> {
     }
 
     this.props.focused = cloneDate(this._cursor);
+  }
+
+  // Overridden by child class
+  next(): void {
+    // Go to next page
+  }
+
+  // Overridden by child class
+  prev(): void {
+    // Go to next page
   }
 
   // Overridden by child class
