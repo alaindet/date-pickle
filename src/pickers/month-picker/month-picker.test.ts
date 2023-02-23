@@ -70,7 +70,7 @@ describe('MonthPicker', () => {
 
   it('should trigger onSelectedChange', () => {
     const d = new Date('2022-09-05');
-    const picker = new MonthPicker();
+    const picker = new MonthPicker({ selected: d });
     let result!: Date | undefined;
     picker.onSelectedChange(selected => (result = selected), true);
     expect(result).toBeTruthy();
@@ -79,7 +79,7 @@ describe('MonthPicker', () => {
 
   it('should trigger onFocusedChange', async () => {
     const d = new Date('2022-09-05');
-    const picker = new MonthPicker();
+    const picker = new MonthPicker({ focused: d });
     let result!: Date | undefined;
     picker.onFocusedChange(focused => (result = focused), true);
     expect(result).toBeTruthy();

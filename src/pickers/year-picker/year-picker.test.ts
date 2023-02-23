@@ -53,7 +53,7 @@ describe('YearPicker', () => {
 
   it('should trigger onSelectedChange', () => {
     const d = new Date('2022-09-05');
-    const picker = new YearPicker();
+    const picker = new YearPicker({ selected: d });
     let result!: Date | undefined;
     picker.onSelectedChange(selected => (result = selected), true);
     expect(result).toBeTruthy();
@@ -62,9 +62,9 @@ describe('YearPicker', () => {
 
   it('should trigger onFocusedChange', () => {
     const d = new Date('2022-09-05');
-    const picker = new YearPicker();
+    const picker = new YearPicker({ focused: d });
     let result!: Date | undefined;
-    picker.onFocusedChange(focused => (result = focused), true);
+    picker.onFocusedChange(focused => result = focused, true);
     expect(result).toBeTruthy();
     expect(comparable(result!)).toEqual(comparable(d));
   });

@@ -1,4 +1,5 @@
-export function findLastIndex<T = unknown>(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function findLastIndex<T = any>(
   arr: T[],
   fn: (item: T) => boolean
 ): number {

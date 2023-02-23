@@ -1,6 +1,7 @@
 import { BaseItem } from './item';
 
-export type PickerEventHandler<T = unknown> = (data: T) => void;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type PickerEventHandler<T = any> = (data: T) => void;
 
 export type PickerEventHadlers<TItem extends BaseItem> = {
   itemsChange?: PickerEventHandler<TItem[]>;

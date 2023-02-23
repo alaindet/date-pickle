@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ParsedPickerInput, PickerOptions } from '../types';
 
-const isDate = (d?: unknown) => d && d instanceof Date;
-const isNotDate = (d?: unknown) => d && !(d instanceof Date);
+const isDate = (d?: any) => d && d instanceof Date;
+const isNotDate = (d?: any) => d && !(d instanceof Date);
 
 export function parsePickerInput(
   cursorOrOptions?: PickerOptions | Date,

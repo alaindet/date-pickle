@@ -1,8 +1,9 @@
-type Constructor<T> = new (...args: unknown[]) => T;
+/* eslint-disable @typescript-eslint/no-explicit-any */
+type Constructor<T> = new (...args: any[]) => T;
 
 export function isInstanceOf(
-  obj: unknown,
-  classType: Constructor<unknown>
+  obj: any,
+  classType: Constructor<any>
 ): boolean {
   return obj instanceof classType;
 }
