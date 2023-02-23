@@ -44,35 +44,29 @@ describe('YearPicker', () => {
     expect(year2009.isDisabled).toBeTruthy(); // > max
   });
 
-  it('should trigger onItemsChange', async () => {
+  it('should trigger onItemsChange', () => {
     const picker = new YearPicker();
-    const items = await new Promise<YearItem[]>(done => {
-      const immediate = true;
-      picker.onItemsChange(items => done(items), immediate);
-    });
-    expect(items.length).not.toEqual(0);
+    let result!: YearItem[];
+    picker.onItemsChange(items => (result = items), true);
+    expect(result.length).not.toEqual(0);
   });
 
-  it('should trigger onSelectedChange', async () => {
+  it('should trigger onSelectedChange', () => {
     const d = new Date('2022-09-05');
     const picker = new YearPicker();
-    const selected = await new Promise<Date | undefined>((resolve, _) => {
-      picker.onSelectedChange(selected => resolve(selected));
-      picker.selected = d;
-    });
-    expect(selected).toBeTruthy();
-    expect(comparable(selected!)).toEqual(comparable(d));
+    let result!: Date | undefined;
+    picker.onSelectedChange(selected => (result = selected), true);
+    expect(result).toBeTruthy();
+    expect(comparable(result!)).toEqual(comparable(d));
   });
 
-  it('should trigger onFocusedChange', async () => {
+  it('should trigger onFocusedChange', () => {
     const d = new Date('2022-09-05');
     const picker = new YearPicker();
-    const focused = await new Promise<Date | undefined>((resolve, _) => {
-      picker.onFocusedChange(focused => resolve(focused));
-      picker.focused = d;
-    });
-    expect(focused).toBeTruthy();
-    expect(comparable(focused!)).toEqual(comparable(d));
+    let result!: Date | undefined;
+    picker.onFocusedChange(focused => (result = focused), true);
+    expect(result).toBeTruthy();
+    expect(comparable(result!)).toEqual(comparable(d));
   });
 
   it('should show next years when calling next()', () => {

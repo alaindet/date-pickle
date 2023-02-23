@@ -1,5 +1,8 @@
-type Constructor<T> = new (...args: any[]) => T;
+type Constructor<T> = new (...args: unknown[]) => T;
 
-export function isInstanceOf(obj: any, classType: Constructor<any>): boolean {
+export function isInstanceOf(
+  obj: unknown,
+  classType: Constructor<unknown>
+): boolean {
   return obj instanceof classType;
 }

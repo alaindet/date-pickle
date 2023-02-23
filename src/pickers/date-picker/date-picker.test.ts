@@ -108,6 +108,7 @@ describe('DatePicker', () => {
     expect(comparable(result!)).toEqual(comparable(d));
   });
 
+  // eslint-disable-next-line quotes
   it("should show next month's dates when calling next()", () => {
     const picker = new DatePicker(new Date('2022-08-15'));
     const month1 = picker.items[10].date.getMonth();
@@ -116,6 +117,7 @@ describe('DatePicker', () => {
     expect(month2).toEqual(month1 + 1);
   });
 
+  // eslint-disable-next-line quotes
   it("should show previous month's dates when calling prev()", () => {
     const picker = new DatePicker(new Date('2022-08-15'));
     const month1 = picker.items[10].date.getMonth();

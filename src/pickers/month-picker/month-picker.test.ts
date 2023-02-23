@@ -68,26 +68,22 @@ describe('MonthPicker', () => {
     expect(items.length).not.toEqual(0);
   });
 
-  it('should trigger onSelectedChange', async () => {
+  it('should trigger onSelectedChange', () => {
     const d = new Date('2022-09-05');
     const picker = new MonthPicker();
-    const selected = await new Promise<Date | undefined>((resolve, _) => {
-      picker.onSelectedChange(selected => resolve(selected));
-      picker.selected = d;
-    });
-    expect(selected).toBeTruthy();
-    expect(comparable(selected!)).toEqual(comparable(d));
+    let result!: Date | undefined;
+    picker.onSelectedChange(selected => (result = selected), true);
+    expect(result).toBeTruthy();
+    expect(comparable(result!)).toEqual(comparable(d));
   });
 
   it('should trigger onFocusedChange', async () => {
     const d = new Date('2022-09-05');
     const picker = new MonthPicker();
-    const focused = await new Promise<Date | undefined>((resolve, _) => {
-      picker.onFocusedChange(focused => resolve(focused));
-      picker.focused = d;
-    });
-    expect(focused).toBeTruthy();
-    expect(comparable(focused!)).toEqual(comparable(d));
+    let result!: Date | undefined;
+    picker.onFocusedChange(focused => (result = focused), true);
+    expect(result).toBeTruthy();
+    expect(comparable(result!)).toEqual(comparable(d));
   });
 
   it('should show next year when calling next()', () => {
