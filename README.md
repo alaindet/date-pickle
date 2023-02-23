@@ -14,7 +14,7 @@ npm i date-pickle
 
 ## TL;DR
 ```ts
-import { DatePicker } from './pickers/date-picker/date-picker';
+import { DatePicker } from 'date-pickle';
 
 const dp = new DatePicker(new Date('2022-09-09'));
 
