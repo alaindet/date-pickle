@@ -1,8 +1,21 @@
-import { parsePickerInput, comparableDate, cloneDate, addTimeInterval, findLastIndex } from '../utils';
-import { PickerEventHandler, Locale, PickerOptions, BaseItem, PickerEventHadlers, PickerProperties, TIME_INTERVAL } from '../types';
+import {
+  parsePickerInput,
+  comparableDate,
+  cloneDate,
+  addTimeInterval,
+  findLastIndex,
+} from '../utils';
+import {
+  PickerEventHandler,
+  Locale,
+  PickerOptions,
+  BaseItem,
+  PickerEventHadlers,
+  PickerProperties,
+  TIME_INTERVAL,
+} from '../types';
 
 export abstract class BasePicker<TItem extends BaseItem> {
-
   protected handlers: PickerEventHadlers<TItem> = {};
   protected props: PickerProperties = {
     locale: 'default',
@@ -22,7 +35,8 @@ export abstract class BasePicker<TItem extends BaseItem> {
     this.props.locale = input.options.locale ?? this.props.locale;
     this.props.selected = input.options.selected ?? this.props.selected;
     this.props.focused = input.options.focused ?? this.props.focused;
-    this.props.focusOffset = input.options.focusOffset ?? this.props.focusOffset;
+    this.props.focusOffset =
+      input.options.focusOffset ?? this.props.focusOffset;
   }
 
   get cursor(): Date {
@@ -130,7 +144,10 @@ export abstract class BasePicker<TItem extends BaseItem> {
     delete this.handlers.itemsChange;
   }
 
-  onSelectedChange(handler: PickerEventHandler<Date | undefined>, immediate = false): void {
+  onSelectedChange(
+    handler: PickerEventHandler<Date | undefined>,
+    immediate = false
+  ): void {
     this.handlers.selectedChange = handler;
     if (immediate) handler(this.props.selected);
   }
@@ -139,7 +156,10 @@ export abstract class BasePicker<TItem extends BaseItem> {
     delete this.handlers.selectedChange;
   }
 
-  onFocusedChange(handler: PickerEventHandler<Date | undefined>, immediate = false): void {
+  onFocusedChange(
+    handler: PickerEventHandler<Date | undefined>,
+    immediate = false
+  ): void {
     this.handlers.focusedChange = handler;
     if (immediate) handler(this.props.focused);
   }
@@ -157,7 +177,11 @@ export abstract class BasePicker<TItem extends BaseItem> {
     const offset = _offset ?? this.props.focusOffset;
     this.updateAfter(() => {
       this.initFocusedIfNeeded();
-      this.focused = addTimeInterval(this.focused!, offset, this.props.interval);
+      this.focused = addTimeInterval(
+        this.focused!,
+        offset,
+        this.props.interval
+      );
     });
   }
 
@@ -200,7 +224,6 @@ export abstract class BasePicker<TItem extends BaseItem> {
   }
 
   private initFocusedIfNeeded(): void {
-
     if (this.props.focused) {
       return;
     }

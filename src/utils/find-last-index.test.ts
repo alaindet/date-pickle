@@ -1,7 +1,6 @@
 import { findLastIndex } from './find-last-index';
 
 describe('findLastIndex() utility function', () => {
-
   const getItems = () => [
     { id: 1, name: 'Item #1', someFlag: true },
     { id: 2, name: 'Item #2', someFlag: false },
@@ -22,5 +21,4 @@ describe('findLastIndex() utility function', () => {
     const result = findLastIndex(items, item => item.id === 42);
     expect(result).toEqual(expected);
   });
-
 });

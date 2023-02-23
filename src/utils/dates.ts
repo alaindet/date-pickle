@@ -7,18 +7,21 @@ const d = (d: Date) => padStart(d.getUTCDate(), '0', 2);
 
 export function comparableDate(
   date: Date | undefined | null,
-  interval: TimeInterval,
+  interval: TimeInterval
 ): number | null {
-
   if (!date) {
     return null;
   }
 
   switch (interval) {
-    case TIME_INTERVAL.DAY: return getUniqueDayId(date);
-    case TIME_INTERVAL.MONTH: return getUniqueMonthId(date);
-    case TIME_INTERVAL.YEAR: return getUniqueYearId(date);
-    default: throw new Error('invalid time interval ' + interval);
+    case TIME_INTERVAL.DAY:
+      return getUniqueDayId(date);
+    case TIME_INTERVAL.MONTH:
+      return getUniqueMonthId(date);
+    case TIME_INTERVAL.YEAR:
+      return getUniqueYearId(date);
+    default:
+      throw new Error('invalid time interval ' + interval);
   }
 }
 
@@ -29,13 +32,11 @@ export function cloneDate(d: Date): Date {
 export function addTimeInterval(
   date: Date,
   amount: number,
-  precision: TimeInterval,
+  precision: TimeInterval
 ): Date {
-
   const d = cloneDate(date);
 
   switch (precision) {
-
     case TIME_INTERVAL.DAY:
       d.setUTCDate(d.getUTCDate() + amount);
       break;

@@ -6,7 +6,6 @@ import { expectFocusedDateToEqual } from '../../tests/matchers';
 const comparable = (d: Date) => comparableDate(d, 'year');
 
 describe('YearPicker', () => {
-
   it('should return years in the given decade', () => {
     const picker = new YearPicker(new Date('2001-06-07'));
     const result = picker.items.map(i => i.date.getUTCFullYear());
@@ -159,7 +158,6 @@ describe('YearPicker', () => {
   });
 
   describe('startWith property', () => {
-
     const getFirstItemYear = (items: YearItem[]): number => {
       return items[0].date.getUTCFullYear();
     };
@@ -194,8 +192,10 @@ describe('YearPicker', () => {
   });
 
   describe('focus management', () => {
-
-    function expectFocusedDateToBeOnTheSameYear(picker: YearPicker, expected: Date): void {
+    function expectFocusedDateToBeOnTheSameYear(
+      picker: YearPicker,
+      expected: Date
+    ): void {
       expectFocusedDateToEqual(picker, expected, TIME_INTERVAL.YEAR);
     }
 
@@ -288,7 +288,9 @@ describe('YearPicker', () => {
 
       expect(() => picker.focusItemByIndex(-4)).toThrowError();
       expect(() => picker.focusItemByIndex(undefined)).toThrowError();
-      expect(() => picker.focusItemByIndex(picker.items?.length)).toThrowError();
+      expect(() =>
+        picker.focusItemByIndex(picker.items?.length)
+      ).toThrowError();
     });
   });
 });

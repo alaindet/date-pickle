@@ -7,11 +7,15 @@ import { expectDatesToBeOnTheSameTimeInterval } from './date-to-equal-within-int
 export function expectFocusedDateToEqual(
   picker: DatePicker | MonthPicker | YearPicker,
   expected: Date,
-  interval: TimeInterval,
+  interval: TimeInterval
 ): void {
   expect(picker.focused).not.toBeUndefined();
   expectDatesToBeOnTheSameTimeInterval(picker.focused!, expected, interval);
   const focusedItems = (picker.items ?? []).filter(item => item.isFocused);
   expect(focusedItems.length).toEqual(1);
-  expectDatesToBeOnTheSameTimeInterval(focusedItems[0].date, expected, interval);
+  expectDatesToBeOnTheSameTimeInterval(
+    focusedItems[0].date,
+    expected,
+    interval
+  );
 }

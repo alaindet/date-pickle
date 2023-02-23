@@ -6,10 +6,9 @@ const FIRST_MONTH_INDEX = 0;
 const LAST_MONTH_INDEX = 11;
 
 export class MonthPicker extends BasePicker<MonthItem> {
-
   constructor(cursor?: Date | PickerOptions, options?: PickerOptions) {
     super(cursor, options);
-    this.props.focusOffset = 3;  // Jumps one season by default
+    this.props.focusOffset = 3; // Jumps one season by default
     this.props.interval = TIME_INTERVAL.MONTH;
     this.updateItems();
   }
@@ -27,7 +26,6 @@ export class MonthPicker extends BasePicker<MonthItem> {
   }
 
   protected buildItems(): MonthItem[] {
-
     // Fictious point in time
     // July 1st is half year so it's nice!
     const year = this._cursor.getUTCFullYear();

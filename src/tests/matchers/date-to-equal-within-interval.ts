@@ -4,7 +4,7 @@ import { comparableDate } from '../../utils';
 export function expectDatesToBeOnTheSameTimeInterval(
   result: Date,
   expected: Date,
-  interval: TimeInterval,
+  interval: TimeInterval
 ): void {
   const resultComparable = comparableDate(result, interval);
   const expectedComparable = comparableDate(expected, interval);
@@ -16,14 +16,35 @@ export function expectDatesToBeOnTheSameTimeInterval(
   }
 }
 
-export function expectDatesToBeOnTheSameDay(result: Date, expected: Date): void {
-  return expectDatesToBeOnTheSameTimeInterval(result, expected, TIME_INTERVAL.DAY);
+export function expectDatesToBeOnTheSameDay(
+  result: Date,
+  expected: Date
+): void {
+  return expectDatesToBeOnTheSameTimeInterval(
+    result,
+    expected,
+    TIME_INTERVAL.DAY
+  );
 }
 
-export function expectDatesToBeOnTheSameMonth(result: Date, expected: Date): void {
-  return expectDatesToBeOnTheSameTimeInterval(result, expected, TIME_INTERVAL.MONTH);
+export function expectDatesToBeOnTheSameMonth(
+  result: Date,
+  expected: Date
+): void {
+  return expectDatesToBeOnTheSameTimeInterval(
+    result,
+    expected,
+    TIME_INTERVAL.MONTH
+  );
 }
 
-export function expectDatesToBeOnTheSameYear(result: Date, expected: Date): void {
-  return expectDatesToBeOnTheSameTimeInterval(result, expected, TIME_INTERVAL.YEAR);
+export function expectDatesToBeOnTheSameYear(
+  result: Date,
+  expected: Date
+): void {
+  return expectDatesToBeOnTheSameTimeInterval(
+    result,
+    expected,
+    TIME_INTERVAL.YEAR
+  );
 }

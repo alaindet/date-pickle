@@ -6,7 +6,6 @@ import { MonthPicker } from './month-picker/month-picker';
 
 describe('Picker', () => {
   describe('constructor', () => {
-
     const d = new Date('2006-01-02');
     const options: PickerOptions = {
       min: d,
@@ -89,7 +88,10 @@ describe('Picker', () => {
       const d = new Date('2022-08-08');
       const picker = new DatePicker(d);
       const selected = addTimeInterval(d, 3, TIME_INTERVAL.MONTH);
-      const pageChanged = didPageChange(picker, () => picker.selected = selected);
+      const pageChanged = didPageChange(
+        picker,
+        () => (picker.selected = selected)
+      );
       expect(pageChanged).toBeTruthy();
     });
 
@@ -97,7 +99,10 @@ describe('Picker', () => {
       const d = new Date('2022-08-08');
       const picker = new MonthPicker(d);
       const focused = addTimeInterval(d, 2, TIME_INTERVAL.YEAR);
-      const pageChanged = didPageChange(picker, () => picker.focused = focused);
+      const pageChanged = didPageChange(
+        picker,
+        () => (picker.focused = focused)
+      );
       expect(pageChanged).toBeTruthy();
     });
   });

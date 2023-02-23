@@ -1,13 +1,19 @@
 import { range, cloneDate, getUniqueYearId } from '../../utils';
-import { PickerOptions, TIME_INTERVAL, YearItem, YearPickerStartWith, YEAR_PICKER_START_WITH } from '../../types';
+import {
+  PickerOptions,
+  TIME_INTERVAL,
+  YearItem,
+  YearPickerStartWith,
+  YEAR_PICKER_START_WITH,
+} from '../../types';
 import { BasePicker } from '../base-picker';
 
 const YEARS_COUNT = 10;
 
 export class YearPicker extends BasePicker<YearItem> {
-
   // TODO: Group into picker-specific props
-  private startWithProp: YearPickerStartWith = YEAR_PICKER_START_WITH.FIRST_OF_DECADE;
+  private startWithProp: YearPickerStartWith =
+    YEAR_PICKER_START_WITH.FIRST_OF_DECADE;
 
   get startWith(): YearPickerStartWith {
     return this.startWithProp;
@@ -52,12 +58,11 @@ export class YearPicker extends BasePicker<YearItem> {
         return [...yearsRange, last + 1];
       case YEAR_PICKER_START_WITH.LAST_OF_PREVIOUS_DECADE:
       case YEAR_PICKER_START_WITH.X9:
-        return [first - 1, ...yearsRange];;
+        return [first - 1, ...yearsRange];
     }
   }
 
   protected buildItems(): YearItem[] {
-
     // Fictous point in time
     // July 1st is half year so it's nice!
     const y = this._cursor.getUTCFullYear();

@@ -1,13 +1,12 @@
 import { ParsedPickerInput, PickerOptions } from '../types';
 
-const isDate = (d?: any) => d && (d instanceof Date);
+const isDate = (d?: any) => d && d instanceof Date;
 const isNotDate = (d?: any) => d && !(d instanceof Date);
 
 export function parsePickerInput(
   cursorOrOptions?: PickerOptions | Date,
-  pickerOptions?: PickerOptions,
+  pickerOptions?: PickerOptions
 ): ParsedPickerInput {
-
   // No arguments
   if (!cursorOrOptions && !pickerOptions) {
     const cursor = new Date();

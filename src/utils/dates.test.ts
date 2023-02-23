@@ -1,5 +1,12 @@
 import { TIME_INTERVAL } from '../types';
-import { comparableDate, cloneDate, addTimeInterval, getUniqueYearId, getUniqueMonthId, getUniqueDayId } from './dates';
+import {
+  comparableDate,
+  cloneDate,
+  addTimeInterval,
+  getUniqueYearId,
+  getUniqueMonthId,
+  getUniqueDayId,
+} from './dates';
 import { expectDatesToBeOnTheSameDay } from '../tests/matchers';
 
 describe('comparableDate() utility function', () => {
@@ -38,7 +45,6 @@ describe('cloneDate() utility function', () => {
 });
 
 describe('addTimeInterval() utility function', () => {
-
   it('should subtract 1 day interval', () => {
     const input = new Date('2023-03-01');
     const result = addTimeInterval(input, -1, TIME_INTERVAL.DAY);

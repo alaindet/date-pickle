@@ -3,7 +3,6 @@ import { DayItem, PickerOptions, TIME_INTERVAL } from '../../types';
 import { BasePicker } from '../base-picker';
 
 export class DatePicker extends BasePicker<DayItem> {
-
   constructor(cursor?: Date | PickerOptions, options?: PickerOptions) {
     super(cursor, options);
     this.props.focusOffset = 7; // Jumps one week by default
@@ -72,7 +71,7 @@ export class DatePicker extends BasePicker<DayItem> {
     const theMonth = d.getUTCMonth();
     const days: Date[] = [];
 
-    while(d.getUTCMonth() === theMonth) {
+    while (d.getUTCMonth() === theMonth) {
       days.push(new Date(d.getTime()));
       d.setUTCDate(d.getUTCDate() + 1);
     }

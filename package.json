@@ -11,7 +11,7 @@
     "test": "cross-env NODE_ICU_DATA=node_modules/full-icu jest",
     "test:watch": "cross-env NODE_ICU_DATA=node_modules/full-icu jest --watch",
     "lint": "eslint --ext .js,.ts .",
-    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "format": "prettier --write \"src/**/*.ts\"",
 
     "release": "npm run build && npm pack",
     "prepare": "npm run build",

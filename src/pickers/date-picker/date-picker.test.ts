@@ -7,12 +7,14 @@ function comparable(d: Date) {
   return comparableDate(d, 'day');
 }
 
-function expectFocusedDateToBeOnTheSameDay(picker: DatePicker, expected: Date): void {
+function expectFocusedDateToBeOnTheSameDay(
+  picker: DatePicker,
+  expected: Date
+): void {
   expectFocusedDateToEqual(picker, expected, TIME_INTERVAL.DAY);
 }
 
 describe('DatePicker', () => {
-
   it('should display 31 days for august', () => {
     const AUGUST = 7; // Month index
     const d = new Date(Date.UTC(2022, AUGUST, 15));
@@ -43,7 +45,7 @@ describe('DatePicker', () => {
     const picker = new DatePicker(new Date('2022-08-15'));
     const items = picker.items;
 
-    const testCases: { input: number; expected: boolean; }[] = [
+    const testCases: { input: number; expected: boolean }[] = [
       { input: 18, expected: false }, // friday
       { input: 19, expected: true }, // saturday
       { input: 20, expected: true }, // sunday
@@ -84,7 +86,7 @@ describe('DatePicker', () => {
   it('should trigger onItemsChange', () => {
     const picker = new DatePicker();
     let result!: DayItem[];
-    picker.onItemsChange(items => result = items, true);
+    picker.onItemsChange(items => (result = items), true);
     expect(result.length).not.toEqual(0);
   });
 
@@ -92,7 +94,7 @@ describe('DatePicker', () => {
     const d = new Date('2022-09-05');
     const picker = new DatePicker({ selected: d });
     let result!: Date | undefined;
-    picker.onSelectedChange(selected => result = selected, true);
+    picker.onSelectedChange(selected => (result = selected), true);
     expect(result).toBeTruthy();
     expect(comparable(result!)).toEqual(comparable(d));
   });
@@ -101,12 +103,12 @@ describe('DatePicker', () => {
     const d = new Date('2022-09-05');
     const picker = new DatePicker({ focused: d });
     let result!: Date | undefined;
-    picker.onFocusedChange(focused => result = focused, true);
+    picker.onFocusedChange(focused => (result = focused), true);
     expect(result).toBeTruthy();
     expect(comparable(result!)).toEqual(comparable(d));
   });
 
-  it('should show next month\'s dates when calling next()', () => {
+  it("should show next month's dates when calling next()", () => {
     const picker = new DatePicker(new Date('2022-08-15'));
     const month1 = picker.items[10].date.getMonth();
     picker.next();
@@ -114,7 +116,7 @@ describe('DatePicker', () => {
     expect(month2).toEqual(month1 + 1);
   });
 
-  it('should show previous month\'s dates when calling prev()', () => {
+  it("should show previous month's dates when calling prev()", () => {
     const picker = new DatePicker(new Date('2022-08-15'));
     const month1 = picker.items[10].date.getMonth();
     picker.prev();
@@ -141,8 +143,12 @@ describe('DatePicker', () => {
     const selectedComp = comparable(selected);
     const picker = new DatePicker(d, { selected });
     const items = picker.items;
-    const shouldBeSelected = items.find(i => comparable(i.date) === selectedComp);
-    const shouldNoBeSelected = items.find(i => comparable(i.date) === dummyComp);
+    const shouldBeSelected = items.find(
+      i => comparable(i.date) === selectedComp
+    );
+    const shouldNoBeSelected = items.find(
+      i => comparable(i.date) === dummyComp
+    );
     expect(shouldBeSelected?.isSelected).toBeTruthy();
     expect(shouldNoBeSelected?.isSelected).toBeFalsy();
   });
@@ -155,8 +161,12 @@ describe('DatePicker', () => {
     const picker = new DatePicker(d);
     picker.selected = selected;
     const items = picker.items;
-    const shouldBeSelected = items.find(i => comparable(i.date) === selectedComp);
-    const shouldNoBeSelected = items.find(i => comparable(i.date) === dummyComp);
+    const shouldBeSelected = items.find(
+      i => comparable(i.date) === selectedComp
+    );
+    const shouldNoBeSelected = items.find(
+      i => comparable(i.date) === dummyComp
+    );
     expect(shouldBeSelected?.isSelected).toBeTruthy();
     expect(shouldNoBeSelected?.isSelected).toBeFalsy();
   });
@@ -241,7 +251,9 @@ describe('DatePicker', () => {
       expectFocusedDateToBeOnTheSameDay(picker, new Date('2023-02-19'));
 
       picker.focused = new Date('2023-01-01');
-      const pageChanged = didPageChange(picker, () => picker.focusPreviousItem());
+      const pageChanged = didPageChange(picker, () =>
+        picker.focusPreviousItem()
+      );
       expect(pageChanged).toBeTruthy();
       expectFocusedDateToBeOnTheSameDay(picker, new Date('2022-12-31'));
     });
@@ -265,7 +277,9 @@ describe('DatePicker', () => {
       expectFocusedDateToBeOnTheSameDay(picker, new Date('2023-02-13'));
 
       picker.focused = new Date('2023-02-02');
-      const pageChanged = didPageChange(picker, () => picker.focusPreviousItemByOffset());
+      const pageChanged = didPageChange(picker, () =>
+        picker.focusPreviousItemByOffset()
+      );
       expect(pageChanged).toBeTruthy();
       expectFocusedDateToBeOnTheSameDay(picker, new Date('2023-01-26'));
     });
@@ -277,7 +291,9 @@ describe('DatePicker', () => {
       expectFocusedDateToBeOnTheSameDay(picker, new Date('2023-02-17'));
 
       picker.focused = new Date('2023-02-05');
-      const pageChanged = didPageChange(picker, () => picker.focusPreviousItemByOffset(14));
+      const pageChanged = didPageChange(picker, () =>
+        picker.focusPreviousItemByOffset(14)
+      );
       expect(pageChanged).toBeTruthy();
       expectFocusedDateToBeOnTheSameDay(picker, new Date('2023-01-22'));
     });
@@ -289,7 +305,9 @@ describe('DatePicker', () => {
       expectFocusedDateToBeOnTheSameDay(picker, new Date('2019-02-27'));
 
       picker.focused = new Date('2021-02-27');
-      const pageChanged = didPageChange(picker, () => picker.focusNextItemByOffset());
+      const pageChanged = didPageChange(picker, () =>
+        picker.focusNextItemByOffset()
+      );
       expect(pageChanged).toBeTruthy();
       expectFocusedDateToBeOnTheSameDay(picker, new Date('2021-03-06'));
     });
@@ -301,7 +319,9 @@ describe('DatePicker', () => {
       expectFocusedDateToBeOnTheSameDay(picker, new Date('2010-06-15'));
 
       picker.focused = new Date('2023-02-20');
-      const pageChanged = didPageChange(picker, () => picker.focusNextItemByOffset(14));
+      const pageChanged = didPageChange(picker, () =>
+        picker.focusNextItemByOffset(14)
+      );
       expect(pageChanged).toBeTruthy();
       expectFocusedDateToBeOnTheSameDay(picker, new Date('2023-03-06'));
     });

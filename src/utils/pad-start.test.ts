@@ -1,9 +1,7 @@
 import { padStart } from './pad-start';
 
 describe('padStart() utility function', () => {
-
   it('should pad left', () => {
-
     const testCases: {
       input: [number, string, number];
       expected: string;

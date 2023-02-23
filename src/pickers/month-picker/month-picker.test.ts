@@ -160,8 +160,10 @@ describe('MonthPicker', () => {
   });
 
   describe('focus management', () => {
-
-    function expectFocusedDateToBeOnTheSameMonth(picker: MonthPicker, expected: Date): void {
+    function expectFocusedDateToBeOnTheSameMonth(
+      picker: MonthPicker,
+      expected: Date
+    ): void {
       expectFocusedDateToEqual(picker, expected, TIME_INTERVAL.MONTH);
     }
 
@@ -254,7 +256,9 @@ describe('MonthPicker', () => {
 
       expect(() => picker.focusItemByIndex(-4)).toThrowError();
       expect(() => picker.focusItemByIndex(undefined)).toThrowError();
-      expect(() => picker.focusItemByIndex(picker.items?.length)).toThrowError();
+      expect(() =>
+        picker.focusItemByIndex(picker.items?.length)
+      ).toThrowError();
     });
   });
 });
