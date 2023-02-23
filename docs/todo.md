@@ -5,6 +5,8 @@
 - [ ] update tsconfig.json target, module and lib
 - [ ] update version to 0.0.14 via `npm version 0.0.14`
 - [ ] remove the years count of 12 from README
+- [ ] Remove synchronization
+- [ ] Add grouped changes then synchronize
 
 - [x] add focus management to Picker
 - [x] update focused and ref in focus-related methods
