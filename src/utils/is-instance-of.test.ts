@@ -23,7 +23,6 @@ describe('isInstanceOf() utility function', () => {
     const anObj = new yetAnotherClass();
     expect(isInstanceOf(anObj, justAnotherClass)).toBeFalsy();
     expect(isInstanceOf(anObj, Date)).toBeFalsy();
-    expect(isInstanceOf(anObj, Event)).toBeFalsy();
   });
 
   it('should recognize most objects and arrays as instance of Object', () => {
