@@ -37,19 +37,19 @@ export function addTimeInterval(
   const d = cloneDate(date);
 
   switch (precision) {
-    case TIME_INTERVAL.DAY:
-      d.setUTCDate(d.getUTCDate() + amount);
-      break;
+  case TIME_INTERVAL.DAY:
+    d.setUTCDate(d.getUTCDate() + amount);
+    break;
 
-    // There are known edge cases for leap years
-    case TIME_INTERVAL.MONTH:
-      d.setUTCMonth(d.getUTCMonth() + amount);
-      break;
+  // There are known edge cases for leap years
+  case TIME_INTERVAL.MONTH:
+    d.setUTCMonth(d.getUTCMonth() + amount);
+    break;
 
-    // There are known edge cases for leap years
-    case TIME_INTERVAL.YEAR:
-      d.setUTCFullYear(d.getUTCFullYear() + amount);
-      break;
+  // There are known edge cases for leap years
+  case TIME_INTERVAL.YEAR:
+    d.setUTCFullYear(d.getUTCFullYear() + amount);
+    break;
   }
 
   return d;

@@ -53,12 +53,12 @@ export class YearPicker extends BasePicker<YearItem> {
     const yearsRange = range(first, last);
 
     switch (this.startWithProp) {
-      case YEAR_PICKER_START_WITH.FIRST_OF_DECADE:
-      case YEAR_PICKER_START_WITH.X0:
-        return [...yearsRange, last + 1];
-      case YEAR_PICKER_START_WITH.LAST_OF_PREVIOUS_DECADE:
-      case YEAR_PICKER_START_WITH.X9:
-        return [first - 1, ...yearsRange];
+    case YEAR_PICKER_START_WITH.FIRST_OF_DECADE:
+    case YEAR_PICKER_START_WITH.X0:
+      return [...yearsRange, last + 1];
+    case YEAR_PICKER_START_WITH.LAST_OF_PREVIOUS_DECADE:
+    case YEAR_PICKER_START_WITH.X9:
+      return [first - 1, ...yearsRange];
     }
   }
 
