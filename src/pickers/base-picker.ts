@@ -1,53 +1,45 @@
 import { parsePickerInput, comparableDate, cloneDate, addTimeInterval, findLastIndex } from '../utils';
-import { PickerEventHandler, Locale, PickerOptions, TimeInterval, BaseItem } from '../types';
+import { PickerEventHandler, Locale, PickerOptions, TimeInterval, BaseItem, PickerEventHadlers, PickerProperties, TIME_INTERVAL } from '../types';
 
-export abstract class Picker<ItemType extends BaseItem> {
+export abstract class BasePicker<TItem extends BaseItem> {
 
-  protected _ref!: Date;
-  protected _items: ItemType[] = [];
+  protected handlers: PickerEventHadlers<TItem> = {};
+  // protected props: PickerProperties = {
+  //   locale: 'default',
+  //   focusOffset: 7, // Overridden by child
+  //   interval: TIME_INTERVAL.DAY, // Overridden by child
+  // };
+
+  protected _cursor!: Date;
+  protected _items: TItem[] = [];
+
   protected _min?: Date;
   protected _max?: Date;
   protected _locale = 'default';
-  protected _itemsChangeHandler?: PickerEventHandler<ItemType[]>;
-  protected _sync = true;
-
   protected _selected?: Date;
-  protected _selectedHandler?: PickerEventHandler<Date | undefined>;
-
   protected _focused?: Date;
   protected _focusOffset!: number; // Defined by child class
-  protected _focusedHandler?: PickerEventHandler<Date | undefined>;
   protected _interval!: TimeInterval; // Defined by child class
 
-  constructor(refOrOptions?: PickerOptions | Date, options?: PickerOptions) {
-    const input = parsePickerInput(refOrOptions, options);
-    this._ref = input.ref;
-    this._ref = input.options.ref ?? this._ref;
+  constructor(cursorOrOptions?: Date | PickerOptions, options?: PickerOptions) {
+    const input = parsePickerInput(cursorOrOptions, options);
+    this._cursor = input.cursor;
+    this._cursor = input.options.cursor ?? this._cursor;
     this._min = input.options.min ?? this._min;
     this._max = input.options.max ?? this._max;
     this._locale = input.options.locale ?? this._locale;
     this._selected = input.options.selected ?? this._selected;
     this._focused = input.options.focused ?? this._focused;
     this._focusOffset = input.options.focusOffset ?? this._focusOffset;
-    this._sync = input.options.sync ?? this._sync;
   }
 
-  get ref(): Date {
-    return this._ref;
+  get cursor(): Date {
+    return this._cursor;
   }
 
-  set ref(ref: Date | null) {
-    this._ref = ref ?? new Date();
+  set cursor(cursor: Date | null) {
+    this._cursor = cursor ?? new Date();
     this.updateItems();
-  }
-
-  get sync(): boolean {
-    return this._sync;
-  }
-
-  set sync(sync: boolean | null) {
-    this._sync = !!sync;
-    sync && this.updateItems();
   }
 
   get min(): Date | undefined {
@@ -86,8 +78,15 @@ export abstract class Picker<ItemType extends BaseItem> {
   set selected(selected: Date | undefined | null) {
     if (selected === null) selected = undefined;
     this._selected = selected;
+
+    // Selected items MUST be on the page
+    // This updates the whole page if needed
+    if (this._selected) {
+      this._cursor = cloneDate(selected as Date);
+    }
+
     this.updateItems();
-    this._selectedHandler && this._selectedHandler(selected);
+    if (this.handlers.selectedChange) this.handlers.selectedChange(selected);
   }
 
   get focused(): Date | undefined {
@@ -101,11 +100,11 @@ export abstract class Picker<ItemType extends BaseItem> {
     // Focused items MUST be on the page
     // This updates the whole page if needed
     if (this._focused) {
-      this._ref = cloneDate(focused as Date);
+      this._cursor = cloneDate(focused as Date);
     }
 
     this.updateItems();
-    this._focusedHandler && this._focusedHandler(focused);
+    if (this.handlers.focusedChange) this.handlers.focusedChange(focused);
   }
 
   get focusOffset(): number {
@@ -116,48 +115,55 @@ export abstract class Picker<ItemType extends BaseItem> {
     this._focusOffset = focusOffset;
   }
 
-  get items(): ItemType[] | undefined {
+  get items(): TItem[] | undefined {
     return this._items;
   }
 
-  thenUpdateItems(fn: () => void): void {
-    const syncBackup = this._sync;
-    this._sync = false;
+  updateAfter(fn: () => void): void {
     fn();
     this._items = this.buildItems();
-    this._itemsChangeHandler && this._itemsChangeHandler(this._items);
-    this._sync = syncBackup;
+    if (this.handlers.itemsChange) this.handlers.itemsChange(this._items);
   }
 
   now(): void {
-    this._ref = new Date();
-    this.updateItems();
+    this.cursor = new Date();
   }
 
-  onItemsChange(handler: PickerEventHandler<ItemType[]>): void {
-    this._itemsChangeHandler = handler;
-    if (this.items && this._sync) handler(this.items);
+  onItemsChange(handler: PickerEventHandler<TItem[]>, immediate = false): void {
+    this.handlers.itemsChange = handler;
+    if (immediate) handler(this._items ?? []);
   }
 
-  onSelected(handler: PickerEventHandler<Date | undefined>): void {
-    this._selectedHandler = handler;
-    if (this._selected && this._sync) handler(this._selected);
+  clearItemsChangeEventListener(): void {
+    delete this.handlers.itemsChange;
   }
 
-  onFocused(handler: PickerEventHandler<Date | undefined>): void {
-    this._focusedHandler = handler;
-    if (this._focused && this._sync) handler(this._focused);
+  onSelectedChange(handler: PickerEventHandler<Date | undefined>, immediate = false): void {
+    this.handlers.selectedChange = handler;
+    if (immediate) handler(this._selected);
+  }
+
+  clearSelectedChangeEventListener(): void {
+    delete this.handlers.selectedChange;
+  }
+
+  onFocusedChange(handler: PickerEventHandler<Date | undefined>, immediate = false): void {
+    this.handlers.focusedChange = handler;
+    if (immediate) handler(this._focused);
+  }
+
+  clearFocusedChangeEventListener(): void {
+    delete this.handlers.focusedChange;
   }
 
   updateItems(): void {
-    if (!this._sync) return;
     this._items = this.buildItems();
-    this._itemsChangeHandler && this._itemsChangeHandler(this._items);
+    if (this.handlers.itemsChange) this.handlers.itemsChange(this._items);
   }
 
   focusItemByOffset(_offset: number): void {
     const offset = _offset ?? this._focusOffset;
-    this.thenUpdateItems(() => {
+    this.updateAfter(() => {
       this.initFocusedIfNeeded();
       this.focused = addTimeInterval(this.focused!, offset, this._interval);
     });
@@ -170,7 +176,7 @@ export abstract class Picker<ItemType extends BaseItem> {
     if (index === -1) {
       throw new Error('no valid items');
     }
-    this.thenUpdateItems(() => {
+    this.updateAfter(() => {
       this.initFocusedIfNeeded();
       this.focused = cloneDate(this._items[index].date);
     });
@@ -201,16 +207,6 @@ export abstract class Picker<ItemType extends BaseItem> {
     this.focusItemByIndex(findLastIndex(this._items, item => !item.isDisabled));
   }
 
-  // Overridden by child class
-  protected buildItems(): ItemType[] {
-    return [];
-  }
-
-  protected toComparable(d?: Date | null): number | null {
-    return d ? comparableDate(d, this._interval) : null;
-  }
-
-  // TODO: Move to mixin
   private initFocusedIfNeeded(): void {
 
     if (this._focused) {
@@ -222,6 +218,15 @@ export abstract class Picker<ItemType extends BaseItem> {
       return;
     }
 
-    this._focused = cloneDate(this._ref);
+    this._focused = cloneDate(this._cursor);
+  }
+
+  // Overridden by child class
+  protected buildItems(): TItem[] {
+    return [];
+  }
+
+  protected toComparable(d?: Date | null): number | null {
+    return d ? comparableDate(d, this._interval) : null;
   }
 }

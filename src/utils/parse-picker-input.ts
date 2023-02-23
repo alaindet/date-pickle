@@ -4,36 +4,36 @@ const isDate = (d?: any) => d && (d instanceof Date);
 const isNotDate = (d?: any) => d && !(d instanceof Date);
 
 export function parsePickerInput(
-  refOrOptions?: PickerOptions | Date,
+  cursorOrOptions?: PickerOptions | Date,
   pickerOptions?: PickerOptions,
 ): ParsedPickerInput {
 
   // No arguments
-  if (!refOrOptions && !pickerOptions) {
-    const ref = new Date();
+  if (!cursorOrOptions && !pickerOptions) {
+    const cursor = new Date();
     const options = {};
-    return { ref, options };
+    return { cursor, options };
   }
 
   // One argument: Date
-  if (isDate(refOrOptions) && !pickerOptions) {
-    const ref = refOrOptions as Date;
+  if (isDate(cursorOrOptions) && !pickerOptions) {
+    const cursor = cursorOrOptions as Date;
     const options = {};
-    return { ref, options };
+    return { cursor, options };
   }
 
   // One argument: PickerOptions
-  if (isNotDate(refOrOptions) && !pickerOptions) {
-    const ref = new Date();
-    const options = refOrOptions as PickerOptions;
-    return { ref, options };
+  if (isNotDate(cursorOrOptions) && !pickerOptions) {
+    const cursor = new Date();
+    const options = cursorOrOptions as PickerOptions;
+    return { cursor, options };
   }
 
   // Two arguments: Date, PickerOptions
-  if (isDate(refOrOptions) && isNotDate(pickerOptions)) {
-    const ref = refOrOptions as Date;
+  if (isDate(cursorOrOptions) && isNotDate(pickerOptions)) {
+    const cursor = cursorOrOptions as Date;
     const options = pickerOptions as PickerOptions;
-    return { ref, options: options! };
+    return { cursor, options: options! };
   }
 
   throw new Error('invalid input');

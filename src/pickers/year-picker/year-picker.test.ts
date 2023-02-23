@@ -1,7 +1,7 @@
 import { TIME_INTERVAL, YearItem } from '../../types';
 import { comparableDate, range } from '../../utils';
 import { YearPicker } from './year-picker';
-import { expectDatesToBeOnTheSameYear, expectFocusedDateToEqual } from '../../tests/matchers';
+import { expectFocusedDateToEqual } from '../../tests/matchers';
 
 const comparable = (d: Date) => comparableDate(d, 'year');
 
@@ -46,30 +46,30 @@ describe('YearPicker', () => {
   });
 
   it('should trigger onItemsChange', async () => {
-    const picker = new YearPicker(new Date('2001-06-07'), { sync: false });
-    const items = await new Promise<YearItem[]>((resolve, _) => {
-      picker.onItemsChange(items => resolve(items));
-      picker.sync = true;
+    const picker = new YearPicker();
+    const items = await new Promise<YearItem[]>(done => {
+      const immediate = true;
+      picker.onItemsChange(items => done(items), immediate);
     });
     expect(items.length).not.toEqual(0);
   });
 
-  it('should trigger onSelected', async () => {
+  it('should trigger onSelectedChange', async () => {
     const d = new Date('2022-09-05');
     const picker = new YearPicker();
     const selected = await new Promise<Date | undefined>((resolve, _) => {
-      picker.onSelected(selected => resolve(selected));
+      picker.onSelectedChange(selected => resolve(selected));
       picker.selected = d;
     });
     expect(selected).toBeTruthy();
     expect(comparable(selected!)).toEqual(comparable(d));
   });
 
-  it('should trigger onFocused', async () => {
+  it('should trigger onFocusedChange', async () => {
     const d = new Date('2022-09-05');
     const picker = new YearPicker();
     const focused = await new Promise<Date | undefined>((resolve, _) => {
-      picker.onFocused(focused => resolve(focused));
+      picker.onFocusedChange(focused => resolve(focused));
       picker.focused = d;
     });
     expect(focused).toBeTruthy();

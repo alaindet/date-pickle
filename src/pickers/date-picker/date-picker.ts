@@ -1,8 +1,8 @@
 import { cloneDate, getUniqueDayId } from '../../utils';
 import { DayItem, PickerOptions, TIME_INTERVAL } from '../../types';
-import { Picker } from '../picker';
+import { BasePicker } from '../base-picker';
 
-export class DatePicker extends Picker<DayItem> {
+export class DatePicker extends BasePicker<DayItem> {
 
   constructor(ref?: Date | PickerOptions, options?: PickerOptions) {
     super(ref, options);
@@ -12,55 +12,46 @@ export class DatePicker extends Picker<DayItem> {
   }
 
   next(): void {
-    this._ref.setUTCDate(15);
-    this._ref.setUTCMonth(this._ref.getUTCMonth() + 1);
-    this.updateItems();
+    const cursor = cloneDate(this._cursor);
+    cursor.setUTCDate(15);
+    cursor.setUTCMonth(cursor.getUTCMonth() + 1);
+    this.cursor = cursor;
   }
 
   prev(): void {
-    this._ref.setUTCDate(15);
-    this._ref.setUTCMonth(this._ref.getUTCMonth() - 1);
-    this.updateItems();
+    const cursor = cloneDate(this._cursor);
+    cursor.setUTCDate(15);
+    cursor.setUTCMonth(cursor.getUTCMonth() - 1);
+    this.cursor = cursor;
   }
 
   protected buildItems(): DayItem[] {
-
     const days = this.getDaysInCurrentMonth();
-
-    // TODO: Manage peek property?
-    const peek = true;
-
-    if (peek) {
-      days.unshift(...this.getDaysInPreviousMonth());
-      days.push(...this.getDaysInNextMonth());
-    }
-
+    days.unshift(...this.getDaysInPreviousMonth());
+    days.push(...this.getDaysInNextMonth());
     return this.toCalendarDays(days);
   }
 
   private getDaysInCurrentMonth(): Date[] {
-    return this.getDaysInMonth(
-      this._ref.getUTCFullYear(),
-      this._ref.getUTCMonth(),
-    );
+    const y = this._cursor.getUTCFullYear();
+    const m = this._cursor.getUTCMonth();
+    return this.getDaysInMonth(y, m);
   }
 
   private getDaysInPreviousMonth(): Date[] {
-    const d = cloneDate(this._ref);
+    const d = cloneDate(this._cursor);
     d.setUTCDate(15);
     d.setUTCMonth(d.getUTCMonth() - 1);
     const days = this.getDaysInMonth(d.getUTCFullYear(), d.getUTCMonth());
     const lastDayOfPrevMonth = days[days.length - 1];
     const lastWeekday = lastDayOfPrevMonth.getUTCDay();
     const offset = -lastWeekday;
-    if (offset === 0) {
-      return [];
-    }
+    if (offset === 0) return [];
     return days.slice(-lastWeekday);
   }
 
   private getDaysInNextMonth(): Date[] {
-    const d = cloneDate(this._ref);
+    const d = cloneDate(this._cursor);
     d.setUTCDate(15);
     d.setUTCMonth(d.getUTCMonth() + 1);
     const days = this.getDaysInMonth(d.getUTCFullYear(), d.getUTCMonth());
@@ -119,13 +110,13 @@ export class DatePicker extends Picker<DayItem> {
   }
 
   private getFirstDayOfCurrentMonth(): Date {
-    const d = cloneDate(this._ref);
+    const d = cloneDate(this._cursor);
     d.setUTCDate(1);
     return d;
   }
 
   private getLastDayOfCurrentMonth(): Date {
-    const d = cloneDate(this._ref);
+    const d = cloneDate(this._cursor);
     d.setUTCDate(1);
     d.setUTCMonth(d.getUTCMonth() + 1);
     d.setUTCDate(d.getUTCDate() - 1);

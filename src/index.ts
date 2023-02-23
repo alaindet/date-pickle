@@ -1,4 +1,3 @@
-export * from './date-pickle';
 export * from './pickers/date-picker/date-picker';
 export * from './pickers/month-picker/month-picker';
 export * from './pickers/year-picker/year-picker';

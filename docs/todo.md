@@ -4,10 +4,23 @@
 - [ ] update to absolute imports
 - [ ] update tsconfig.json target, module and lib
 - [ ] update version to 0.0.14 via `npm version 0.0.14`
-- [ ] remove the years count of 12 from README
-- [ ] Remove synchronization
-- [ ] Add grouped changes then synchronize
+- [ ] Add flag to onItemsChange to avoid firing immediately
+- [ ] Event listeners DO NOT trigger by default
+- [ ] Add methods to de-register event listeners
+- [ ] Group options and handlers in BasePicker
+- [ ] Add focus management description on README.md
 
+- [x] Add tests for "immediate" argument of events
+- [x] Add tests for changing pages implicitly when setting focused and selected
+- [x] Remove synchronization
+- [x] Change cursor also when setting "selected" property
+- [x] Change "ref" to "cursor"?
+- [x] Change "Picker" to "BasePicker"
+- [x] Add grouped changes then synchronize
+- [x] Change "onSelected" and "onFocused" as "onSelectedChange" and "onFocusedChange"
+- [x] remove the years count of 12 from README
+- [x] Remove "DatePickle" class?
+- [x] cursor option takes precedence over cursor as 1st argument
 - [x] add focus management to Picker
 - [x] update focused and ref in focus-related methods
 - [x] derive ref from focused date

@@ -1,4 +1,4 @@
-import { expectDatesToBeOnTheSameMonth, expectFocusedDateToEqual } from '../../tests/matchers';
+import { expectFocusedDateToEqual } from '../../tests/matchers';
 import { MonthItem, TIME_INTERVAL } from '../../types';
 import { cloneDate, comparableDate } from '../../utils';
 import { MonthPicker } from './month-picker';
@@ -60,31 +60,30 @@ describe('MonthPicker', () => {
   });
 
   it('should trigger onItemsChange', async () => {
-    const now = new Date();
-    const picker = new MonthPicker(now, { locale: 'en', sync: false });
-    const items = await new Promise<MonthItem[]>((resolve, _) => {
-      picker.onItemsChange(items => resolve(items));
-      picker.sync = true;
+    const picker = new MonthPicker();
+    const items = await new Promise<MonthItem[]>(done => {
+      const immediate = true;
+      picker.onItemsChange(items => done(items), immediate);
     });
     expect(items.length).not.toEqual(0);
   });
 
-  it('should trigger onSelected', async () => {
+  it('should trigger onSelectedChange', async () => {
     const d = new Date('2022-09-05');
     const picker = new MonthPicker();
     const selected = await new Promise<Date | undefined>((resolve, _) => {
-      picker.onSelected(selected => resolve(selected));
+      picker.onSelectedChange(selected => resolve(selected));
       picker.selected = d;
     });
     expect(selected).toBeTruthy();
     expect(comparable(selected!)).toEqual(comparable(d));
   });
 
-  it('should trigger onFocused', async () => {
+  it('should trigger onFocusedChange', async () => {
     const d = new Date('2022-09-05');
     const picker = new MonthPicker();
     const focused = await new Promise<Date | undefined>((resolve, _) => {
-      picker.onFocused(focused => resolve(focused));
+      picker.onFocusedChange(focused => resolve(focused));
       picker.focused = d;
     });
     expect(focused).toBeTruthy();
@@ -94,14 +93,14 @@ describe('MonthPicker', () => {
   it('should show next year when calling next()', () => {
     const picker = new MonthPicker(new Date('2000-01-01'));
     picker.next();
-    const year = picker.ref.getUTCFullYear();
+    const year = picker.cursor.getUTCFullYear();
     expect(year).toEqual(2001);
   });
 
   it('should show previous year when calling prev()', () => {
     const picker = new MonthPicker(new Date('2000-01-01'));
     picker.prev();
-    const year = picker.ref.getUTCFullYear();
+    const year = picker.cursor.getUTCFullYear();
     expect(year).toEqual(1999);
   });
 

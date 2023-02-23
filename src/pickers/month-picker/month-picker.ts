@@ -1,11 +1,11 @@
 import { cloneDate, getUniqueMonthId, range } from '../../utils';
 import { MonthItem, PickerOptions, TIME_INTERVAL } from '../../types';
-import { Picker } from '../picker';
+import { BasePicker } from '../base-picker';
 
 const FIRST_MONTH_INDEX = 0;
 const LAST_MONTH_INDEX = 11;
 
-export class MonthPicker extends Picker<MonthItem> {
+export class MonthPicker extends BasePicker<MonthItem> {
 
   constructor(ref?: Date | PickerOptions, options?: PickerOptions) {
     super(ref, options);
@@ -15,20 +15,22 @@ export class MonthPicker extends Picker<MonthItem> {
   }
 
   next(): void {
-    this._ref.setUTCFullYear(this._ref.getUTCFullYear() + 1);
-    this.updateItems();
+    const cursor = cloneDate(this._cursor);
+    cursor.setUTCFullYear(cursor.getUTCFullYear() + 1);
+    this.cursor = cursor;
   }
 
   prev(): void {
-    this._ref.setUTCFullYear(this._ref.getUTCFullYear() - 1);
-    this.updateItems();
+    const cursor = cloneDate(this._cursor);
+    cursor.setUTCFullYear(cursor.getUTCFullYear() - 1);
+    this.cursor = cursor;
   }
 
   protected buildItems(): MonthItem[] {
 
     // Fictious point in time
     // July 1st is half year so it's nice!
-    const year = this._ref.getUTCFullYear();
+    const year = this._cursor.getUTCFullYear();
     const d = new Date(Date.UTC(year, 6, 1));
 
     // Init comparable values

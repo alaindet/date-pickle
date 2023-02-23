@@ -1,6 +1,6 @@
-import { PickerOptions } from './picker-options';
+import { PickerOptions } from './options';
 
 export type ParsedPickerInput = {
-  ref: Date;
+  cursor: Date;
   options: PickerOptions;
 };

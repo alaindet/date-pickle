@@ -1,10 +1,10 @@
 import { range, cloneDate, getUniqueYearId } from '../../utils';
 import { PickerOptions, TIME_INTERVAL, YearItem, YearPickerStartWith, YEAR_PICKER_START_WITH } from '../../types';
-import { Picker } from '../picker';
+import { BasePicker } from '../base-picker';
 
 const YEARS_COUNT = 10;
 
-export class YearPicker extends Picker<YearItem> {
+export class YearPicker extends BasePicker<YearItem> {
 
   private _startWith: YearPickerStartWith = YEAR_PICKER_START_WITH.FIRST_OF_DECADE;
 
@@ -20,25 +20,27 @@ export class YearPicker extends Picker<YearItem> {
     this.updateItems();
   }
 
-  constructor(ref?: Date | PickerOptions, options?: PickerOptions) {
-    super(ref, options);
+  constructor(cursor?: Date | PickerOptions, options?: PickerOptions) {
+    super(cursor, options);
     this._focusOffset = 3;
     this._interval = TIME_INTERVAL.YEAR;
     this.updateItems();
   }
 
   next(): void {
-    this._ref.setUTCFullYear(this._ref.getUTCFullYear() + YEARS_COUNT);
-    this.updateItems();
+    const cursor = cloneDate(this._cursor);
+    cursor.setUTCFullYear(cursor.getUTCFullYear() + YEARS_COUNT);
+    this.cursor = cursor;
   }
 
   prev(): void {
-    this._ref.setUTCFullYear(this._ref.getUTCFullYear() - YEARS_COUNT);
-    this.updateItems();
+    const cursor = cloneDate(this._cursor);
+    cursor.setUTCFullYear(cursor.getUTCFullYear() - YEARS_COUNT);
+    this.cursor = cursor;
   }
 
   private getYearsRange(): number[] {
-    const year = this._ref.getUTCFullYear(); // 2023
+    const year = this._cursor.getUTCFullYear(); // 2023
     const first = Math.floor(year / YEARS_COUNT) * YEARS_COUNT; // 2020
     const last = first + YEARS_COUNT; // 2030
     const yearsRange = range(first, last);
@@ -57,7 +59,7 @@ export class YearPicker extends Picker<YearItem> {
 
     // Fictous point in time
     // July 1st is half year so it's nice!
-    const y = this._ref.getUTCFullYear();
+    const y = this._cursor.getUTCFullYear();
     const d = new Date(Date.UTC(y, 6, 1));
 
     // Init comparable values

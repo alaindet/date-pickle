@@ -1,9 +1,15 @@
-import { cloneDate, comparableDate } from '../../utils';
+import { cloneDate, comparableDate, didPageChange } from '../../utils';
 import { DayItem, TIME_INTERVAL } from '../../types';
 import { DatePicker } from './date-picker';
-import { expectDatesToBeOnTheSameDay, expectFocusedDateToEqual } from '../../tests/matchers';
+import { expectFocusedDateToEqual } from '../../tests/matchers';
 
-const comparable = (d: Date) => comparableDate(d, 'day');
+function comparable(d: Date) {
+  return comparableDate(d, 'day');
+}
+
+function expectFocusedDateToBeOnTheSameDay(picker: DatePicker, expected: Date): void {
+  expectFocusedDateToEqual(picker, expected, TIME_INTERVAL.DAY);
+}
 
 describe('DatePicker', () => {
 
@@ -75,35 +81,29 @@ describe('DatePicker', () => {
     expect(items[index + 1].isDisabled).toBeTruthy(); // above max
   });
 
-  it('should trigger onItemsChange', async () => {
-    const picker = new DatePicker(new Date(), { sync: false });
-    const items = await new Promise<DayItem[]>((resolve, _) => {
-      picker.onItemsChange(items => resolve(items));
-      picker.sync = true;
-    });
-    expect(items.length).not.toEqual(0);
+  it('should trigger onItemsChange', () => {
+    const picker = new DatePicker();
+    let result!: DayItem[];
+    picker.onItemsChange(items => result = items, true);
+    expect(result.length).not.toEqual(0);
   });
 
-  it('should trigger onSelected', async () => {
+  it('should trigger onSelectedChange', () => {
     const d = new Date('2022-09-05');
-    const picker = new DatePicker();
-    const selected = await new Promise<Date | undefined>((resolve, _) => {
-      picker.onSelected(selected => resolve(selected));
-      picker.selected = d;
-    });
-    expect(selected).toBeTruthy();
-    expect(comparable(selected!)).toEqual(comparable(d));
+    const picker = new DatePicker({ selected: d });
+    let result!: Date | undefined;
+    picker.onSelectedChange(selected => result = selected, true);
+    expect(result).toBeTruthy();
+    expect(comparable(result!)).toEqual(comparable(d));
   });
 
-  it('should trigger onFocused', async () => {
+  it('should trigger onFocusedChange', () => {
     const d = new Date('2022-09-05');
-    const picker = new DatePicker();
-    const focused = await new Promise<Date | undefined>((resolve, _) => {
-      picker.onFocused(focused => resolve(focused));
-      picker.focused = d;
-    });
-    expect(focused).toBeTruthy();
-    expect(comparable(focused!)).toEqual(comparable(d));
+    const picker = new DatePicker({ focused: d });
+    let result!: Date | undefined;
+    picker.onFocusedChange(focused => result = focused, true);
+    expect(result).toBeTruthy();
+    expect(comparable(result!)).toEqual(comparable(d));
   });
 
   it('should show next month\'s dates when calling next()', () => {
@@ -141,12 +141,8 @@ describe('DatePicker', () => {
     const selectedComp = comparable(selected);
     const picker = new DatePicker(d, { selected });
     const items = picker.items!;
-    const shouldBeSelected = items.find(
-      i => comparable(i.date) === selectedComp
-    );
-    const shouldNoBeSelected = items.find(
-      i => comparable(i.date) === dummyComp
-    );
+    const shouldBeSelected = items.find(i => comparable(i.date) === selectedComp);
+    const shouldNoBeSelected = items.find(i => comparable(i.date) === dummyComp);
     expect(shouldBeSelected?.isSelected).toBeTruthy();
     expect(shouldNoBeSelected?.isSelected).toBeFalsy();
   });
@@ -159,12 +155,8 @@ describe('DatePicker', () => {
     const picker = new DatePicker(d);
     picker.selected = selected;
     const items = picker.items!;
-    const shouldBeSelected = items.find(
-      i => comparable(i.date) === selectedComp
-    );
-    const shouldNoBeSelected = items.find(
-      i => comparable(i.date) === dummyComp
-    );
+    const shouldBeSelected = items.find(i => comparable(i.date) === selectedComp);
+    const shouldNoBeSelected = items.find(i => comparable(i.date) === dummyComp);
     expect(shouldBeSelected?.isSelected).toBeTruthy();
     expect(shouldNoBeSelected?.isSelected).toBeFalsy();
   });
@@ -198,17 +190,18 @@ describe('DatePicker', () => {
 
   it('should treat null values on optional properties as undefined', () => {
     const picker = new DatePicker(new Date('2022-09-05'), {
-      sync: false, // Avoid re-calculating items
       min: new Date('2019-09-05'),
       max: new Date('2022-09-06'),
       selected: new Date('2022-09-03'),
       focused: new Date('2022-09-04'),
     });
 
-    picker.min = null; // Same as picker.min = undefined;
-    picker.max = null;
-    picker.selected = null;
-    picker.focused = null;
+    picker.updateAfter(() => {
+      picker.min = null; // Same as picker.min = undefined;
+      picker.max = null; // Same as picker.max = undefined;
+      picker.selected = null; // Same as picker.selected = undefined;
+      picker.focused = null; // Same as picker.focused = undefined;
+    });
 
     expect(picker.min).toBeUndefined();
     expect(picker.max).toBeUndefined();
@@ -241,21 +234,6 @@ describe('DatePicker', () => {
   });
 
   describe('focus management', () => {
-
-    function getPageHash(picker: DatePicker): string {
-      return picker.items!.map(item => item.id).join('');
-    }
-
-    function didPageChange(picker: DatePicker, fn: () => void): boolean {
-      const before = getPageHash(picker);
-      fn();
-      return before !== getPageHash(picker);
-    }
-
-    function expectFocusedDateToBeOnTheSameDay(picker: DatePicker, expected: Date): void {
-      expectFocusedDateToEqual(picker, expected, TIME_INTERVAL.DAY);
-    }
-
     it('should move focus to previous day', () => {
       const d = new Date('2023-02-20');
       const picker = new DatePicker(d, { focused: d });
