@@ -14,14 +14,14 @@ export function comparableDate(
   }
 
   switch (interval) {
-  case TIME_INTERVAL.DAY:
-    return getUniqueDayId(date);
-  case TIME_INTERVAL.MONTH:
-    return getUniqueMonthId(date);
-  case TIME_INTERVAL.YEAR:
-    return getUniqueYearId(date);
-  default:
-    throw new Error('invalid time interval ' + interval);
+    case TIME_INTERVAL.DAY:
+      return getUniqueDayId(date);
+    case TIME_INTERVAL.MONTH:
+      return getUniqueMonthId(date);
+    case TIME_INTERVAL.YEAR:
+      return getUniqueYearId(date);
+    default:
+      throw new Error('invalid time interval ' + interval);
   }
 }
 
@@ -37,19 +37,19 @@ export function addTimeInterval(
   const d = cloneDate(date);
 
   switch (precision) {
-  case TIME_INTERVAL.DAY:
-    d.setUTCDate(d.getUTCDate() + amount);
-    break;
+    case TIME_INTERVAL.DAY:
+      d.setUTCDate(d.getUTCDate() + amount);
+      break;
 
-  // There are known edge cases for leap years
-  case TIME_INTERVAL.MONTH:
-    d.setUTCMonth(d.getUTCMonth() + amount);
-    break;
+    // There are known edge cases for leap years
+    case TIME_INTERVAL.MONTH:
+      d.setUTCMonth(d.getUTCMonth() + amount);
+      break;
 
-  // There are known edge cases for leap years
-  case TIME_INTERVAL.YEAR:
-    d.setUTCFullYear(d.getUTCFullYear() + amount);
-    break;
+    // There are known edge cases for leap years
+    case TIME_INTERVAL.YEAR:
+      d.setUTCFullYear(d.getUTCFullYear() + amount);
+      break;
   }
 
   return d;
