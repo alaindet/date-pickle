@@ -4,12 +4,13 @@
 - [ ] update to absolute imports
 - [ ] update tsconfig.json target, module and lib
 - [ ] update version to 0.0.14 via `npm version 0.0.14`
-- [ ] Add flag to onItemsChange to avoid firing immediately
-- [ ] Event listeners DO NOT trigger by default
-- [ ] Add methods to de-register event listeners
-- [ ] Group options and handlers in BasePicker
 - [ ] Add focus management description on README.md
+- [ ] Add public API to README.md
 
+- [x] Add flag to onItemsChange to avoid firing immediately
+- [x] Event listeners DO NOT trigger by default
+- [x] Add methods to de-register event listeners
+- [x] Group options and handlers in BasePicker
 - [x] Add tests for "immediate" argument of events
 - [x] Add tests for changing pages implicitly when setting focused and selected
 - [x] Remove synchronization

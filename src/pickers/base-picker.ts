@@ -1,36 +1,28 @@
 import { parsePickerInput, comparableDate, cloneDate, addTimeInterval, findLastIndex } from '../utils';
-import { PickerEventHandler, Locale, PickerOptions, TimeInterval, BaseItem, PickerEventHadlers, PickerProperties, TIME_INTERVAL } from '../types';
+import { PickerEventHandler, Locale, PickerOptions, BaseItem, PickerEventHadlers, PickerProperties, TIME_INTERVAL } from '../types';
 
 export abstract class BasePicker<TItem extends BaseItem> {
 
   protected handlers: PickerEventHadlers<TItem> = {};
-  // protected props: PickerProperties = {
-  //   locale: 'default',
-  //   focusOffset: 7, // Overridden by child
-  //   interval: TIME_INTERVAL.DAY, // Overridden by child
-  // };
+  protected props: PickerProperties = {
+    locale: 'default',
+    focusOffset: 7, // Overridden by child
+    interval: TIME_INTERVAL.DAY, // Overridden by child
+  };
 
   protected _cursor!: Date;
   protected _items: TItem[] = [];
-
-  protected _min?: Date;
-  protected _max?: Date;
-  protected _locale = 'default';
-  protected _selected?: Date;
-  protected _focused?: Date;
-  protected _focusOffset!: number; // Defined by child class
-  protected _interval!: TimeInterval; // Defined by child class
 
   constructor(cursorOrOptions?: Date | PickerOptions, options?: PickerOptions) {
     const input = parsePickerInput(cursorOrOptions, options);
     this._cursor = input.cursor;
     this._cursor = input.options.cursor ?? this._cursor;
-    this._min = input.options.min ?? this._min;
-    this._max = input.options.max ?? this._max;
-    this._locale = input.options.locale ?? this._locale;
-    this._selected = input.options.selected ?? this._selected;
-    this._focused = input.options.focused ?? this._focused;
-    this._focusOffset = input.options.focusOffset ?? this._focusOffset;
+    this.props.min = input.options.min ?? this.props.min;
+    this.props.max = input.options.max ?? this.props.max;
+    this.props.locale = input.options.locale ?? this.props.locale;
+    this.props.selected = input.options.selected ?? this.props.selected;
+    this.props.focused = input.options.focused ?? this.props.focused;
+    this.props.focusOffset = input.options.focusOffset ?? this.props.focusOffset;
   }
 
   get cursor(): Date {
@@ -43,45 +35,45 @@ export abstract class BasePicker<TItem extends BaseItem> {
   }
 
   get min(): Date | undefined {
-    return this._min;
+    return this.props.min;
   }
 
   set min(min: Date | undefined | null) {
     if (min === null) min = undefined;
-    this._min = min;
+    this.props.min = min;
     this.updateItems();
   }
 
   get max(): Date | undefined {
-    return this._max;
+    return this.props.max;
   }
 
   set max(max: Date | undefined | null) {
     if (max === null) max = undefined;
-    this._max = max;
+    this.props.max = max;
     this.updateItems();
   }
 
   get locale(): Locale {
-    return this._locale;
+    return this.props.locale;
   }
 
   set locale(locale: Locale) {
-    this._locale = locale;
+    this.props.locale = locale;
     this.updateItems();
   }
 
   get selected(): Date | undefined {
-    return this._selected;
+    return this.props.selected;
   }
 
   set selected(selected: Date | undefined | null) {
     if (selected === null) selected = undefined;
-    this._selected = selected;
+    this.props.selected = selected;
 
     // Selected items MUST be on the page
     // This updates the whole page if needed
-    if (this._selected) {
+    if (this.props.selected) {
       this._cursor = cloneDate(selected as Date);
     }
 
@@ -90,16 +82,16 @@ export abstract class BasePicker<TItem extends BaseItem> {
   }
 
   get focused(): Date | undefined {
-    return this._focused;
+    return this.props.focused;
   }
 
   set focused(focused: Date | undefined | null) {
     if (focused === null) focused = undefined;
-    this._focused = focused;
+    this.props.focused = focused;
 
     // Focused items MUST be on the page
     // This updates the whole page if needed
-    if (this._focused) {
+    if (this.props.focused) {
       this._cursor = cloneDate(focused as Date);
     }
 
@@ -108,11 +100,11 @@ export abstract class BasePicker<TItem extends BaseItem> {
   }
 
   get focusOffset(): number {
-    return this._focusOffset;
+    return this.props.focusOffset;
   }
 
   set focusOffset(focusOffset: number) {
-    this._focusOffset = focusOffset;
+    this.props.focusOffset = focusOffset;
   }
 
   get items(): TItem[] | undefined {
@@ -140,7 +132,7 @@ export abstract class BasePicker<TItem extends BaseItem> {
 
   onSelectedChange(handler: PickerEventHandler<Date | undefined>, immediate = false): void {
     this.handlers.selectedChange = handler;
-    if (immediate) handler(this._selected);
+    if (immediate) handler(this.props.selected);
   }
 
   clearSelectedChangeEventListener(): void {
@@ -149,7 +141,7 @@ export abstract class BasePicker<TItem extends BaseItem> {
 
   onFocusedChange(handler: PickerEventHandler<Date | undefined>, immediate = false): void {
     this.handlers.focusedChange = handler;
-    if (immediate) handler(this._focused);
+    if (immediate) handler(this.props.focused);
   }
 
   clearFocusedChangeEventListener(): void {
@@ -162,10 +154,10 @@ export abstract class BasePicker<TItem extends BaseItem> {
   }
 
   focusItemByOffset(_offset: number): void {
-    const offset = _offset ?? this._focusOffset;
+    const offset = _offset ?? this.props.focusOffset;
     this.updateAfter(() => {
       this.initFocusedIfNeeded();
-      this.focused = addTimeInterval(this.focused!, offset, this._interval);
+      this.focused = addTimeInterval(this.focused!, offset, this.props.interval);
     });
   }
 
@@ -191,12 +183,12 @@ export abstract class BasePicker<TItem extends BaseItem> {
   }
 
   focusPreviousItemByOffset(_offset?: number): void {
-    const offset = _offset ?? this._focusOffset;
+    const offset = _offset ?? this.props.focusOffset;
     this.focusItemByOffset(-1 * offset);
   }
 
   focusNextItemByOffset(_offset?: number): void {
-    this.focusItemByOffset(_offset ?? this._focusOffset);
+    this.focusItemByOffset(_offset ?? this.props.focusOffset);
   }
 
   focusFirstItemOfPage(): void {
@@ -209,16 +201,16 @@ export abstract class BasePicker<TItem extends BaseItem> {
 
   private initFocusedIfNeeded(): void {
 
-    if (this._focused) {
+    if (this.props.focused) {
       return;
     }
 
-    if (this._selected) {
-      this._focused = cloneDate(this._selected);
+    if (this.props.selected) {
+      this.props.focused = cloneDate(this.props.selected);
       return;
     }
 
-    this._focused = cloneDate(this._cursor);
+    this.props.focused = cloneDate(this._cursor);
   }
 
   // Overridden by child class
@@ -227,6 +219,6 @@ export abstract class BasePicker<TItem extends BaseItem> {
   }
 
   protected toComparable(d?: Date | null): number | null {
-    return d ? comparableDate(d, this._interval) : null;
+    return d ? comparableDate(d, this.props.interval) : null;
   }
 }

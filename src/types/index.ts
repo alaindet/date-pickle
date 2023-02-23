@@ -6,3 +6,4 @@ export * from './options';
 export * from './parsed-picker-input';
 export * from './time-interval';
 export * from './year-picker';
+export * from './properties';

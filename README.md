@@ -146,8 +146,51 @@ const dp5 = new DatePicker({ cursor, min, max });
 - Properties can be set explicitly, like `dp.selected = new Date()`, or upon the picker's creation as options, like `const dp = DatePicker({ selected: new Date() })`
 - The `focused` and the `selected` properties also move the cursor when you set them, since a "focused" or "selected" item on an invisible page makes no sense
 
+## Focus management
+Let's say you build a simple calendar with rows of days representing weeks as usual. There's already a focused element, you press Arrow Up and you want the day "on top" to focus, or maybe you press Home and want the first day of the month to focus, how to do that?
+
+Date Pickle helps you by exposing some methods to move focus in a predictable way. For example
+
+```ts
+const d = new Date('2023-02-23');
+const dp = new DatePicker({ cursor: d, focused: d });
+dp.focusOffset = 7; // Already set to 7 by default
+dp.focusPreviousItemByOffset(); // Moves focus to a week earlier (Arrow Up)
+dp.focusNextItemByOffset(); // Moves focus to a week later (Arrow Down)
+dp.focusFirstItemOfPage(); // Moves focus to first day of month (Home)
+dp.focusLastItemOfPage(); // Moves focus to last day of month (End)
+dp.focusNextItem(); // Moves focus to the next day (Arrow Right)
+dp.focusPreviousItem(); // Moves focus to the previous day (Arrow Left)
+dp.focusItemByIndex(12); // Moves focus to an arbitrary item index on a page
+dp.focusItemByOffset(12); // Moves focus to an arbitrary number of time intervals
+
+dp.focusNextItemByOffset(3);
+// Equivalent to `dp.focusItemByOffset(3)`, does not affect `focusOffset`
+
+dp.focusPreviousItemByOffset(10);
+// Equivalent to `dp.focusItemByOffset(-10)`, does not affect `focusOffset`
+```
+
+- Moving focus to another page also moves the cursor (and all items) to that page
+- The `focusOffset` represents the number of "time intervals" the focused date must jump, e.g. "day" for `DatePicker`, "month" for `MonthPicker`, "year" for `YearPicker`
+- There can be only up to ONE focused item on the page, or no one focused
+- Date Pickle does not handle HTML, so tabIndex attributes and keyboard event capturing are the user's responsibility
+- `focusItemByOffset()` accepts negative integers as well to go back in time
+
 ## Public API
+
+### Pickers
+#### `DatePicker`
 TODO
 
-## Examples
+#### `MonthPicker`
+TODO
+
+#### `YearPicker`
+TODO
+
+### Types
+TODO
+
+### Utilities
 TODO

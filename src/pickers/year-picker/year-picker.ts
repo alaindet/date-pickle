@@ -6,24 +6,25 @@ const YEARS_COUNT = 10;
 
 export class YearPicker extends BasePicker<YearItem> {
 
-  private _startWith: YearPickerStartWith = YEAR_PICKER_START_WITH.FIRST_OF_DECADE;
+  // TODO: Group into picker-specific props
+  private startWithProp: YearPickerStartWith = YEAR_PICKER_START_WITH.FIRST_OF_DECADE;
 
   get startWith(): YearPickerStartWith {
-    return this._startWith;
+    return this.startWithProp;
   }
 
   set startWith(startWith: YearPickerStartWith) {
     if (!Object.values(YEAR_PICKER_START_WITH).includes(startWith)) {
       throw new Error('invalid value for startWith property');
     }
-    this._startWith = startWith;
+    this.startWithProp = startWith;
     this.updateItems();
   }
 
   constructor(cursor?: Date | PickerOptions, options?: PickerOptions) {
     super(cursor, options);
-    this._focusOffset = 3;
-    this._interval = TIME_INTERVAL.YEAR;
+    this.props.focusOffset = 3;
+    this.props.interval = TIME_INTERVAL.YEAR;
     this.updateItems();
   }
 
@@ -45,7 +46,7 @@ export class YearPicker extends BasePicker<YearItem> {
     const last = first + YEARS_COUNT; // 2030
     const yearsRange = range(first, last);
 
-    switch (this._startWith) {
+    switch (this.startWithProp) {
       case YEAR_PICKER_START_WITH.FIRST_OF_DECADE:
       case YEAR_PICKER_START_WITH.X0:
         return [...yearsRange, last + 1];
@@ -64,10 +65,10 @@ export class YearPicker extends BasePicker<YearItem> {
 
     // Init comparable values
     const nowComp = this.toComparable(new Date());
-    const minComp = this.toComparable(this?.min);
-    const maxComp = this.toComparable(this?.max);
-    const selectedComp = this.toComparable(this?.selected);
-    const focusedComp = this.toComparable(this?.focused);
+    const minComp = this.toComparable(this.props?.min);
+    const maxComp = this.toComparable(this.props?.max);
+    const selectedComp = this.toComparable(this.props?.selected);
+    const focusedComp = this.toComparable(this.props?.focused);
 
     return this.getYearsRange().map(year => {
       d.setUTCFullYear(year);

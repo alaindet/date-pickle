@@ -6,8 +6,8 @@ export class DatePicker extends BasePicker<DayItem> {
 
   constructor(ref?: Date | PickerOptions, options?: PickerOptions) {
     super(ref, options);
-    this._focusOffset = 7; // Jumps one week by default
-    this._interval = TIME_INTERVAL.DAY;
+    this.props.focusOffset = 7; // Jumps one week by default
+    this.props.interval = TIME_INTERVAL.DAY;
     this.updateItems();
   }
 
@@ -88,8 +88,8 @@ export class DatePicker extends BasePicker<DayItem> {
     const SUNDAY = 0;
     const SATURDAY = 6;
     const nowComp = this.toComparable(new Date());
-    const selectedComp = this.toComparable(this?.selected);
-    const focusedComp = this.toComparable(this?.focused);
+    const selectedComp = this.toComparable(this.props?.selected);
+    const focusedComp = this.toComparable(this.props?.focused);
 
     return dates.map(d => {
       const itemComp = this.toComparable(d)!;
@@ -128,15 +128,15 @@ export class DatePicker extends BasePicker<DayItem> {
     let sup = this.getLastDayOfCurrentMonth();
 
     // Restrict range from bottom?
-    if (this._min) {
+    if (this.props.min) {
       const minComp = this.toComparable(this.min)!;
-      inf = minComp > this.toComparable(inf)! ? this._min! : inf;
+      inf = minComp > this.toComparable(inf)! ? this.props.min! : inf;
     }
 
     // Restrict range from top?
-    if (this._max) {
-      const maxComp = this.toComparable(this._max)!;
-      sup = maxComp < this.toComparable(sup)! ? this._max! : sup;
+    if (this.props.max) {
+      const maxComp = this.toComparable(this.props.max)!;
+      sup = maxComp < this.toComparable(sup)! ? this.props.max! : sup;
     }
 
     return [inf, sup];

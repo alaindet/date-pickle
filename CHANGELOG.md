@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Add `findLastIndex()` utility function
 - Add `getUniqueDayId` utility function
 - Add `startWith` property to `YearPicker`
+- Add methods to de-register from pickers' events
 
 ### Changed
 - Use `getUniqueDayId` to guarantee uniqueness for any item of any picker
@@ -26,6 +27,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Removed
 - `/jest.config.js`
 - Remove `DatePickle` parent class
+- `sync` property, now everything is immediately sync'ed by default, unless you're updating props in a `Picker.updateAfter()` callback
+- `ref` property, replaced by `cursor`
 
 ### Fixed
 - `MonthPicker` wrong hard-coded year used for building items

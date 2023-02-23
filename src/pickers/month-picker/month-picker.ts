@@ -9,8 +9,8 @@ export class MonthPicker extends BasePicker<MonthItem> {
 
   constructor(ref?: Date | PickerOptions, options?: PickerOptions) {
     super(ref, options);
-    this._focusOffset = 3; // Jumps one season by default
-    this._interval = TIME_INTERVAL.MONTH;
+    this.props.focusOffset = 3;  // Jumps one season by default
+    this.props.interval = TIME_INTERVAL.MONTH;
     this.updateItems();
   }
 
@@ -35,10 +35,10 @@ export class MonthPicker extends BasePicker<MonthItem> {
 
     // Init comparable values
     const nowComp = this.toComparable(new Date());
-    const minComp = this.toComparable(this?.min);
-    const maxComp = this.toComparable(this?.max);
-    const selectedComp = this.toComparable(this?.selected);
-    const focusedComp = this.toComparable(this?.focused);
+    const minComp = this.toComparable(this.props?.min);
+    const maxComp = this.toComparable(this.props?.max);
+    const selectedComp = this.toComparable(this.props?.selected);
+    const focusedComp = this.toComparable(this.props?.focused);
 
     return range(FIRST_MONTH_INDEX, LAST_MONTH_INDEX).map(monthIndex => {
       d.setUTCMonth(monthIndex);
@@ -46,7 +46,7 @@ export class MonthPicker extends BasePicker<MonthItem> {
       const itemComp = this.toComparable(d)!;
 
       const label = d
-        .toLocaleString(this._locale, { month: 'long' })
+        .toLocaleString(this.props.locale, { month: 'long' })
         .toLocaleLowerCase();
 
       let isDisabled = false;
