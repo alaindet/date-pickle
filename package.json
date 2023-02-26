@@ -6,6 +6,7 @@
   "type": "module",
   "types": "dist/index.d.ts",
   "repository": "https://github.com/alaindet/date-pickle",
+  "homepage": "https://github.com/alaindet/date-pickle",
   "scripts": {
     "start": "npx nodemon",
     "build": "rimraf ./dist && tsc -p tsconfig.build.json",
@@ -27,7 +28,7 @@
     "calendar",
     "time"
   ],
-  "author": "Alain D'Ettorre <alain.det@gmail.com>",
+  "author": "Alain D'Ettorre <alain.det@gmail.com> (https://github.com/alaindet)",
   "license": "MIT",
   "devDependencies": {
     "@types/jest": "^28.1.8",
