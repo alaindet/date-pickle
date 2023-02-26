@@ -43,8 +43,8 @@ export abstract class BasePicker<TItem extends BaseItem> {
     return this._cursor;
   }
 
-  set cursor(cursor: Date | null) {
-    this._cursor = cursor ?? new Date();
+  set cursor(cursor: Date) {
+    this._cursor = cursor;
     this.updateItems();
   }
 
