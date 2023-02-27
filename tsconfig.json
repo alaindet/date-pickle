@@ -16,7 +16,10 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "ES2017",
-    "types": ["node", "jest"]
+    "types": ["node", "jest"],
+    "paths": {
+      "@/*": ["*"]
+    }
   },
   "compileOnSave": true,
   "include": ["src"],
