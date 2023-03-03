@@ -209,9 +209,6 @@ export abstract class BasePicker<TItem extends BaseItem> {
     if (index === undefined || index < 0 || index > this._items.length - 1) {
       throw new Error('invalid index');
     }
-    if (index === -1) {
-      throw new Error('no valid items');
-    }
     this.updateAfter(() => {
       this.initFocusedIfNeeded();
       this.focused = cloneDate(this._items[index].date);
