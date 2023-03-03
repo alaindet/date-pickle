@@ -16,15 +16,22 @@ import {
 } from '../types';
 
 export abstract class BasePicker<TItem extends BaseItem> {
-  protected handlers: PickerEventHadlers<TItem> = {};
+  // State
+  protected _cursor!: Date;
+  protected _items: TItem[] = [];
+  protected _title = '';
+  protected _weekdays: string[] = []; // Date Picker-specific
+
+  // Properties
   protected props: PickerProperties = {
     locale: 'default',
     focusOffset: 7, // Overridden by child
     interval: TIME_INTERVAL.DAY, // Overridden by child
+    weekdaysLength: 2,
   };
 
-  protected _cursor!: Date;
-  protected _items: TItem[] = [];
+  // Event handlers
+  protected handlers: PickerEventHadlers<TItem> = {};
 
   constructor(cursorOrOptions?: Date | PickerOptions, options?: PickerOptions) {
     const input = parsePickerInput(cursorOrOptions, options);
@@ -43,9 +50,9 @@ export abstract class BasePicker<TItem extends BaseItem> {
     return this._cursor;
   }
 
-  set cursor(cursor: Date | null) {
+  set cursor(cursor: Date) {
     this._cursor = cursor ?? new Date();
-    this.updateItems();
+    this.updateState();
   }
 
   get min(): Date | undefined {
@@ -55,7 +62,7 @@ export abstract class BasePicker<TItem extends BaseItem> {
   set min(min: Date | undefined | null) {
     if (min === null) min = undefined;
     this.props.min = min;
-    this.updateItems();
+    this.updateState();
   }
 
   get max(): Date | undefined {
@@ -65,7 +72,7 @@ export abstract class BasePicker<TItem extends BaseItem> {
   set max(max: Date | undefined | null) {
     if (max === null) max = undefined;
     this.props.max = max;
-    this.updateItems();
+    this.updateState();
   }
 
   get locale(): Locale {
@@ -74,7 +81,7 @@ export abstract class BasePicker<TItem extends BaseItem> {
 
   set locale(locale: Locale) {
     this.props.locale = locale;
-    this.updateItems();
+    this.updateState();
   }
 
   get selected(): Date | undefined {
@@ -91,7 +98,7 @@ export abstract class BasePicker<TItem extends BaseItem> {
       this._cursor = cloneDate(selected as Date);
     }
 
-    this.updateItems();
+    this.updateState();
     if (this.handlers.selectedChange) this.handlers.selectedChange(selected);
   }
 
@@ -109,7 +116,7 @@ export abstract class BasePicker<TItem extends BaseItem> {
       this._cursor = cloneDate(focused as Date);
     }
 
-    this.updateItems();
+    this.updateState();
     if (this.handlers.focusedChange) this.handlers.focusedChange(focused);
   }
 
@@ -121,14 +128,23 @@ export abstract class BasePicker<TItem extends BaseItem> {
     this.props.focusOffset = focusOffset;
   }
 
+  // Date Picker-specific
+  set weekdaysLength(weekdaysLength: number) {
+    this.props.weekdaysLength = Math.max(1, weekdaysLength);
+  }
+
+  // Date Picker-specific
+  get weekdaysLength(): number {
+    return this.props.weekdaysLength;
+  }
+
   get items(): TItem[] {
     return this._items ?? [];
   }
 
   updateAfter(fn: () => void): void {
     fn();
-    this._items = this.buildItems();
-    if (this.handlers.itemsChange) this.handlers.itemsChange(this._items ?? []);
+    this.updateState();
   }
 
   now(): void {
@@ -142,6 +158,15 @@ export abstract class BasePicker<TItem extends BaseItem> {
 
   clearItemsChangeEventListener(): void {
     delete this.handlers.itemsChange;
+  }
+
+  onTitleChange(handler: PickerEventHandler<string>, immediate = false): void {
+    this.handlers.titleChange = handler;
+    if (immediate) handler(this._title);
+  }
+
+  clearTitleChangeEventListener(): void {
+    delete this.handlers.titleChange;
   }
 
   onSelectedChange(
@@ -166,11 +191,6 @@ export abstract class BasePicker<TItem extends BaseItem> {
 
   clearFocusedChangeEventListener(): void {
     delete this.handlers.focusedChange;
-  }
-
-  protected updateItems(): void {
-    this._items = this.buildItems();
-    if (this.handlers.itemsChange) this.handlers.itemsChange(this._items ?? []);
   }
 
   focusItemByOffset(_offset: number): void {
@@ -223,6 +243,59 @@ export abstract class BasePicker<TItem extends BaseItem> {
     this.focusItemByIndex(findLastIndex(this._items, item => !item.isDisabled));
   }
 
+  // Overridden by child class
+  next(): void {
+    // Go to next page
+  }
+
+  // Overridden by child class
+  prev(): void {
+    // Go to next page
+  }
+
+  protected updateState(): void {
+    this._items = this.buildItems();
+    if (this.handlers.itemsChange) {
+      this.handlers.itemsChange(this._items ?? []);
+    }
+
+    const title = this.buildTitle();
+    if (title && this._title !== title) {
+      this._title = title;
+      if (this.handlers.titleChange) {
+        this.handlers.titleChange(this._title);
+      }
+    }
+
+    const weekdays = this.buildWeekdays();
+    if (weekdays.length && this._weekdays[0] !== weekdays[0]) {
+      this._weekdays = weekdays;
+      if (this.handlers.weekdaysChange) {
+        this.handlers.weekdaysChange(this._weekdays);
+      }
+    }
+  }
+
+  // Overridden by child class
+  protected buildItems(): TItem[] {
+    return [];
+  }
+
+  // Overridden by child class
+  protected buildTitle(): string {
+    return '';
+  }
+
+  // Overridden by child class
+  // Date Picker-specific
+  protected buildWeekdays(): string[] {
+    return [];
+  }
+
+  protected toComparable(d?: Date | null): number | null {
+    return d ? comparableDate(d, this.props.interval) : null;
+  }
+
   private initFocusedIfNeeded(): void {
     if (this.props.focused) {
       return;
@@ -234,24 +307,5 @@ export abstract class BasePicker<TItem extends BaseItem> {
     }
 
     this.props.focused = cloneDate(this._cursor);
-  }
-
-  // Overridden by child class
-  next(): void {
-    // Go to next page
-  }
-
-  // Overridden by child class
-  prev(): void {
-    // Go to next page
-  }
-
-  // Overridden by child class
-  protected buildItems(): TItem[] {
-    return [];
-  }
-
-  protected toComparable(d?: Date | null): number | null {
-    return d ? comparableDate(d, this.props.interval) : null;
   }
 }

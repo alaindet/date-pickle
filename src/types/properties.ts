@@ -9,4 +9,7 @@ export type PickerProperties = {
   focused?: Date;
   focusOffset: number;
   interval: TimeInterval;
+
+  // Date Picker-specific
+  weekdaysLength: number;
 };

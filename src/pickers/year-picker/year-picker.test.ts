@@ -51,6 +51,13 @@ describe('YearPicker', () => {
     expect(result.length).not.toEqual(0);
   });
 
+  it('should trigger onTitleChange', () => {
+    const picker = new YearPicker(new Date('2023-03-03'));
+    let result!: string;
+    picker.onTitleChange(title => (result = title), true);
+    expect(result).toEqual('2020-2030');
+  });
+
   it('should trigger onSelectedChange', () => {
     const d = new Date('2022-09-05');
     const picker = new YearPicker({ selected: d });

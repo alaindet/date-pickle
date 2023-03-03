@@ -68,6 +68,13 @@ describe('MonthPicker', () => {
     expect(items.length).not.toEqual(0);
   });
 
+  it('should trigger onTitleChange', () => {
+    const picker = new MonthPicker(new Date('2023-03-03'));
+    let result!: string;
+    picker.onTitleChange(title => (result = title), true);
+    expect(result).toEqual('2023');
+  });
+
   it('should trigger onSelectedChange', () => {
     const d = new Date('2022-09-05');
     const picker = new MonthPicker({ selected: d });

@@ -62,6 +62,17 @@ describe('Picker', () => {
       expect(counter).toEqual(2);
     });
 
+    it('should register/unregister an event handler for titleChange event', async () => {
+      const picker = new DatePicker();
+      let counter = 0;
+      const immediate = true;
+      picker.onTitleChange(() => counter++, immediate);
+      picker.next();
+      picker.clearTitleChangeEventListener();
+      picker.next();
+      expect(counter).toEqual(2);
+    });
+
     it('should register/unregister an event handler for selectedChange event', async () => {
       const picker = new MonthPicker();
       let counter = 0;

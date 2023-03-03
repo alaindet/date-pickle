@@ -8,4 +8,7 @@ export type PickerOptions = {
   selected?: Date | null;
   focused?: Date | null;
   focusOffset?: number;
+
+  // Date Picker-specific
+  weekdaysLength?: number;
 };

@@ -14,14 +14,14 @@ export function comparableDate(
   }
 
   switch (interval) {
-    case TIME_INTERVAL.DAY:
-      return getUniqueDayId(date);
-    case TIME_INTERVAL.MONTH:
-      return getUniqueMonthId(date);
-    case TIME_INTERVAL.YEAR:
-      return getUniqueYearId(date);
-    default:
-      throw new Error('invalid time interval ' + interval);
+  case TIME_INTERVAL.DAY:
+    return getUniqueDayId(date);
+  case TIME_INTERVAL.MONTH:
+    return getUniqueMonthId(date);
+  case TIME_INTERVAL.YEAR:
+    return getUniqueYearId(date);
+  default:
+    throw new Error('invalid time interval ' + interval);
   }
 }
 

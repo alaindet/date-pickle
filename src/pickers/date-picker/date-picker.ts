@@ -1,5 +1,5 @@
-import { cloneDate, getUniqueDayId } from '../../utils';
-import { DayItem, PickerOptions, TIME_INTERVAL } from '../../types';
+import { capitalize, cloneDate, getUniqueDayId } from '../../utils';
+import { DayItem, PickerEventHandler, PickerOptions, TIME_INTERVAL } from '../../types';
 import { BasePicker } from '../base-picker';
 
 export class DatePicker extends BasePicker<DayItem> {
@@ -7,7 +7,7 @@ export class DatePicker extends BasePicker<DayItem> {
     super(cursor, options);
     this.props.focusOffset = 7; // Jumps one week by default
     this.props.interval = TIME_INTERVAL.DAY;
-    this.updateItems();
+    this.updateState();
   }
 
   next(): void {
@@ -24,11 +24,41 @@ export class DatePicker extends BasePicker<DayItem> {
     this.cursor = cursor;
   }
 
+  onWeekdaysChange(
+    handler: PickerEventHandler<string[]>,
+    immediate = false
+  ): void {
+    this.handlers.weekdaysChange = handler;
+    if (immediate) handler(this._weekdays);
+  }
+
+  clearWeekdaysChangeEventListener(): void {
+    delete this.handlers.weekdaysChange;
+  }
+
   protected buildItems(): DayItem[] {
     const days = this.getDaysInCurrentMonth();
     days.unshift(...this.getDaysInPreviousMonth());
     days.push(...this.getDaysInNextMonth());
     return this.toCalendarDays(days);
+  }
+
+  // Ex.: "March 2023"
+  protected buildTitle(): string {
+    const date = this._items[15].date;
+    const year = date.getFullYear();
+    let month = date.toLocaleString(this.props.locale, { month: 'long' });
+    month = capitalize(month);
+    return `${month} ${year}`;
+  }
+
+  // Ex.: ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
+  protected buildWeekdays(): string[] {
+    return this._items.slice(0, 7).map(item => {
+      let weekday = item.date.toLocaleString(this.props.locale, { weekday: 'long' });
+      weekday = capitalize(weekday);
+      return weekday.slice(0, this.props.weekdaysLength);
+    });
   }
 
   private getDaysInCurrentMonth(): Date[] {

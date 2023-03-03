@@ -24,14 +24,14 @@ export class YearPicker extends BasePicker<YearItem> {
       throw new Error('invalid value for startWith property');
     }
     this.startWithProp = startWith;
-    this.updateItems();
+    this.updateState();
   }
 
   constructor(cursor?: Date | PickerOptions, options?: PickerOptions) {
     super(cursor, options);
     this.props.focusOffset = 3;
     this.props.interval = TIME_INTERVAL.YEAR;
-    this.updateItems();
+    this.updateState();
   }
 
   next(): void {
@@ -53,12 +53,12 @@ export class YearPicker extends BasePicker<YearItem> {
     const yearsRange = range(first, last);
 
     switch (this.startWithProp) {
-      case YEAR_PICKER_START_WITH.FIRST_OF_DECADE:
-      case YEAR_PICKER_START_WITH.X0:
-        return [...yearsRange, last + 1];
-      case YEAR_PICKER_START_WITH.LAST_OF_PREVIOUS_DECADE:
-      case YEAR_PICKER_START_WITH.X9:
-        return [first - 1, ...yearsRange];
+    case YEAR_PICKER_START_WITH.FIRST_OF_DECADE:
+    case YEAR_PICKER_START_WITH.X0:
+      return [...yearsRange, last + 1];
+    case YEAR_PICKER_START_WITH.LAST_OF_PREVIOUS_DECADE:
+    case YEAR_PICKER_START_WITH.X9:
+      return [first - 1, ...yearsRange];
     }
   }
 
@@ -93,5 +93,13 @@ export class YearPicker extends BasePicker<YearItem> {
         isFocused: itemComp === focusedComp,
       };
     });
+  }
+
+  // Ex.: "2020-2030"
+  protected buildTitle(): string {
+    const year = this._cursor.getUTCFullYear(); // 2023
+    const first = Math.floor(year / YEARS_COUNT) * YEARS_COUNT; // 2020
+    const last = first + YEARS_COUNT; // 2030
+    return `${first}-${last}`;
   }
 }

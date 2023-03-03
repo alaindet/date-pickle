@@ -10,7 +10,7 @@ export class MonthPicker extends BasePicker<MonthItem> {
     super(cursor, options);
     this.props.focusOffset = 3; // Jumps one season by default
     this.props.interval = TIME_INTERVAL.MONTH;
-    this.updateItems();
+    this.updateState();
   }
 
   next(): void {
@@ -61,5 +61,13 @@ export class MonthPicker extends BasePicker<MonthItem> {
         isFocused: itemComp === focusedComp,
       };
     });
+  }
+
+  // Ex.: "2023"
+  protected buildTitle(): string {
+    const someMonthInTheYear = Math.floor(this._items.length / 2);
+    const d = this._items[someMonthInTheYear].date;
+    const year = d.getFullYear();
+    return `${year}`;
   }
 }

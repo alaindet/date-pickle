@@ -90,6 +90,21 @@ describe('DatePicker', () => {
     expect(result.length).not.toEqual(0);
   });
 
+  it('should trigger onTitleChange', () => {
+    const picker = new DatePicker(new Date('2023-03-03'), { locale: 'en' });
+    let result!: string;
+    picker.onTitleChange(title => (result = title), true);
+    expect(result).toEqual('March 2023');
+  });
+
+  it('should trigger onWeekdaysChange', () => {
+    const options = { locale: 'en', weekdaysLength: 2 };
+    const picker = new DatePicker(new Date('2023-03-03'), options);
+    let result!: string[];
+    picker.onWeekdaysChange(weekdays => (result = weekdays), true);
+    expect(result).toEqual(['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su']);
+  });
+
   it('should trigger onSelectedChange', () => {
     const d = new Date('2022-09-05');
     const picker = new DatePicker({ selected: d });

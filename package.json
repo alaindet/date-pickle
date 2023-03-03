@@ -6,6 +6,17 @@
   "type": "module",
   "types": "dist/index.d.ts",
   "repository": "https://github.com/alaindet/date-pickle",
+  "homepage": "https://github.com/alaindet/date-pickle",
+  "bugs": "https://github.com/alaindet/date-pickle/issues",
+  "keywords": [
+    "date-pickle",
+    "typescript",
+    "javascript",
+    "calendar",
+    "time"
+  ],
+  "author": "Alain D'Ettorre <alain.det@gmail.com>",
+  "license": "MIT",
   "scripts": {
     "start": "npx nodemon",
     "build": "rimraf ./dist && tsc -p tsconfig.build.json",
@@ -20,15 +31,6 @@
     "postversion": "git push && git push --tags",
     "prepublishOnly": "npm test && npm run lint"
   },
-  "keywords": [
-    "date-pickle",
-    "typescript",
-    "javascript",
-    "calendar",
-    "time"
-  ],
-  "author": "Alain D'Ettorre <alain.det@gmail.com>",
-  "license": "MIT",
   "devDependencies": {
     "@types/jest": "^28.1.8",
     "@types/node": "^18.7.14",

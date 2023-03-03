@@ -37,12 +37,22 @@ abstract class BasePicker<TItem extends BaseItem> {
   get focusOffset(): number;
   set focusOffset(focusOffset: number);
 
+  // Date Picker-specific
+  get weekdaysLength(): number;
+  set weekdaysLength(weekdaysLength: number);
+
   // Events
   onItemsChange(
     handler: PickerEventHandler<TItem[]>,
     immediate?: boolean,
   ): void;
   clearItemsChangeEventListener(): void;
+
+  onTitleChange(
+    handler: PickerEventHandler<string>,
+    immediate?: boolean,
+  ): void;
+  clearTitleChangeEventListener(): void;
 
   onSelectedChange(
     handler: PickerEventHandler<Date | undefined>,
@@ -55,6 +65,13 @@ abstract class BasePicker<TItem extends BaseItem> {
     immediate?: boolean,
   ): void;
   clearFocusedChangeEventListener(): void;
+
+  // Date Picker-specific
+  onWeekdaysChange(
+    handler: PickerEventHandler<string[]>,
+    immediate?: boolean,
+  ): void;
+  clearWeekdaysChangeEventListener(): void;
 
   // Core
   now(): void;

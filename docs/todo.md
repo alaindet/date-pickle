@@ -4,6 +4,7 @@
 - [ ] update tsconfig.json target, module and lib
 - [ ] update version to 0.0.14 via `npm version 0.0.14`
 - [ ] Document the startWith from YearPicker
+- [ ] Move Date Picker-specific features inside `DatePicker` class
 
 - [x] update readme.md
 - [x] add public API to README.md
